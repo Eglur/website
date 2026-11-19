@@ -142,10 +142,38 @@ footer small{font-size:13px;color:var(--muted);font-family:var(--mono);letter-sp
 .flow p{margin:0;font-size:16px;color:var(--ink-2)}
 .note{font-family:var(--mono);font-size:13px;color:var(--muted);margin-top:40px}
 @media (max-width:900px){.row,.flow{grid-template-columns:1fr}.row{gap:12px}.flow div+div{border-left:0;border-top:1px solid var(--hair)}.doc{padding:64px 0 88px}}
+
+/* header nav morph: section links <-> Home */
+.morph{position:relative;display:inline-flex;align-items:center;justify-content:flex-end;height:38px}
+.morph.anim{transition:width .6s cubic-bezier(.65,0,.35,1)}
+.morph .sect{display:flex;align-items:center;gap:28px;white-space:nowrap}
+.morph .sect a,.morph .home{transition:transform .55s cubic-bezier(.65,0,.35,1),opacity .4s ease}
+.morph.is-home .sect,.morph.is-sect .home{position:absolute;right:0;top:50%;margin-top:-12px;pointer-events:none}
+.morph.is-home .sect a{opacity:0;transform:translateX(56px)}
+.morph.is-home .sect a:nth-child(2){transition-delay:.05s}
+.morph.is-home .sect a:nth-child(1){transition-delay:.1s}
+.morph.is-sect .home{opacity:0;transform:translateX(-14px)}
+.morph.is-home .sect a{transition:transform .55s cubic-bezier(.65,0,.35,1),opacity .28s ease}
+.morph.is-home .home{transition-delay:.34s}
+.morph.is-sect .home{transition:transform .3s ease,opacity .22s ease}
+.morph.is-sect .sect a:nth-child(3){transition-delay:.14s}
+.morph.is-sect .sect a:nth-child(2){transition-delay:.19s}
+.morph.is-sect .sect a:nth-child(1){transition-delay:.24s}
+.morph.rest.is-home .sect,.morph.rest.is-sect .home{visibility:hidden}
+@keyframes navin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+@media (max-width:900px){
+  header nav{gap:20px}
+  .morph .sect{display:none}
+  .morph.is-sect{display:none}
+  .morph.is-home .home{position:static;margin:0}
+  .morph.enter .home{animation:navin .5s cubic-bezier(.65,0,.35,1) both}
+}
+@media (max-width:400px){header nav{gap:16px}header .btn{padding:0 12px}}
+@media (prefers-reduced-motion:reduce){.morph *,.morph{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<header><div class="wrap"><a href="/" aria-label="Eglur, home"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8">
+<header><div class="wrap"><a href="/" aria-label="Eglur, home" data-nav="to-home"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8">
 <path d="M38.556 32.33999999999999Q48.175999999999995 32.33999999999999 54.983999999999995 36.26199999999999Q61.791999999999994 40.184 65.41799999999999 46.91799999999999Q69.04399999999998 53.651999999999994 69.04399999999998 62.23599999999999Q69.04399999999998 63.86399999999999 68.89599999999999 65.566Q68.74799999999999 67.268 68.304 68.6H24.2Q24.348 84.58399999999999 29.898 91.61399999999999Q35.448 98.64399999999999 46.4 98.64399999999999Q53.8 98.64399999999999 58.38799999999999 96.27599999999998Q62.97599999999999 93.90799999999999 66.97200000000001 89.32L68.452 90.65199999999999Q63.864 98.79199999999999 56.242 103.38Q48.62 107.96799999999999 37.964 107.96799999999999Q27.456 107.96799999999999 19.316 103.454Q11.176 98.94 6.588 90.50399999999999Q2.0 82.06799999999998 2.0 70.37599999999999Q2.0 58.239999999999995 7.327999999999999 49.73Q12.655999999999999 41.22 21.018 36.779999999999994Q29.38 32.33999999999999 38.556 32.33999999999999ZM38.112 35.3Q33.82 35.3 30.786 37.88999999999999Q27.752 40.47999999999999 26.049999999999997 47.06599999999999Q24.348 53.651999999999994 24.2 65.63999999999999H49.507999999999996Q50.988 49.507999999999996 48.324 42.403999999999996Q45.66 35.3 38.112 35.3Z" fill="currentColor"/>
 <path d="M104.708 80.14399999999999Q94.49600000000001 80.14399999999999 87.39200000000001 76.74V81.77199999999999Q87.39200000000001 86.35999999999999 91.98 87.24799999999999L119.804 92.428Q126.76 93.75999999999999 132.38400000000001 95.90599999999999Q138.008 98.05199999999999 141.412 101.97399999999999Q144.816 105.89599999999999 144.816 112.704Q144.816 119.95599999999999 140.07999999999998 126.09799999999998Q135.344 132.23999999999998 126.094 136.01399999999998Q116.84400000000001 139.78799999999998 103.08000000000001 139.78799999999998Q91.24000000000001 139.78799999999998 84.284 137.346Q77.328 134.904 74.44200000000001 131.05599999999998Q71.55600000000001 127.20799999999998 71.55600000000001 122.916Q71.55600000000001 117.588 75.18200000000002 112.18599999999999Q78.808 106.78399999999999 84.13600000000001 103.52799999999999Q79.548 101.752 77.476 98.94Q75.40400000000001 96.12799999999999 75.40400000000001 92.87199999999999Q75.40400000000001 89.91199999999999 76.958 87.322Q78.512 84.732 80.73200000000001 82.06799999999998L85.61600000000001 75.85199999999999Q74.81200000000001 69.636 74.81200000000001 56.315999999999995Q74.81200000000001 45.66 82.43400000000001 38.99999999999999Q90.05600000000001 32.33999999999999 104.85600000000001 32.33999999999999Q112.404 32.33999999999999 118.102 34.11599999999999Q123.80000000000001 35.891999999999996 127.5 39.147999999999996Q132.236 38.40799999999999 136.454 36.70599999999999Q140.67200000000003 35.00399999999999 144.07600000000002 32.044L146.14800000000002 33.524V41.07199999999999H129.424Q134.752 46.99199999999999 134.752 56.315999999999995Q134.752 66.67599999999999 127.13000000000001 73.41Q119.50800000000001 80.14399999999999 104.708 80.14399999999999ZM104.56 77.184Q110.48 77.184 113.218 72.3Q115.956 67.416 115.956 56.019999999999996Q115.956 44.623999999999995 113.218 39.961999999999996Q110.48 35.3 104.85600000000001 35.3Q99.38000000000001 35.3 96.56800000000001 40.11Q93.756 44.919999999999995 93.756 56.315999999999995Q93.756 67.71199999999999 96.346 72.448Q98.936 77.184 104.56 77.184ZM82.50800000000001 118.17999999999999Q82.50800000000001 126.91199999999999 87.91000000000001 131.35199999999998Q93.31200000000001 135.79199999999997 105.004 135.79199999999997Q117.28800000000001 135.79199999999997 123.504 131.796Q129.72 127.79999999999998 129.72 120.54799999999999Q129.72 116.404 126.686 113.88799999999999Q123.65200000000002 111.37199999999999 116.4 110.03999999999999L89.61200000000001 105.008Q88.42800000000001 104.71199999999999 87.244 104.416Q85.17200000000001 107.37599999999999 83.84 111.14999999999999Q82.50800000000001 114.92399999999999 82.50800000000001 118.17999999999999Z" fill="currentColor"/>
 <path d="M147.476 105.74799999999999V104.26799999999999L149.252 103.67599999999999Q154.58 101.89999999999999 154.58 96.276V17.09599999999999Q154.58 14.135999999999996 153.39600000000002 12.581999999999994Q152.212 11.027999999999992 149.252 10.287999999999997L147.328 9.843999999999994V8.36399999999999L174.412 2.0L176.188 3.3319999999999936L175.596 24.051999999999992V74.66799999999999Q175.596 80.14399999999999 175.67000000000002 85.54599999999999Q175.744 90.948 175.744 96.276Q175.744 99.23599999999999 176.928 101.08599999999998Q178.112 102.93599999999999 180.924 103.82399999999998L182.848 104.26799999999999V105.74799999999999Z" fill="currentColor"/>
@@ -154,9 +182,10 @@ footer small{font-size:13px;color:var(--muted);font-family:var(--mono);letter-sp
 <path d="M335.42400000000004 107.96799999999999Q330.09600000000006 107.96799999999999 326.3960000000001 104.26799999999999Q322.696 100.56799999999998 322.696 95.38799999999999Q322.696 90.208 326.3960000000001 86.36Q330.09600000000006 82.512 335.42400000000004 82.512Q340.75200000000007 82.512 344.45200000000006 86.36Q348.15200000000004 90.208 348.15200000000004 95.38799999999999Q348.15200000000004 100.56799999999998 344.45200000000006 104.26799999999999Q340.75200000000007 107.96799999999999 335.42400000000004 107.96799999999999Z" class="dot"/>
 </svg>
 </a><nav aria-label="Main">
-      <a class="hide" href="/#mission">Mission</a>
-      <a class="hide" href="/#who">Who it's for</a>
-      <a class="hide" href="/#how">How it works</a>
+      <span class="morph rest is-home" data-page="data">
+        <span class="sect" aria-hidden="true"><a href="/#mission" tabindex="-1">Mission</a><a href="/#who" tabindex="-1">Who it's for</a><a href="/#how" tabindex="-1">How it works</a></span>
+        <a class="home" href="/" data-nav="to-home">Home</a>
+      </span>
       <a href="/data" aria-current="page" style="color:var(--ink);font-weight:600">Data</a>
       <a class="btn primary" href="mailto:toby@eglurtech.com?subject=Eglur">Talk to us</a>
     </nav></div></header>
@@ -198,5 +227,32 @@ footer small{font-size:13px;color:var(--muted);font-family:var(--mono);letter-sp
   </div>
 </footer>
 
+<script>
+(function(){
+  var KEY='eglur-nav',m=document.querySelector('.morph');if(!m)return;
+  var page=m.getAttribute('data-page'),from=null;
+  try{from=sessionStorage.getItem(KEY);sessionStorage.removeItem(KEY);}catch(e){}
+  document.querySelectorAll('[data-nav]').forEach(function(a){
+    a.addEventListener('click',function(){try{sessionStorage.setItem(KEY,a.getAttribute('data-nav'));}catch(e){}});
+  });
+  var arrived=(page==='data'&&from==='to-data')||(page==='home'&&from==='to-home');
+  if(!arrived||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  if(!matchMedia('(min-width: 901px)').matches){
+    if(page==='data'){m.classList.add('enter');}
+    return;
+  }
+  var sect=m.querySelector('.sect'),home=m.querySelector('.home');
+  var endState=page==='data'?'is-home':'is-sect',startState=page==='data'?'is-sect':'is-home';
+  m.classList.remove('rest',endState);m.classList.add(startState);
+  var wStart=(page==='data'?sect:home).offsetWidth,wEnd=(page==='data'?home:sect).offsetWidth;
+  m.style.width=wStart+'px';
+  m.offsetWidth;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    m.classList.add('anim');m.classList.remove(startState);m.classList.add(endState);
+    m.style.width=wEnd+'px';
+    setTimeout(function(){m.classList.remove('anim');m.classList.add('rest');m.style.width='';},800);
+  });});
+})();
+</script>
 </body>
 </html>
