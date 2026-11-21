@@ -1,21 +1,22 @@
-# Security Policy
+# Security policy
 
-## Supported Versions
+Eglur Technologies is building a secure workspace for the offices of elected representatives. If you think you've found a security issue in Eglur or in this website, we want to hear about it.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Report a vulnerability
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Email **[security@eglurtech.com](mailto:security@eglurtech.com)** with what you found, where, and how to reproduce it.
 
-## Reporting a Vulnerability
+- Give us reasonable time to fix it before sharing it.
+- Don't access, change or keep data that isn't yours.
 
-Use this section to tell people how to report a vulnerability.
+Good faith is protected: we won't take action against research that follows these rules.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+## Scope
+
+- This website, [www.eglurtech.com](https://www.eglurtech.com), and this repository.
+- The Eglur product is in development. It holds no real office data, and won't until it has passed an independent security review.
+
+## More
+
+- Machine-readable contact: [/.well-known/security.txt](https://www.eglurtech.com/.well-known/security.txt)
+- How Eglur handles data: [www.eglurtech.com/data](https://www.eglurtech.com/data)
