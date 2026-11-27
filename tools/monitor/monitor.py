@@ -693,7 +693,8 @@ def page(title: str, main: str, root: str) -> str:
 <footer class="site"><div class="wrap foot">
 <div class="fbrand">{wordmark()}<small>clarity for public servants</small></div>
 <p class="fine">Built from public data published by UK Parliament under the
-<a href="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/">Open Parliament Licence v3.0</a>.
+<a href="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/">Open Parliament Licence v3.0</a>
+and by the Senedd under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence</a>.
 Summaries are drafted by AI and can be wrong, so every item links to the official record.</p>
 <p class="fine">Eglur Technologies · In development · Eglur is Welsh for clear</p>
 </div></footer>
