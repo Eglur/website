@@ -1,17 +1,17 @@
 """One-off probe of devolved-parliament data sources (runs on GitHub Actions)."""
 import json, urllib.request, sys
 
+B = "https://data.niassembly.gov.uk/questions.asmx/"
 URLS = [
-    ("scot-questions", "https://data.parliament.scot/api/motionsquestionsanswersquestions?year=2026"),
-    ("scot-questions-noyear", "https://data.parliament.scot/api/motionsquestionsanswersquestions"),
-    ("scot-motions", "https://data.parliament.scot/api/motionsquestionsanswersmotions?year=2026"),
-    ("scot-members", "https://data.parliament.scot/api/members"),
-    ("ni-questions-json", "https://data.niassembly.gov.uk/questions_json.ashx?m=GetQuestionsForWrittenAnswer_ByDateRange&startDate=2026-11-20&endDate=2026-11-27"),
-    ("ni-questions-asmx", "https://data.niassembly.gov.uk/questions.asmx/GetQuestionsForWrittenAnswer_ByDateRange_JSON?startDate=2026-11-20&endDate=2026-11-27"),
-    ("ni-members", "https://data.niassembly.gov.uk/members_json.ashx?m=GetAllCurrentMembers"),
-    ("ni-site", "https://data.niassembly.gov.uk/"),
+    ("ni-tabled-1", B + "GetQuestionsForWrittenAnswer_TabledInRange_JSON?startDate=2026-11-20&endDate=2026-11-27"),
+    ("ni-tabled-2", B + "GetQuestionsForWrittenAnswer_TabledInRange_JSON?startDate=20/11/2026&endDate=27/11/2026"),
+    ("ni-answered", B + "GetQuestionsForWrittenAnswer_AnsweredInRange_JSON?startDate=2026-11-20&endDate=2026-11-27"),
+    ("ni-wsdl", "https://data.niassembly.gov.uk/questions.asmx?WSDL"),
+    ("postcodes-ni", "https://api.postcodes.io/postcodes/BT15GS"),
     ("postcodes-scot", "https://api.postcodes.io/postcodes/EH991SP"),
-    ("postcodes-ni", "https://api.postcodes.io/postcodes/BT48BS"),
+    ("scot-constits", "https://data.parliament.scot/api/constituencies"),
+    ("scot-mecs", "https://data.parliament.scot/api/memberelectionconstituencystatuses"),
+    ("scot-regions", "https://data.parliament.scot/api/regions"),
 ]
 
 for name, url in URLS:
@@ -21,16 +21,25 @@ for name, url in URLS:
             raw = r.read()
             print(f"=== {name} {r.status} {r.headers.get('Content-Type')} {len(raw)} bytes")
             txt = raw.decode("utf-8-sig", "replace")
+            if name == "ni-wsdl":
+                import re
+                i = txt.find('TabledInRange_JSON">')
+                print(txt[i-200:i+800]); continue
             try:
                 data = json.loads(txt)
                 if isinstance(data, list):
-                    print(f"list len={len(data)}; last item:")
-                    print(json.dumps(data[-1], indent=1)[:1500])
+                    print(f"list len={len(data)}; last items:")
+                    print(json.dumps(data[-2:], indent=1)[:1500])
+                elif name.startswith("postcodes"):
+                    res = data["result"]; print({k: v for k, v in res.items() if k != "codes"}); print(res.get("codes"))
                 else:
-                    print("keys:", list(data)[:20] if isinstance(data, dict) else type(data))
-                    print(json.dumps(data, indent=1)[:2000])
+                    print(json.dumps(data, indent=1)[:2500])
             except Exception:
-                print(txt[:2000])
+                print(txt[:1500])
     except Exception as e:
-        print(f"=== {name} FAILED {e}")
+        body = ""
+        if hasattr(e, "read"):
+            try: body = e.read().decode("utf-8", "replace")[:600]
+            except Exception: pass
+        print(f"=== {name} FAILED {e} {body}")
     sys.stdout.flush()
