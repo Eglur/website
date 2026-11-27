@@ -16,3 +16,7 @@ alter table public.waitlist enable row level security;
 drop policy if exists "website can add sign-ups" on public.waitlist;
 create policy "website can add sign-ups" on public.waitlist for insert to anon with check (true);
 -- No select, update or delete policies: the public key can't read or change anything.
+
+-- The project doesn't expose new tables automatically, so allow exactly one thing: the website adding a row.
+grant usage on schema public to anon;
+grant insert (email, area, topics, topics_other, places, people, frequency) on public.waitlist to anon;
