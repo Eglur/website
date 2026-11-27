@@ -2,14 +2,20 @@
 # This is an EXAMPLE profile. Replace it with the office you're testing for.
 
 [office]
-name = "Example office"
-# Plain-English description. The AI reads this to judge relevance and write "why it matters".
+name = "Paul Davies MS, Ceredigion Penfro (demo profile from public sources, not affiliated)"
+# Built from Paul Davies MS's public record (Senedd profile, his website and local press, November 2026).
 description = """
-A Welsh elected representative for a rural west Wales constituency (Pembrokeshire).
-Priorities: farming and agriculture, rural health services and GP access, ferries and
-ports (Fishguard, Pembroke Dock, Milford Haven), energy and the Celtic Sea, rural
-transport, and anything with a specific Welsh angle or Welsh Government interaction.
-Interested in how UK Government decisions affect Wales.
+Paul Davies MS, Welsh Conservative Member of the Senedd for Ceredigion Penfro (Ceredigion plus north
+Pembrokeshire, including Cardigan, Newport, St Dogmaels and Fishguard), first elected in 2007; constituency
+office in Haverfordwest. In the Welsh Conservative Senedd group he is Deputy Leader, Shadow Trefnydd, Chief Whip,
+and Shadow Minister for the Welsh Language, Culture, Tourism and Sport.
+Constituency priorities from his recent public campaigning: keeping services at Withybush (Haverfordwest) and
+Bronglais (Aberystwyth) hospitals and Hywel Dda health board decisions; sewage discharges and water and bathing
+water quality; bovine TB and farming; car parking charges and town-centre trade; bank branch closures in
+Haverfordwest and Aberystwyth; full fibre broadband in west Wales; the Withyhedge landfill site; hospices and
+palliative care; NHS dentistry; the visitor levy and tourism; young farmers and rural communities.
+Portfolio interests: Welsh language, culture, tourism and sport, and Senedd business management.
+Westminster items matter when they affect Wales, west Wales, farming, rural services or his portfolio.
 """
 
 [filter]
@@ -18,10 +24,20 @@ Interested in how UK Government decisions affect Wales.
 # End with * to match word beginnings: "farm*" matches farm, farmer, farming.
 # Leave empty to send everything (more cost, more noise).
 keywords = [
-  "Wales", "Welsh", "Cymru", "Senedd", "devol*",
-  "Pembrokeshire", "Milford Haven", "Fishguard", "Pembroke Dock", "Haverfordwest",
-  "farm*", "agricultur*", "livestock", "bovine TB", "rural", "crop*",
-  "GP", "port", "ferry", "ferries", "Celtic Sea", "floating offshore wind",
+  # place
+  "Wales", "Ceredigion", "Penfro", "Pembrokeshire", "Aberystwyth", "Cardigan", "Aberteifi", "Fishguard", "Abergwaun",
+  "Goodwick", "St Dogmaels", "Haverfordwest", "Hwlffordd", "Lampeter", "Aberaeron", "Llandysul", "Tregaron", "New Quay",
+  "west Wales", "Mid and West Wales",
+  # health
+  "Withybush", "Bronglais", "Hywel Dda", "hospice*", "palliative", "dentist*", "dental", "GP",
+  # environment, farming, rural
+  "sewage", "water quality", "bathing water", "Welsh Water", "Dŵr Cymru", "bovine TB", "farm*", "agricultur*",
+  "livestock", "young farmers", "rural", "Withyhedge", "landfill",
+  # economy and services
+  "car parking", "parking charge*", "bank branch*", "broadband", "full fibre", "visitor levy", "tourism", "town centre*",
+  "Fishguard port", "Stena", "Irish Sea",
+  # portfolio
+  "Welsh language", "Cymraeg", "S4C", "Eisteddfod", "culture", "sport", "Trefnydd",
 ]
 # Hard cap on items sent to the AI per run (controls cost).
 max_items = 120
