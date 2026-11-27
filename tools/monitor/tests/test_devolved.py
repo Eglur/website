@@ -110,3 +110,32 @@ class NationRouting(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class EmailQuality(unittest.TestCase):
+    def test_plain_headline_used_for_title_and_subject(self):
+        it = {"house": "Council", "council": "Pembrokeshire", "title": "Review of Decant Feasibility Options Relating to Tenby VC School",
+              "headline": "Tenby school: where pupils go during building work", "summary": "s", "score": 8, "date": "2026-11-30", "url": "u"}
+        subject, html_doc, text = subscribers.render_email([it], {"frequency": "daily"}, {"country": "Wales", "council": "Pembrokeshire"},
+                                                           monitor.dt.date(2026, 11, 27))
+        self.assertEqual(subject, "Tenby school: where pupils go during building work")
+        self.assertIn(">Tenby school: where pupils go during building work</a>", html_doc)
+        self.assertNotIn("Decant", html_doc + text)
+
+    def test_logo_is_an_image(self):
+        _, html_doc, _ = subscribers.render_email(
+            [{"house": "Commons", "title": "t", "summary": "s", "score": 8, "date": "2026-11-27", "url": "u"}],
+            {"frequency": "daily"}, {"country": "England"}, monitor.dt.date(2026, 11, 27))
+        self.assertIn('src="https://www.eglurtech.com/img/email-wordmark.png"', html_doc)
+        self.assertIn('alt="eglur."', html_doc)
+
+    def test_followed_person_always_included(self):
+        items = [{"id": f"x{n}", "house": "Commons", "type": "Written question", "title": "Schools funding", "who": "Someone Else (Labour)",
+                  "body": "DfE", "date": "2026-11-27", "text": "schools schools", "url": "u"} for n in range(70)]
+        items.append({"id": "mine", "house": "Commons", "type": "Written question", "title": "Fishing quotas",
+                      "who": "Henry Tufnell (Labour, Mid and South Pembrokeshire)", "body": "Defra", "date": "2026-11-27",
+                      "text": "fish", "url": "u"})
+        sub = {"topics": "Schools", "people": "Henry Tufnell MP", "frequency": "daily"}
+        got = subscribers.for_subscriber(items, sub, {"country": "Wales", "council": "Pembrokeshire"}, use_ai=False)
+        self.assertIn("mine", [i["id"] for i in got])
+        self.assertGreaterEqual(next(i for i in got if i["id"] == "mine")["score"], 7)

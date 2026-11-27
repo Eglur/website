@@ -57,7 +57,11 @@ genuinely touches where they live or what they follow. Be strict: a short email 
 Write plainly for a non-expert. "summary": one sentence on what happened. "why": one sentence
 starting "You" or naming their place or interest, on why it matters to them. "action": only when
 there's a real, practical step (comment on a planning application, watch a meeting, contact a
-representative); otherwise empty. Never tell them what to think or how to vote, never favour a party,
+representative); otherwise empty. "headline": plain words a neighbour would use, never the official
+title's jargon ("decant", "feasibility", "WESP"). When a named member asked a question or made a statement,
+say who in the summary (the "who" field), e.g. "Paul Davies MS asked…", never "a Member". Never mention
+postcodes. Vary the "why" lines rather than starting each one the same way. If an item involves a person
+they follow, score it at least 7. Never tell them what to think or how to vote, never favour a party,
 and never state anything that is not in the item text. Leave "post" and "link" empty. British English."""
 
 POSTCODE = re.compile(r"^([A-Z]{1,2}\d[A-Z\d]?)\s*(\d[A-Z]{2})$", re.I)
@@ -195,10 +199,14 @@ def email_item(it: dict) -> str:
             f'<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
             f'<td width="3" style="background:{colour};border-radius:3px"></td><td style="padding-left:16px">'
             f'<p style="margin:0;font-size:12px;font-weight:bold;color:{colour}">{meta}</p>'
-            f'<p style="margin:4px 0 0;font-size:17px;line-height:1.35;font-weight:bold"><a href="{esc(it["url"])}" style="color:#101A1A;text-decoration:none">{esc(it["title"])}</a></p>'
+            f'<p style="margin:4px 0 0;font-size:17px;line-height:1.35;font-weight:bold"><a href="{esc(it["url"])}" style="color:#101A1A;text-decoration:none">{esc(heading(it))}</a></p>'
             f'<p style="margin:6px 0 0;font-size:15px;line-height:1.55;color:#3D4A49">{esc(it["summary"])}</p>{why}{action}'
             f'<p style="margin:8px 0 0;font-size:13px"><a href="{esc(it["url"])}" style="color:#5F6B6A">Official record</a></p>'
             f'</td></tr></table></td></tr>')
+
+
+def heading(it: dict) -> str:
+    return it.get("headline") or it["title"]
 
 
 def section(title: str, items: list[dict]) -> str:
@@ -210,7 +218,7 @@ def section(title: str, items: list[dict]) -> str:
 
 
 def subject_line(items: list[dict]) -> str:
-    first = items[0]["title"].rstrip(".…")
+    first = heading(items[0]).rstrip(".…")
     first = first if len(first) <= 60 else first[:57].rsplit(" ", 1)[0] + "…"
     return first if len(items) == 1 else f"{first}, and {len(items) - 1} more"
 
@@ -237,7 +245,7 @@ def render_email(items: list[dict], sub: dict, geo: dict, today: dt.date) -> tup
                         f'For now your briefing covers {esc(levels(geo, council=False))}.</p>')
     html_doc = frame(body + council_note, f"{subject_line(keep)}" if keep else "Your briefing")
     text = "\n".join([f"{day}: {headline}.", ""] + [
-        f"- {where_label(i)}: {i['title']}\n  {i['summary']}\n  {i.get('why', '')}\n  {i['url']}" for i in keep
+        f"- {where_label(i)}: {heading(i)}\n  {i['summary']}\n  {i.get('why', '')}\n  {i['url']}" for i in keep
     ] + ["", "Reply to change what you follow. Unsubscribe: {{UNSUBSCRIBE}}"])
     return subject_line(keep), html_doc, text
 
@@ -249,7 +257,7 @@ def frame(inner: str, preheader: str) -> str:
             f'<div style="display:none;max-height:0;overflow:hidden;opacity:0">{esc(preheader)}</div>'
             '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F6F5"><tr><td align="center" style="padding:32px 14px">'
             '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px">'
-            '<tr><td style="padding:0 6px 22px"><span style="font-family:\'DM Serif Display\',Georgia,serif;font-size:26px;line-height:1;color:#101A1A">eglur<span style="color:#286A6C">.</span></span></td></tr>'
+            '<tr><td style="padding:0 6px 22px"><a href="https://www.eglurtech.com/"><img src="https://www.eglurtech.com/img/email-wordmark.png" width="96" height="39" alt="eglur." style="display:block;border:0;outline:none;width:96px;height:39px"></a></td></tr>'
             f'<tr><td style="background:#FFFFFF;border-radius:16px;padding:36px 34px;font-family:Arial,Helvetica,sans-serif">{inner}</td></tr>'
             '<tr><td style="padding:22px 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#5F6B6A">'
             'Eglur Technologies. Eglur is Welsh for clear.<br>Built from official records published by UK Parliament (Open Parliament Licence), '
@@ -291,13 +299,22 @@ def for_subscriber(items: list[dict], sub: dict, geo: dict, use_ai: bool) -> lis
     prof = build_profile(sub, geo)
     mine = [i for i in items if relevant_place(i, geo)]
     shortlist = monitor.prefilter(copy.deepcopy(mine), prof["filter"]["keywords"], prof["filter"]["max_items"])
+    # Anything a followed person did themselves always makes the shortlist, however many keyword hits others have.
+    people = monitor.compile_keywords([person_name(p) for p in split_list(sub.get("people", ""))])
+    by_person = [i for i in copy.deepcopy(mine) if any(pat.search(i.get("who", "")) for _, pat in people)]
+    have = {i["id"] for i in shortlist}
+    shortlist = [i for i in by_person if i["id"] not in have][:20] + shortlist
     if not shortlist:
         return []
     if use_ai:
         monitor.assess(shortlist, prof, [], system=SYSTEM)
     else:
         monitor.assess_without_ai(shortlist)
-    return [i for i in shortlist if i["score"] >= prof["filter"]["min_score"]][:12]
+    mine_ids = {i["id"] for i in by_person}
+    for i in shortlist:
+        if i["id"] in mine_ids:
+            i["score"] = max(i["score"], 7)
+    return sorted([i for i in shortlist if i["score"] >= prof["filter"]["min_score"]], key=lambda i: -i["score"])[:12]
 
 
 def main() -> None:

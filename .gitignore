@@ -1,1 +1,3 @@
 daily-email/preview/
+__pycache__/
+*.pyc

@@ -276,7 +276,9 @@ function testSend() {
 /* ---------------------------------------------------------- email pieces */
 
 function wordmark_(size) {
-  return '<span style="font-family:\'DM Serif Display\',Georgia,serif;font-size:' + size + 'px;line-height:1;color:#101A1A;letter-spacing:-.02em">eglur<span style="color:#286A6C">.</span></span>';
+  var h = Math.round(size * 1.5), w = Math.round(h * 330 / 134);   // the real wordmark as an image: email clients won't load the font
+  return '<a href="' + SITE + '/"><img src="' + SITE + '/img/email-wordmark.png" width="' + w + '" height="' + h + '" alt="eglur." ' +
+         'style="display:block;border:0;outline:none;width:' + w + 'px;height:' + h + 'px"></a>';
 }
 
 function button_(href, label) {
