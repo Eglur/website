@@ -18,7 +18,7 @@ monitor.get_json = fake_api.fake_get_json
 monitor.OUT = Path(sys.argv[1] if len(sys.argv) > 1 else "preview")
 anthropic.Anthropic = FakeClaude
 
-profile = tomllib.loads((HERE.parent / "profile.toml").read_text())
+profile = tomllib.loads((HERE / "example_profile.toml").read_text())
 monitor.run(profile, dt.date(2026, 11, 27), 4, use_ai=True, extra_note=(
     "Preview: real Parliament items from 23 to 26 November 2026, with the text shortened. "
     "Claude wrote the rankings and explanations in the build chat, following the live instructions. "

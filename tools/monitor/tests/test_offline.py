@@ -16,7 +16,7 @@ import anthropic  # real SDK, used only for its response types
 import fake_api
 import monitor
 
-PROFILE = tomllib.loads((HERE.parent / "profile.toml").read_text())
+PROFILE = tomllib.loads((HERE / "example_profile.toml").read_text())  # fixed test profile, independent of the live one
 ASSESSMENTS = json.loads((HERE / "sample_assessments.json").read_text())["assessments"]
 TODAY = dt.date(2026, 11, 27)  # a Friday; the sample data covers 23-27 Nov
 
