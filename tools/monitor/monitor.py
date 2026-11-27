@@ -676,6 +676,7 @@ TOOL = {
                         "id": {"type": "string"},
                         "score": {"type": "integer", "minimum": 0, "maximum": 10,
                                   "description": "Relevance to THIS office. 9-10: needs the office today. 6-8: should know. 0-5: noise."},
+                        "headline": {"type": "string", "description": "A plain-English headline of 4-10 words a non-expert would understand: no jargon, no reference numbers, sentence case. E.g. 'Tenby school: where pupils go during building work'."},
                         "summary": {"type": "string", "description": "One plain sentence: what happened. Facts only."},
                         "why": {"type": "string", "description": "One sentence: why it matters to this office specifically. Empty if score < 6."},
                         "action": {"type": "string", "description": "Optional concrete next step, e.g. a follow-up written question or a line for a press release. Empty if none."},
@@ -746,6 +747,7 @@ def assess(items: list[dict], profile: dict, statements: list[dict] | None = Non
             a = by_id.get(it["id"], {})
             it["score"] = int(a.get("score", 0))
             it["summary"] = a.get("summary", "")
+            it["headline"] = (a.get("headline") or "").strip().rstrip(".")
             it["why"] = a.get("why", "")
             it["action"] = a.get("action", "")
             it["link"] = a.get("link", "")
