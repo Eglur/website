@@ -119,8 +119,20 @@ class TestMain(unittest.TestCase):
         return {"ok": True}
 
     def run_main(self, *argv):
+        import os
+        os.environ.setdefault("SUBSCRIBERS_URL", "https://script.example/exec"); os.environ.setdefault("SUBSCRIBERS_TOKEN", "t")
         sys.argv = ["subscribers.py", "--no-ai", *argv]
         S.main()
+
+    def test_quiet_without_secrets(self):
+        import os
+        saved = {k: os.environ.pop(k, None) for k in ("SUBSCRIBERS_URL", "SUBSCRIBERS_TOKEN")}
+        try:
+            sys.argv = ["subscribers.py"]; S.main()
+            self.assertEqual(self.sent, [])
+        finally:
+            for k, v in saved.items():
+                if v is not None: os.environ[k] = v
 
     def test_sends_to_due_subscribers_with_something_relevant(self):
         self.run_main()

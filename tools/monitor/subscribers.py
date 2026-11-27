@@ -291,6 +291,9 @@ def main() -> None:
     args = ap.parse_args()
 
     today = dt.date.today()
+    if not (os.environ.get("SUBSCRIBERS_URL") and os.environ.get("SUBSCRIBERS_TOKEN")):
+        print("SUBSCRIBERS_URL / SUBSCRIBERS_TOKEN not set yet: nothing to do (see tools/waitlist/SETUP.md).", file=sys.stderr)
+        return
     reply = sheet_request({"action": "list"})
     if not reply.get("ok"):
         sys.exit(f"Couldn't read subscribers: {reply.get('error')}")
