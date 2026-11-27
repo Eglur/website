@@ -261,7 +261,14 @@ fieldset{border:0;margin:0 0 22px;padding:0}
 
 <script>
 // Where sign-ups are saved. Fill in with the Supabase project URL and its publishable (anon) key.
-var WAITLIST = { url: "", key: "" };
+var WAITLIST = { url: "https://dqkhccwtwfyxgimafcad.supabase.co", key: "" };
+
+function waitlistHeaders() {
+  var h = { "apikey": WAITLIST.key, "Content-Type": "application/json", "Prefer": "return=minimal" };
+  // Older "anon" keys are JWTs and also go in Authorization; newer sb_publishable_ keys must not.
+  if (WAITLIST.key.indexOf("sb_") !== 0) h["Authorization"] = "Bearer " + WAITLIST.key;
+  return h;
+}
 
 (function () {
   var dlg = document.getElementById("waitlist"), form = document.getElementById("wl-form"),
@@ -278,13 +285,13 @@ var WAITLIST = { url: "", key: "" };
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Enter an email address, like name@example.com."; return; }
     if (!area) { err.textContent = "Enter a postcode or area so we know which council to watch."; return; }
     if (!f.get("consent")) { err.textContent = "Tick the box so we can email you at launch."; return; }
-    if (!WAITLIST.url) { err.textContent = "Sign-ups open soon. Please check back shortly."; return; }
+    if (!WAITLIST.url || !WAITLIST.key) { err.textContent = "Sign-ups open soon. Please check back shortly."; return; }
     var row = { email: email, area: area, topics: f.getAll("topics"), topics_other: f.get("topics_other") || "",
                 places: f.get("places") || "", people: f.get("people") || "", frequency: f.get("frequency") };
     var btn = form.querySelector("[type=submit]"); btn.disabled = true; btn.textContent = "Joining…";
     fetch(WAITLIST.url.replace(/\/$/, "") + "/rest/v1/waitlist", {
       method: "POST",
-      headers: { "apikey": WAITLIST.key, "Authorization": "Bearer " + WAITLIST.key, "Content-Type": "application/json", "Prefer": "return=minimal" },
+      headers: waitlistHeaders(),
       body: JSON.stringify(row)
     }).then(function (r) {
       if (!r.ok && r.status !== 409) throw new Error(r.status);
