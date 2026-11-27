@@ -83,8 +83,8 @@ class TestEmail(unittest.TestCase):
         self.assertNotIn("jane@example.com", html)
 
     def test_council_not_yet_covered(self):
-        _, html, _ = S.render_email([item()], SUB, dict(GEO, council="Cardiff", codes=["W06000015"]), dt.date(2026, 11, 27))
-        self.assertIn("Coverage of Cardiff Council is coming soon", html)
+        _, html, _ = S.render_email([item()], SUB, dict(GEO, council="Wrexham", codes=["W06000006"]), dt.date(2026, 11, 27))
+        self.assertIn("Coverage of Wrexham Council is coming soon", html)
 
     def test_escaping(self):
         _, html, _ = S.render_email([item(title="<script>x</script>", url='https://e.x/?a=1&b="2"')], SUB, GEO, dt.date(2026, 11, 27))
