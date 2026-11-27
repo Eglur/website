@@ -8,14 +8,14 @@ jobs:
     steps:
       - run: |
           UA="EglurBriefing/0.1 (+https://www.eglurtech.com)"
-          for H in council.ceredigion.gov.uk mgenglish.pembrokeshire.gov.uk; do
-            for P in "mgWebService.asmx" \
-                     "mgWebService.asmx/GetMeetings?lCommitteeId=0&sFromDate=27/11/2026&sToDate=11/12/2026" \
-                     "mgWebService.asmx/GetCommittees?lCommitteeType=0" \
-                     "mgCalendarMonthView.aspx?M=12&DD=2026&CID=0&OT=&C=-1&MR=0&DL=0&ACT=Later&DS=2&HD=0" \
-                     "mgWhatsNew.aspx?bcr=1"; do
-              code=$(curl -s -o out.txt -w "%{http_code}" -A "$UA" "https://$H/$P")
-              echo "===== $H/$P -> $code ($(wc -c < out.txt) bytes)"
-              head -c 2500 out.txt | tr -s ' \r\n\t' ' ' ; echo
-            done
-          done
+          get() { echo "===== $1"; curl -s -A "$UA" "$1" | tr -s ' \r\n\t' ' ' | head -c ${2:-3000}; echo; }
+          P=https://mgenglish.pembrokeshire.gov.uk/mgWebService.asmx
+          C=https://council.ceredigion.gov.uk/mgWebService.asmx
+          get "$P" 9000 | grep -oE 'op=[A-Za-z]+' | sort -u | tr '\n' ' '; echo
+          get "$P/GetCommittees?lCommitteeType=0" 40000 | grep -oE '<committeeid>[0-9]+</committeeid> <committeetitle>[^<]+</committeetitle> <committeedeleted>[^<]+</committeedeleted> <committeeexpired>[^<]+</committeeexpired> <committeecategory>[^<]+' | head -60
+          get "$P/GetMeetings?lCommitteeId=281&sFromDate=01/11/2026&sToDate=31/12/2026" 4000
+          get "$C/GetCommittees?lCommitteeType=0" 8000 | grep -oE '<committeeid>[0-9]+</committeeid> <committeetitle>[^<]+' | head -20
+          get "$C/GetMeetings?lCommitteeId=148&sFromDate=01/11/2026&sToDate=31/12/2026" 4000
+          MID=$(curl -s -A "$UA" "$P/GetMeetings?lCommitteeId=281&sFromDate=01/11/2026&sToDate=31/12/2026" | grep -oE '<meetingid>[0-9]+' | head -1 | grep -oE '[0-9]+')
+          echo "meeting id: $MID"
+          get "$P/GetMeeting?lMeetingId=$MID" 6000
