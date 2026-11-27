@@ -349,6 +349,61 @@ class TestSeneddMemory(Base):
         self.assertIn("senedd_shown", json.loads((monitor.OUT / "state.json").read_text()))
 
 
+NEWS_HTML = """<html><body><nav><a href="/news/category/Local-News">Local News</a></nav>
+<div class="item"><a href="/news/paul-davies-presses-council-answers-over-millions-earmarked-pembroke"><img src="x.jpg"></a>
+<h3><a href="/news/paul-davies-presses-council-answers-over-millions-earmarked-pembroke">Paul Davies presses council for answers over millions earmarked for Pembroke</a></h3>
+<span class="date">Thursday, 12 November, 2026</span><span>Local News</span>
+<a href="/news/paul-davies-presses-council-answers-over-millions-earmarked-pembroke">Read more</a></div>
+<div class="item"><h3><a href="https://www.paul-davies.org.uk/news/totally-unacceptable-paul-davies-demands-answers-after-85-year-old-waits-over-16-hours">&#039;Totally unacceptable&#039;: Paul Davies demands answers after 85-year-old waits over 16 hours for ambulance</a></h3>
+<span>11th November 2026</span></div>
+<a href="/news?page=1">Next</a></body></html>"""
+
+
+class TestMemberVoice(Base):
+    def test_reads_member_news(self):
+        monitor.get_text = lambda url: NEWS_HTML
+        news = monitor.fetch_member_news("https://www.paul-davies.org.uk/news")
+        self.assertEqual([n["date"] for n in news], ["2026-11-12", "2026-11-11"])
+        self.assertEqual(news[0]["url"], "https://www.paul-davies.org.uk/news/paul-davies-presses-council-answers-over-millions-earmarked-pembroke")
+        self.assertEqual(news[1]["title"], "'Totally unacceptable': Paul Davies demands answers after 85-year-old waits over 16 hours for ambulance")
+        self.assertEqual(len(news), 2, "image links, 'Read more', categories and paging are skipped")
+
+    def test_context_includes_statements_and_draft_flag(self):
+        prof = dict(PROFILE, member={"social_drafts": True})
+        ctx = monitor.context_block(prof, [{"title": "Ambulance waits", "date": "2026-11-11", "url": "u"}])
+        self.assertIn("RECENT PUBLIC STATEMENTS", ctx); self.assertIn("11 Nov: Ambulance waits", ctx)
+        self.assertIn("SOCIAL POST DRAFTS REQUESTED: yes", ctx)
+        self.assertIn("SOCIAL POST DRAFTS REQUESTED: no", monitor.context_block(PROFILE, []))
+
+    def test_post_and_link_on_card(self):
+        it = {"id": "x", "type": "Written answer", "house": "Senedd", "title": "t", "who": "", "body": "", "date": "2026-11-26",
+              "text": "", "url": "u", "score": 8, "summary": "s", "why": "w", "action": "", "ai": True,
+              "link": "Your 11 Nov statement on ambulance waits", "post": 'Ambulance waits in "west Wales" must end.'}
+        html = monitor.card(it)
+        self.assertIn("Connects to</span>Your 11 Nov statement on ambulance waits", html)
+        self.assertIn('data-copy="Ambulance waits in &quot;west Wales&quot; must end."', html)
+        self.assertIn("Draft post · AI, edit before use", html)
+
+    def test_statements_section_and_copy_script(self):
+        html = monitor.render_digest([], 0, "Office", "2026-11-27", "2026-11-26", 6, "./",
+                                     statements=[{"title": "Ambulance waits", "date": "2026-11-11", "url": "https://e.x/a"}],
+                                     member="Paul Davies MS")
+        self.assertIn("Recent statements from Paul Davies MS", html)
+        self.assertIn('href="https://e.x/a"', html)
+        self.assertIn("navigator.clipboard.writeText", html)
+
+    def test_post_dropped_below_7(self):
+        class Low(FakeClaude):
+            def create(self, **kw):
+                ids = [i["id"] for i in json.loads(kw["messages"][0]["content"].split("ITEMS:\n", 1)[1].split("\n\nAssess", 1)[0])]
+                out = [{"id": i, "score": 6, "summary": "s", "why": "w", "post": "should not appear"} for i in ids]
+                return types.SimpleNamespace(content=[anthropic.types.ToolUseBlock(id="t", type="tool_use", name="record_assessments", input={"assessments": out})])
+        anthropic.Anthropic = Low
+        items = [{"id": "a", "type": "t", "house": "Commons", "title": "t", "who": "", "body": "", "date": "d", "text": "x"}]
+        monitor.assess(items, PROFILE, [])
+        self.assertEqual(items[0]["post"], "")
+
+
 class TestChamberLabels(unittest.TestCase):
     def test_westminster_tags(self):
         base = {"id": "x", "title": "t", "who": "", "body": "", "date": "2026-11-26", "text": "", "url": "u",
