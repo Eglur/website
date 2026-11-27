@@ -55,6 +55,28 @@ def member_label(m: dict | None) -> str:
     return f"{m['name']} ({extra})" if extra else m["name"]
 
 
+SHORT_BODIES = {
+    "Department for Environment, Food and Rural Affairs": "DEFRA",
+    "Department for Work and Pensions": "DWP",
+    "Department of Health and Social Care": "DHSC",
+    "Ministry of Housing, Communities and Local Government": "MHCLG",
+    "Department for Science, Innovation and Technology": "DSIT",
+    "Department for Digital, Culture, Media and Sport": "DCMS",
+    "Department for Culture, Media and Sport": "DCMS",
+    "Department for Energy Security and Net Zero": "DESNZ",
+    "Department for Business and Trade": "DBT",
+    "Department for Education": "DfE",
+    "Department for Transport": "DfT",
+    "Foreign, Commonwealth and Development Office": "FCDO",
+    "Ministry of Defence": "MoD",
+    "Ministry of Justice": "MoJ",
+}
+
+
+def short_body(name: str) -> str:
+    return SHORT_BODIES.get(name, name)
+
+
 def fetch_written_questions(since: str, until: str) -> list[dict]:
     """Questions tabled OR answered since `since`, both Houses."""
     base = "https://questions-statements-api.parliament.uk/api/writtenquestions/questions"
@@ -82,14 +104,31 @@ def fetch_written_questions(since: str, until: str) -> list[dict]:
             "id": f"wq-{v['id']}",
             "type": "Written answer" if answered else "Written question",
             "house": v.get("house", ""),
-            "title": v.get("heading") or "Written question",
+            "title": v.get("heading") or (f"Question to {short_body(v['answeringBodyName'])}"
+                                          if v.get("answeringBodyName") else "Written question"),
             "who": member_label(v.get("askingMember")),
             "body": v.get("answeringBodyName") or "",
             "date": day(v.get("dateAnswered")) if answered else tabled,
             "text": text,
             "url": f"https://questions-statements.parliament.uk/written-questions/detail/{tabled}/{v.get('uin')}",
         })
-    return items
+    return group_related(items)
+
+
+def group_related(items: list[dict]) -> list[dict]:
+    """One card for a set of questions from the same member, on the same heading, to the same department."""
+    groups: dict[tuple, list[dict]] = {}
+    for it in items:
+        groups.setdefault((it["who"], it["title"], it["body"], it["type"]), []).append(it)
+    out = []
+    for members in groups.values():
+        first = dict(members[0])
+        if len(members) > 1:
+            first["related"] = len(members)
+            first["text"] = " | ".join(m["text"] for m in members)
+            first["date"] = max(m["date"] for m in members)
+        out.append(first)
+    return out
 
 
 def fetch_written_statements(since: str, until: str) -> list[dict]:
@@ -167,6 +206,9 @@ def fetch_bills(since: str, until: str) -> list[dict]:
             "type": "Bill stage",
             "house": b.get("currentHouse", ""),
             "title": b.get("shortTitle") or f"Bill {bill_id}",
+            "bill": {"origin": b.get("originatingHouse") or ("Lords" if "[HL]" in (b.get("shortTitle") or "") else "Commons"),
+                     "stage_id": cur.get("stageId"), "stage": cur.get("description", ""),
+                     "house": cur.get("house", ""), "is_act": bool(b.get("isAct"))},
             "who": "",
             "body": "",
             "date": latest,
@@ -222,7 +264,7 @@ def prefilter(items: list[dict], keywords: list[str], cap: int) -> list[dict]:
         return items[:cap]
     out = []
     for it in items:
-        hay = " ".join((it["title"], it["text"], it["who"], it["body"]))
+        hay = " ".join((it["title"], it["text"], it["who"]))  # not the department name: "Rural Affairs" isn't a rural story
         hits = [k for k, p in pats if p.search(hay)]
         if hits:
             it["hits"] = hits
@@ -374,6 +416,16 @@ text-transform:uppercase;color:var(--muted)}
 border-top:1px solid var(--hair);font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted)}
 .src .ai{color:var(--ai)}.src a{color:var(--teal-deep)}
 .empty{color:var(--ink-2);font-size:19px}
+.track{margin:14px 0 4px}
+.segs{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.seg{height:8px;border-radius:2px;background:var(--hair)}
+.seg.done.h-commons{background:#4C8C6E}.seg.done.h-lords{background:#A2545F}.seg.done.h-both{background:var(--teal)}
+.seg.now{background:var(--decision);box-shadow:0 0 0 2px rgba(154,93,14,.18)}
+.tlabels{display:grid;grid-template-columns:5fr 5fr 2fr;gap:3px;margin-top:6px;font-family:var(--mono);font-size:11px;
+letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tlabels span{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden}
+.hd{width:7px;height:7px;border-radius:50%;flex:none}.hd.h-commons{background:#4C8C6E}.hd.h-lords{background:#A2545F}
+.tnow{margin-top:6px;font-size:14px;color:var(--ink-2)}.tnow b{color:var(--decision);font-weight:600}
 footer.site{border-top:1px solid var(--hair);padding:40px 0 52px;margin-top:56px;background:var(--paper)}
 .foot{display:flex;flex-direction:column;gap:12px}
 .fbrand{display:flex;align-items:center;gap:16px;margin-bottom:6px}.fbrand .wm{height:24px}
@@ -407,16 +459,51 @@ def wordmark() -> str:
     return (BRAND / "wordmark.svg").read_text().strip()
 
 
+HOUSE_STAGES = {"Commons": [(6, "1st reading"), (7, "2nd reading"), (8, "Committee"), (9, "Report"), (10, "3rd reading")],
+                "Lords": [(1, "1st reading"), (2, "2nd reading"), (3, "Committee"), (4, "Report"), (5, "3rd reading")]}
+
+
+def stage_track(bill: dict) -> str:
+    """A coloured bar of the bill's journey: first House, second House, final stages, Royal Assent."""
+    first = bill["origin"] if bill["origin"] in HOUSE_STAGES else "Commons"
+    second = "Lords" if first == "Commons" else "Commons"
+    steps = [(first, sid, name) for sid, name in HOUSE_STAGES[first]] + \
+            [(second, sid, name) for sid, name in HOUSE_STAGES[second]] + \
+            [("Both", "final", "Final stages"), ("Both", "assent", "Royal Assent")]
+    if bill["is_act"] or "royal assent" in bill["stage"].lower():
+        pos = len(steps) - 1
+    else:
+        ids = [s[1] for s in steps]
+        pos = ids.index(bill["stage_id"]) if bill["stage_id"] in ids else len(steps) - 2
+    segs = []
+    for i, (house, _, name) in enumerate(steps):
+        state = "done" if i < pos else "now" if i == pos else "todo"
+        segs.append(f'<span class="seg {state} h-{house.lower()}" title="{esc(house)}: {esc(name)}"></span>')
+    house, _, name = steps[pos]
+    where = name if house == "Both" else f"{name}, {house}"
+    return (f'<div class="track" aria-label="Bill stage: {esc(where)}">'
+            f'<div class="segs">{"".join(segs)}</div>'
+            f'<div class="tlabels"><span><i class="hd h-{first.lower()}"></i>{first}</span>'
+            f'<span><i class="hd h-{second.lower()}"></i>{second}</span><span>Final</span></div>'
+            f'<div class="tnow">Now: <b>{esc(where)}</b> · stage {pos + 1} of {len(steps)}</div></div>')
+
+
+def related_label(it: dict) -> str:
+    return f"{it['related']} related questions · " if it.get("related") else ""
+
+
 def card(it: dict) -> str:
     who = " · ".join(x for x in (it["who"], it["body"]) if x)
     parts = [
         f'<article class="item{" top" if it["score"] >= 9 else ""}">',
         f'<div class="row"><span>{esc(it["type"])} · {esc(it["house"])} · {esc(nice_date(it["date"]))}</span>'
-        f'<span class="score">{it["score"]}/10</span></div>',
+        f'<span class="score">{related_label(it)}{it["score"]}/10</span></div>',
         f'<h3><a href="{esc(it["url"])}" target="_blank" rel="noopener">{esc(it["title"])}</a></h3>',
     ]
     if who:
         parts.append(f'<div class="who">{esc(who)}</div>')
+    if it.get("bill"):
+        parts.append(stage_track(it["bill"]))
     parts.append(f'<p>{esc(it["summary"])}</p>')
     if it.get("why"):
         parts.append(f'<p class="why"><span class="k">Why it matters</span>{esc(it["why"])}</p>')

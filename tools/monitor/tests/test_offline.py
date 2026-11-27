@@ -121,7 +121,7 @@ class TestPipeline(Base):
 
     def test_full_run_with_ai(self):
         html = self.run_pipeline()
-        self.assertEqual(len(FakeClaude.calls), 1, "7 shortlisted items fit in one batch")
+        self.assertEqual(len(FakeClaude.calls), 1, "6 shortlisted items fit in one batch")
         # strictness: only items scoring 6+ appear; 9+ go under "Act today"
         self.assertIn("Needs you today", html)
         self.assertIn("Public Sector: Wales", html)
@@ -131,8 +131,8 @@ class TestPipeline(Base):
         self.assertNotIn("TEST ONLY", html)
         self.assertNotIn("Armed Forces Bill", html)          # filtered before the AI
         self.assertEqual(html.count('<article class="item'), 4)
-        self.assertIn("<b>24</b>updates read", html)
-        self.assertIn("<b>7</b>matched your issues", html)
+        self.assertIn("<b>23</b>updates read", html)
+        self.assertIn("<b>6</b>matched your issues", html)
         self.assertIn('content="noindex,nofollow"', html)
         self.assertNotIn('class="note"', html)
 
@@ -195,6 +195,48 @@ class TestPipeline(Base):
         out = monitor.card(it)
         self.assertNotIn("<script>", out)
         self.assertIn("&amp;b=2", out)
+
+
+class TestQuickFixes(Base):
+    def test_untitled_question_gets_department_title(self):
+        row = dict(fake_api.DATA["writtenquestions"][1], id=777, heading=None, dateAnswered=None)
+        orig = fake_api.DATA["writtenquestions"]
+        fake_api.DATA["writtenquestions"] = [row]
+        try:
+            items = monitor.fetch_written_questions("2026-11-01", "2026-11-27")
+        finally:
+            fake_api.DATA["writtenquestions"] = orig
+        self.assertEqual(items[0]["title"], "Question to DWP")
+
+    def test_related_questions_grouped(self):
+        items = monitor.collect(PROFILE, "2026-11-23", "2026-11-27")
+        gly = [i for i in items if i["title"] == "Glyphosate"]
+        self.assertEqual(len(gly), 1)
+        self.assertEqual(gly[0]["related"], 2)
+        self.assertIn("councils", gly[0]["text"]); self.assertIn("rainwater", gly[0]["text"])
+        html = monitor.card(dict(gly[0], score=6, summary="s", why="", action="", ai=True))
+        self.assertIn("2 related questions · 6/10", html)
+
+    def test_department_name_does_not_match(self):
+        it = {"title": "Water: Cambridgeshire", "text": "Asks about reservoir timetables.", "who": "A Member (Lab, Ely)",
+              "body": "Department for Environment, Food and Rural Affairs"}
+        self.assertEqual(monitor.prefilter([it], ["rural"], 10), [])
+
+    def test_stage_tracker(self):
+        commons = monitor.stage_track({"origin": "Commons", "stage_id": 8, "stage": "Committee stage", "house": "Commons", "is_act": False})
+        self.assertIn("Now: <b>Committee, Commons</b> · stage 3 of 12", commons)
+        self.assertEqual(commons.count('class="seg done'), 2)
+        self.assertEqual(commons.count('class="seg now'), 1)
+        lords_first = monitor.stage_track({"origin": "Lords", "stage_id": 8, "stage": "Committee stage", "house": "Commons", "is_act": False})
+        self.assertIn("stage 8 of 12", lords_first)
+        self.assertLess(lords_first.index("h-lords"), lords_first.index("h-commons"))
+        act = monitor.stage_track({"origin": "Commons", "stage_id": 99, "stage": "Royal Assent", "house": "", "is_act": True})
+        self.assertIn("Now: <b>Royal Assent</b> · stage 12 of 12", act)
+
+    def test_bill_items_carry_stage(self):
+        bills = {b["title"]: b for b in monitor.fetch_bills("2026-11-23", "2026-11-27")}
+        self.assertEqual(bills["Financial Services and Markets Bill [HL]"]["bill"]["origin"], "Lords")
+        self.assertEqual(bills["Highways (Financing) Bill"]["bill"]["stage_id"], 8)
 
 
 class TestBatching(Base):
