@@ -398,6 +398,35 @@ def fetch_calendar(since: str, until: str) -> list[dict]:
     return items
 
 
+MONTHS = {m: i for i, m in enumerate(["january", "february", "march", "april", "may", "june", "july", "august",
+                                       "september", "october", "november", "december"], 1)}
+DATE_TEXT = re.compile(r"(\d{1,2})(?:st|nd|rd|th)?,?\s+(January|February|March|April|May|June|July|August|September|"
+                       r"October|November|December),?\s+(\d{4})", re.I)
+
+
+def fetch_member_news(url: str, limit: int = 10) -> list[dict]:
+    """The member's latest statements from their own news page: title, link and date."""
+    page = get_text(url)
+    base = re.match(r"https?://[^/]+", url).group(0)
+    out, seen = [], set()
+    for m in re.finditer(r'<a\s[^>]*href="((?:https?://[^"/]+)?/news/(?!category|tag|page)[a-z0-9][a-z0-9\-]+)"[^>]*>(.*?)</a>', page, re.S | re.I):
+        link = m.group(1) if m.group(1).startswith("http") else base + m.group(1)
+        title = clean(m.group(2))
+        if link in seen or len(title) < 20:   # skip "Read more" and image links
+            continue
+        seen.add(link)
+        near = DATE_TEXT.search(clean(page[m.end(): m.end() + 1500]))
+        date = f"{near.group(3)}-{MONTHS[near.group(2).lower()]:02d}-{int(near.group(1)):02d}" if near else ""
+        out.append({"title": title, "url": link, "date": date})
+        if len(out) >= limit:
+            break
+    if os.environ.get("BRIEFING_DEBUG"):
+        print(f"member news: {len(out)} statements", file=sys.stderr)
+        for n in out[:3]:
+            print("  NEWS", n, file=sys.stderr)
+    return out
+
+
 SOURCES = {
     "written_questions": fetch_written_questions,
     "written_statements": fetch_written_statements,
@@ -457,6 +486,8 @@ TOOL = {
                         "summary": {"type": "string", "description": "One plain sentence: what happened. Facts only."},
                         "why": {"type": "string", "description": "One sentence: why it matters to this office specifically. Empty if score < 6."},
                         "action": {"type": "string", "description": "Optional concrete next step, e.g. a follow-up written question or a line for a press release. Empty if none."},
+                        "link": {"type": "string", "description": "If the item connects to one of the member's recent statements, name it briefly with its date, e.g. 'Your 11 Nov statement on ambulance waits'. Empty otherwise."},
+                        "post": {"type": "string", "description": "Only if score >= 7 and drafts are requested: a short social media post (max 280 characters) in the member's voice. Factual, constituency-focused, no attacks on named opponents, nothing beyond the item text. Empty otherwise."},
                     },
                     "required": ["id", "score", "summary", "why"],
                 },
@@ -473,7 +504,17 @@ Items whose text starts "Coming up on" are future business: judge whether the of
 Never state anything that is not in the item text. Use British English."""
 
 
-def assess(items: list[dict], profile: dict) -> int:
+def context_block(profile: dict, statements: list[dict]) -> str:
+    out = f"OFFICE PROFILE:\n{profile['office']['description'].strip()}\n"
+    if statements:
+        out += "\nTHE MEMBER'S RECENT PUBLIC STATEMENTS (newest first):\n" + "\n".join(
+            f"- {nice_date(s['date']) if s['date'] else 'undated'}: {s['title']}" for s in statements) + "\n"
+    drafts = profile.get("member", {}).get("social_drafts", False)
+    out += f"\nSOCIAL POST DRAFTS REQUESTED: {'yes' if drafts else 'no'}\n"
+    return out
+
+
+def assess(items: list[dict], profile: dict, statements: list[dict] | None = None) -> int:
     """Score and explain items with Claude. Returns the number of failed batches."""
     import anthropic  # imported here so keyword-only runs don't need the package
     client = anthropic.Anthropic()
@@ -491,7 +532,7 @@ def assess(items: list[dict], profile: dict) -> int:
                 tools=[TOOL],
                 tool_choice={"type": "auto"},  # this model doesn't accept a forced tool choice
                 messages=[{"role": "user", "content":
-                           f"OFFICE PROFILE:\n{profile['office']['description'].strip()}\n\n"
+                           context_block(profile, statements or []) + "\n"
                            f"ITEMS:\n{json.dumps(payload, ensure_ascii=False)}\n\n"
                            "Assess every item by calling record_assessments once, with one entry per item."}],
             )
@@ -513,6 +554,8 @@ def assess(items: list[dict], profile: dict) -> int:
             it["summary"] = a.get("summary", "")
             it["why"] = a.get("why", "")
             it["action"] = a.get("action", "")
+            it["link"] = a.get("link", "")
+            it["post"] = (a.get("post") or "")[:280] if it["score"] >= 7 else ""
             it["ai"] = True
     return failures
 
@@ -595,6 +638,17 @@ text-transform:uppercase;color:var(--muted)}
 border-top:1px solid var(--hair);font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted)}
 .src .ai{color:var(--ai)}.src a{color:var(--teal-deep)}
 .empty{color:var(--ink-2);font-size:19px}
+.link{color:var(--ink-2)}.link .k{color:var(--muted)}
+.post{margin-top:14px;padding:12px 14px;border:1px solid var(--hair);border-radius:2px;background:var(--ground)}
+.post p{margin:6px 0 0;font-size:16px;color:var(--ink)}
+.post-head{display:flex;justify-content:space-between;align-items:center;gap:12px}.post-head .k{color:var(--ai);margin:0}
+.copy{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:5px 10px;cursor:pointer;
+background:var(--paper);color:var(--teal-deep);border:1px solid var(--teal);border-radius:2px}.copy:hover{background:var(--teal);color:var(--paper)}
+.count{display:block;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}
+ul.statements{list-style:none;padding:0;margin:10px 0 0}
+ul.statements li{display:flex;gap:16px;padding:10px 0;border-bottom:1px solid var(--hair);font-size:15px}
+ul.statements li span{flex:none;width:64px;font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+ul.statements a{color:var(--ink);text-decoration:none}ul.statements a:hover{color:var(--teal-deep);text-decoration:underline}
 .track{margin:14px 0 4px}
 .segs{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
 .seg{height:8px;border-radius:2px;background:var(--hair)}
@@ -716,6 +770,12 @@ def card(it: dict) -> str:
         parts.append(f'<p class="why"><span class="k">Why it matters</span>{esc(it["why"])}</p>')
     if it.get("action"):
         parts.append(f'<p class="next"><span class="k">Next step</span>{esc(it["action"])}</p>')
+    if it.get("link"):
+        parts.append(f'<p class="link"><span class="k">Connects to</span>{esc(it["link"])}</p>')
+    if it.get("post"):
+        parts.append(f'<div class="post"><div class="post-head"><span class="k">Draft post · AI, edit before use</span>'
+                     f'<button type="button" class="copy" data-copy="{esc(it["post"])}">Copy</button></div>'
+                     f'<p>{esc(it["post"])}</p><span class="count">{len(it["post"])}/280</span></div>')
     tag = ('<span class="ai">AI-drafted · check the source</span>' if it.get("ai")
            else "<span>Keyword match</span>")
     parts.append(f'<div class="src">{tag}<a href="{esc(it["url"])}" target="_blank" rel="noopener">Official record ↗</a></div>')
@@ -754,6 +814,13 @@ and by the Senedd under the <a href="https://www.nationalarchives.gov.uk/doc/ope
 Summaries are drafted by AI and can be wrong, so every item links to the official record.</p>
 <p class="fine">Eglur Technologies · In development · Eglur is Welsh for clear</p>
 </div></footer>
+<script>
+document.addEventListener("click", function (e) {{
+  var b = e.target.closest(".copy"); if (!b) return;
+  try {{ navigator.clipboard.writeText(b.dataset.copy); b.textContent = "Copied"; }} catch (err) {{ b.textContent = "Select and copy"; }}
+  setTimeout(function () {{ b.textContent = "Copy"; }}, 1600);
+}});
+</script>
 </body></html>
 """
 
@@ -763,8 +830,18 @@ def read_minutes(items: list[dict]) -> int:
     return max(1, round(words / 200))
 
 
+def statements_section(statements: list[dict], member: str) -> str:
+    if not statements:
+        return ""
+    rows = "\n".join(f'<li><span>{esc(nice_date(s["date"])) if s["date"] else ""}</span>'
+                     f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["title"])}</a></li>' for s in statements[:6])
+    return (f'<section class="group"><p class="label">Recent statements from {esc(member)}</p>'
+            f'<ul class="statements">{rows}</ul></section>\n')
+
+
 def render_digest(items: list[dict], scanned: int, office: str, today: str, since: str,
-                  min_score: int, root: str, note: str = "") -> str:
+                  min_score: int, root: str, note: str = "", statements: list[dict] | None = None,
+                  member: str = "the member") -> str:
     keep = sorted((i for i in items if i["score"] >= min_score), key=lambda i: (-i["score"], i["title"]))
     ahead = sorted((i for i in keep if i.get("upcoming")), key=lambda i: (i["date"], i.get("time", ""), -i["score"]))
     top = [i for i in keep if i["score"] >= 9 and not i.get("upcoming")]
@@ -790,7 +867,8 @@ def render_digest(items: list[dict], scanned: int, office: str, today: str, sinc
 <div class="stats">{stats}</div>
 <div class="key"><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
 </section>
-{groups or '<p class="empty">Nothing in this period met the bar for this office.</p>'}"""
+{groups or '<p class="empty">Nothing in this period met the bar for this office.</p>'}
+{statements_section(statements or [], member)}"""
     return page(f"Morning briefing · {nice_date(today, long=True)} · Eglur", main, root)
 
 
@@ -844,9 +922,16 @@ def run(profile: dict, today: dt.date, days: int, use_ai: bool, extra_note: str 
     shortlist = prefilter(items, f.get("keywords", []), f.get("max_items", 120))
     print(f"scanned {scanned}, keyword matches {len(shortlist)}", file=sys.stderr)
 
+    statements, member = [], profile.get("member", {})
+    if member.get("website_news"):
+        try:
+            statements = fetch_member_news(member["website_news"])
+        except Exception as e:
+            print(f"WARNING: member website failed: {e}", file=sys.stderr)
+
     note = ""
     if use_ai:
-        if assess(shortlist, profile):
+        if assess(shortlist, profile, statements):
             note = "Part of today's AI step failed, so some items below are keyword matches only."
     else:
         assess_without_ai(shortlist)
@@ -854,8 +939,9 @@ def run(profile: dict, today: dt.date, days: int, use_ai: bool, extra_note: str 
     note = " ".join(x for x in (extra_note, note) if x)
 
     args = (shortlist, scanned, profile["office"]["name"], today.isoformat(), since, f.get("min_score", 6))
-    publish(render_digest(*args, root="./", note=note),
-            render_digest(*args, root="../", note=note), today.isoformat())
+    extra = {"statements": statements, "member": member.get("name", "the member")}
+    publish(render_digest(*args, root="./", note=note, **extra),
+            render_digest(*args, root="../", note=note, **extra), today.isoformat())
     (OUT / "state.json").write_text(json.dumps(STATE, indent=0) + "\n")
     print(f"Wrote {OUT / 'index.html'}", file=sys.stderr)
 

@@ -18,6 +18,13 @@ Portfolio interests: Welsh language, culture, tourism and sport, and Senedd busi
 Westminster items matter when they affect Wales, west Wales, farming, rural services or his portfolio.
 """
 
+[member]
+name = "Paul Davies MS"
+# The member's own news page: the briefing reads their latest statements as context.
+website_news = "https://www.paul-davies.org.uk/news"
+# Draft a short social media post for the strongest items (AI draft, for the office to edit).
+social_drafts = true
+
 [filter]
 # Items mentioning any of these go through to AI scoring. Not case-sensitive.
 # A plain word matches the whole word plus plurals: "GP" matches GP and GPs, not "GPS".
