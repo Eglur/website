@@ -1,0 +1,21 @@
+name: Council probe (temporary)
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          UA="EglurBriefing/0.1 (+https://www.eglurtech.com)"
+          for H in council.ceredigion.gov.uk mgenglish.pembrokeshire.gov.uk; do
+            for P in "mgWebService.asmx" \
+                     "mgWebService.asmx/GetMeetings?lCommitteeId=0&sFromDate=27/11/2026&sToDate=11/12/2026" \
+                     "mgWebService.asmx/GetCommittees?lCommitteeType=0" \
+                     "mgCalendarMonthView.aspx?M=12&DD=2026&CID=0&OT=&C=-1&MR=0&DL=0&ACT=Later&DS=2&HD=0" \
+                     "mgWhatsNew.aspx?bcr=1"; do
+              code=$(curl -s -o out.txt -w "%{http_code}" -A "$UA" "https://$H/$P")
+              echo "===== $H/$P -> $code ($(wc -c < out.txt) bytes)"
+              head -c 2500 out.txt | tr -s ' \r\n\t' ' ' ; echo
+            done
+          done
