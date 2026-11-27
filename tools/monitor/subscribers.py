@@ -52,7 +52,7 @@ TOPIC_KEYWORDS = {
 }
 
 SYSTEM = """You write a personal civic briefing for a member of the public in the UK.
-You read official updates from their council, the Senedd and Westminster, and keep only what
+You read official updates from their council, their devolved parliament (if any) and Westminster, and keep only what
 genuinely touches where they live or what they follow. Be strict: a short email is a good email.
 Write plainly for a non-expert. "summary": one sentence on what happened. "why": one sentence
 starting "You" or naming their place or interest, on why it matters to them. "action": only when
@@ -155,7 +155,7 @@ def build_profile(sub: dict, geo: dict) -> dict:
                    f"Topics they follow: {', '.join(topics) or 'none given'}.\n"
                    f"Other places they follow: {', '.join(places) or 'none'}.\n"
                    f"People they follow: {', '.join(people) or 'none'}.\n"
-                   "Council items are from their own council unless stated. Senedd items matter only if they live in Wales.")
+                   "Council items are from their own council. Devolved-parliament items are from the parliament for where they live.")
     return {
         "office": {"name": "Eglur Daily", "description": description},
         "filter": {"keywords": list(dict.fromkeys(keywords)), "max_items": 60, "min_score": 6},
@@ -166,8 +166,9 @@ def build_profile(sub: dict, geo: dict) -> dict:
 
 # -------------------------------------------------------------------- email
 
-LEVEL = {"council": ("Council", "#8A6A3B"), "senedd": ("Senedd", "#2F6690"),
-         "commons": ("Westminster", "#3F7F5F"), "lords": ("Westminster", "#3F7F5F")}
+LEVEL = {"council": ("Council", "#8A6A3B"), "senedd": ("Senedd", "#2F6690"), "holyrood": ("Holyrood", "#2F6690"),
+         "stormont": ("Stormont", "#2F6690"), "commons": ("Westminster", "#3F7F5F"), "lords": ("Westminster", "#3F7F5F")}
+NATION_HOUSE = {nation: house for house, (_, nation) in monitor.DEVOLVED.items()}   # "Wales" -> "senedd"
 
 
 def esc(s) -> str:
@@ -178,8 +179,8 @@ def where_label(it: dict) -> str:
     c = monitor.chamber(it)
     if c == "council":
         return f"{it.get('council', '')} Council".strip()
-    if c == "senedd":
-        return "Senedd"
+    if c in monitor.DEVOLVED:
+        return monitor.DEVOLVED[c][0]
     return "Westminster, House of Lords" if c == "lords" else "Westminster, House of Commons"
 
 
@@ -222,7 +223,7 @@ def render_email(items: list[dict], sub: dict, geo: dict, today: dt.date) -> tup
     day = f"{today:%A} {today.day} {today:%B}"
     headline = f"{n} thing{'s' if n != 1 else ''} for you today" if sub.get("frequency") != "weekly" else f"Your week: {n} thing{'s' if n != 1 else ''} for you"
     place = geo.get("council") or geo.get("area") or ""
-    sub_line = f"From your council, the Senedd and Westminster{f', for {place}' if place else ''}."
+    sub_line = f"From {levels(geo)}{f', for {place}' if place else ''}."
     body = (f'<p style="margin:0;font-size:14px;color:#5F6B6A">{esc(day)}</p>'
             f'<h1 style="margin:6px 0 6px;font-family:\'DM Serif Display\',Georgia,serif;font-weight:400;font-size:34px;line-height:1.08;color:#101A1A">'
             f'{esc(headline)}<span style="color:#286A6C">.</span></h1>'
@@ -233,7 +234,7 @@ def render_email(items: list[dict], sub: dict, geo: dict, today: dt.date) -> tup
     council_note = ""
     if geo.get("council") and geo["council"] not in COUNCIL_SITES:
         council_note = (f'<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#5F6B6A">Coverage of {esc(geo["council"])} Council is coming soon. '
-                        'For now your briefing covers the Senedd and Westminster.</p>')
+                        f'For now your briefing covers {esc(levels(geo, council=False))}.</p>')
     html_doc = frame(body + council_note, f"{subject_line(keep)}" if keep else "Your briefing")
     text = "\n".join([f"{day}: {headline}.", ""] + [
         f"- {where_label(i)}: {i['title']}\n  {i['summary']}\n  {i.get('why', '')}\n  {i['url']}" for i in keep
@@ -252,7 +253,7 @@ def frame(inner: str, preheader: str) -> str:
             f'<tr><td style="background:#FFFFFF;border-radius:16px;padding:36px 34px;font-family:Arial,Helvetica,sans-serif">{inner}</td></tr>'
             '<tr><td style="padding:22px 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#5F6B6A">'
             'Eglur Technologies. Eglur is Welsh for clear.<br>Built from official records published by UK Parliament (Open Parliament Licence), '
-            'the Senedd and councils (Open Government Licence). <a href="{{UNSUBSCRIBE}}" style="color:#5F6B6A">Unsubscribe</a></td></tr>'
+            'the Senedd, the Scottish Parliament, the Northern Ireland Assembly and councils under their open licences. <a href="{{UNSUBSCRIBE}}" style="color:#5F6B6A">Unsubscribe</a></td></tr>'
             '</table></td></tr></table></body></html>')
 
 
@@ -270,9 +271,25 @@ def collect_all(subs_geo: list[tuple[dict, dict]], today: dt.date, days: int) ->
     return items
 
 
+def relevant_place(it: dict, geo: dict) -> bool:
+    """Council items only from their own council; devolved items only from their own nation's parliament."""
+    c = monitor.chamber(it)
+    if c == "council":
+        return it.get("council") == geo.get("council")
+    if c in monitor.DEVOLVED:
+        return NATION_HOUSE.get(geo.get("country", "")) == c
+    return True
+
+
+def levels(geo: dict, council: bool = True) -> str:
+    house = NATION_HOUSE.get(geo.get("country", ""))
+    parts = (["your council"] if council else []) + (["the " + monitor.DEVOLVED[house][0]] if house else []) + ["Westminster"]
+    return ", ".join(parts[:-1]) + " and " + parts[-1] if len(parts) > 1 else parts[0]
+
+
 def for_subscriber(items: list[dict], sub: dict, geo: dict, use_ai: bool) -> list[dict]:
     prof = build_profile(sub, geo)
-    mine = [i for i in items if not (monitor.chamber(i) == "council" and i.get("council") != geo.get("council"))]
+    mine = [i for i in items if relevant_place(i, geo)]
     shortlist = monitor.prefilter(copy.deepcopy(mine), prof["filter"]["keywords"], prof["filter"]["max_items"])
     if not shortlist:
         return []

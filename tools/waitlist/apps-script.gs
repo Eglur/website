@@ -198,14 +198,14 @@ function sendWelcome_(email, r) {
     '<h1 style="margin:0 0 18px;font-family:\'DM Serif Display\',Georgia,serif;font-weight:400;font-size:38px;line-height:1.05;color:#101A1A">' +
     "You're on the list<span style=\"color:#286A6C\">.</span></h1>" +
     '<p style="margin:0 0 28px;font-size:17px;line-height:1.6;color:#3D4A49">Thanks for joining Eglur Daily. When it launches, you\'ll get a short email ' +
-    (daily ? 'every weekday morning' : 'every Friday') + ' covering your council, the Senedd and Westminster, with only the things that touch what you follow.</p>' +
+    (daily ? 'every weekday morning' : 'every Friday') + ' covering your council, your parliament and Westminster, with only the things that touch what you follow.</p>' +
     '<p style="margin:0 0 8px;font-size:14px;font-weight:bold;color:#101A1A">What we\'ll watch for you</p>' +
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 28px">' + table +
     '<tr><td colspan="2" style="border-top:1px solid #E3E8E6"></td></tr></table>' +
     '<p style="margin:0 0 30px;font-size:15px;line-height:1.6;color:#3D4A49">Want to change anything? Just reply to this email.</p>' +
     button_(SITE + '/monitor/', 'See a live example');
   var text = "You're on the list.\n\nThanks for joining Eglur Daily. When it launches, you'll get a short email " +
-    (daily ? 'every weekday morning' : 'every Friday') + ' covering your council, the Senedd and Westminster.\n\n' +
+    (daily ? 'every weekday morning' : 'every Friday') + ' covering your council, your parliament and Westminster.\n\n' +
     rows.map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') +
     '\n\nWant to change anything? Just reply to this email.\n\nSee a live example: ' + SITE + '/monitor/\n\nUnsubscribe: ' + unsubscribeUrl_(email);
   sendMail_({

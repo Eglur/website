@@ -34,6 +34,8 @@ written_statements = true
 bills = true
 commons_divisions = true
 senedd_written_questions = true
+holyrood_written_questions = false
+stormont_written_questions = false
 look_ahead = true   # Westminster committee sessions, debates and bill stages in the coming week
 
 [model]
