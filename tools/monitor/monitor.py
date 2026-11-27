@@ -281,14 +281,19 @@ def assess(items: list[dict], profile: dict) -> int:
                 max_tokens=8000,
                 system=SYSTEM,
                 tools=[TOOL],
-                tool_choice={"type": "tool", "name": "record_assessments"},
+                tool_choice={"type": "auto"},  # this model doesn't accept a forced tool choice
                 messages=[{"role": "user", "content":
                            f"OFFICE PROFILE:\n{profile['office']['description'].strip()}\n\n"
                            f"ITEMS:\n{json.dumps(payload, ensure_ascii=False)}\n\n"
-                           "Assess every item."}],
+                           "Assess every item by calling record_assessments once, with one entry per item."}],
             )
-            block = next(b for b in msg.content if b.type == "tool_use")
-            by_id = {a["id"]: a for a in block.input["assessments"]}
+            block = next((b for b in msg.content if b.type == "tool_use"), None)
+            if block is not None:
+                data = block.input
+            else:  # fallback: the model answered with JSON text instead of calling the tool
+                text = "".join(getattr(b, "text", "") for b in msg.content)
+                data = json.loads(re.search(r"\{.*\}", text, re.S).group(0))
+            by_id = {a["id"]: a for a in data["assessments"]}
         except Exception as e:  # keep going: a failed batch falls back to keyword matching
             print(f"WARNING: AI batch {i // 30 + 1} failed ({e}); using keyword matching for it.", file=sys.stderr)
             assess_without_ai(batch)
