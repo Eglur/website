@@ -1095,9 +1095,9 @@ def publish(index_html: str, archived_html: str, today: str) -> None:
 
 # --------------------------------------------------------------------- main
 
-def collect(profile: dict, since: str, until: str) -> list[dict]:
+def collect(profile: dict, since: str, until: str, sources: dict | None = None) -> list[dict]:
     items = []
-    for key, fn in SOURCES.items():
+    for key, fn in (sources or SOURCES).items():
         if not profile["sources"].get(key, True):
             continue
         try:

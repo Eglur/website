@@ -35,6 +35,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           SUBSCRIBERS_URL: ${{ secrets.SUBSCRIBERS_URL }}
           SUBSCRIBERS_TOKEN: ${{ secrets.SUBSCRIBERS_TOKEN }}
+          # Eglur's shared public corpus (read-only). Until all three are set, Daily uses its own fetchers.
+          EGLUR_CORPUS_URL: ${{ secrets.EGLUR_CORPUS_URL }}
+          EGLUR_CORPUS_KEY: ${{ secrets.EGLUR_CORPUS_KEY }}
+          READER_TOKEN: ${{ secrets.READER_TOKEN }}
         run: |
           ARGS=""
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="--dry-run"; fi

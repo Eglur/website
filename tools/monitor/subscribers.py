@@ -29,6 +29,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import monitor  # noqa: E402
+import corpus  # noqa: E402
 
 # Councils whose meetings we can read (ModernGov), keyed by ONS/GSS code. Built by councils/discover.py.
 def load_registry() -> dict:
@@ -67,7 +68,9 @@ starting "You" or naming their place or interest, on why it matters to them. "ac
 there's a real, practical step (comment on a planning application, watch a meeting, contact a
 representative); otherwise empty. "headline": plain words a neighbour would use, never the official
 title's jargon ("decant", "feasibility", "WESP"). When a named member asked a question or made a statement,
-say who in the summary (the "who" field), e.g. "Paul Davies MS asked…", never "a Member". Never mention
+say who in the summary (the "who" field), e.g. "Paul Davies MS asked…", never "a Member". For "Spoke in
+the chamber" items, say in a sentence what the member argued, in your words. If "who" says "your MP", say
+so. Never mention
 postcodes. Vary the "why" lines rather than starting each one the same way. If an item involves a person
 they follow, score it at least 7. Never tell them what to think or how to vote, never favour a party,
 and never state anything that is not in the item text. Leave "post" and "link" empty. British English."""
@@ -300,11 +303,21 @@ def collect_all(subs_geo: list[tuple[dict, dict]], today: dt.date, days: int) ->
     monitor.load_state()
     wanted = {c["url"]: c for _, g in subs_geo for c in councils_for(g)}
     monitor.COUNCILS[:] = sorted(wanted.values(), key=lambda c: c["name"])
-    profile = {"sources": {k: True for k in monitor.SOURCES}}
+    sources = corpus.sources()
+    profile = {"sources": {k: True for k in sources}}
     since = (today - dt.timedelta(days=days)).isoformat()
-    items = monitor.collect(profile, since, today.isoformat())
+    items = monitor.collect(profile, since, today.isoformat(), sources)
+    MEMBERS[:] = []
+    if corpus.settings():
+        try:
+            MEMBERS[:] = corpus.current_members()
+        except Exception as e:  # without the member list, "your MP" just isn't marked
+            print(f"WARNING: corpus members failed: {e}", file=sys.stderr)
     (monitor.OUT / "state.json").write_text(json.dumps(monitor.STATE, indent=0) + "\n")
     return items
+
+
+MEMBERS: list[dict] = []   # current Senedd and Commons members, from the corpus when it is configured
 
 
 def relevant_place(it: dict, geo: dict) -> bool:
@@ -329,7 +342,12 @@ def for_subscriber(items: list[dict], sub: dict, geo: dict, use_ai: bool) -> lis
     shortlist = monitor.prefilter(copy.deepcopy(mine), prof["filter"]["keywords"], prof["filter"]["max_items"])
     # Anything a followed person did themselves always makes the shortlist, however many keyword hits others have.
     people = monitor.compile_keywords([person_name(p) for p in split_list(sub.get("people", ""))])
-    by_person = [i for i in copy.deepcopy(mine) if any(pat.search(i.get("who", "")) for _, pat in people)]
+    reps = corpus.my_representatives(geo, MEMBERS)
+    by_person = [i for i in copy.deepcopy(mine)
+                 if any(pat.search(i.get("who", "")) for _, pat in people) or i.get("member_id") in reps]
+    for i in by_person:
+        if i.get("member_id") in reps and "your MP" not in i.get("who", ""):
+            i["who"] = f"{i['who']}, your MP"
     have = {i["id"] for i in shortlist}
     shortlist = [i for i in by_person if i["id"] not in have][:20] + shortlist
     if not shortlist:
