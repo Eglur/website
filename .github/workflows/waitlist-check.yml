@@ -1,0 +1,19 @@
+name: Waitlist check (temporary)
+on: pull_request
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          U=https://dqkhccwtwfyxgimafcad.supabase.co/rest/v1/waitlist
+          K=sb_publishable_ArmKmsYcSOgwmNGuUpn9Cg_G5RPIfmk
+          echo "== add a test sign-up (expect 201)"
+          curl -s -o r1.txt -w "%{http_code}\n" -X POST "$U" -H "apikey: $K" -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d '{"email":"test-delete-me@eglurtech.com","area":"SA43 test","topics":["Planning"],"topics_other":"","places":"","people":"","frequency":"weekly"}'; cat r1.txt; echo
+          echo "== add it again (expect 409, already on the list)"
+          curl -s -o r2.txt -w "%{http_code}\n" -X POST "$U" -H "apikey: $K" -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            -d '{"email":"test-delete-me@eglurtech.com","area":"SA43 test","frequency":"weekly"}'; cat r2.txt; echo
+          echo "== try to read the list with the public key (expect refusal or empty)"
+          curl -s -w "\n%{http_code}\n" "$U?select=email" -H "apikey: $K"
