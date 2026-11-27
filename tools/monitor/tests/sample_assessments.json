@@ -1,30 +1,47 @@
 {
   "_note": "Example assessments for the sample items, written by Claude in the build chat using the same instructions and office profile as the live pipeline. Used only by the offline tests and the preview. The live run gets its own from the API.",
   "assessments": [
-    {"id": "wq-1961924", "score": 9,
-     "summary": "The Wales Office says the UK Government is giving the Welsh Government an extra £450 million for devolved public services on top of its settlement, rising in real terms over the Spending Review period.",
-     "why": "A new headline funding figure for Welsh public services, which the office may be asked about and can test against rural health and GP access locally.",
-     "action": "Consider a press line or a follow-up question on how much of the £450 million reaches rural health services."},
-    {"id": "wq-1961925", "score": 7,
-     "summary": "Asked about transport connectivity and growth in Wales, the Wales Office says transport links are vital and repeats its commitment to transforming Welsh rail.",
-     "why": "Rural transport is a priority, and this puts the Welsh rail commitment on the record for the office to hold the Government to.",
-     "action": "Could follow up asking what the rail commitment means for services in Pembrokeshire."},
-    {"id": "wq-1961930", "score": 7,
-     "summary": "The Wales Office says growth in every postcode is a priority and that the Prime Minister offered, at the National Economic Council on 30 October 2026, to work with the Welsh Government.",
-     "why": "Records a UK–Welsh Government offer on the industrial strategy, a hook for the office's energy and Celtic Sea interests.",
-     "action": "Could ask how the industrial strategy will support floating offshore wind in the Celtic Sea."},
-    {"id": "wq-1963219", "score": 6,
-     "summary": "DEFRA, asked about glyphosate in rainwater and crop yields in England and Wales, says glyphosate is strictly regulated and approved only where risks are acceptable.",
-     "why": "Farming is a priority. There's no policy change here, but it's useful background if Welsh farmers raise glyphosate.",
-     "action": ""},
-    {"id": "wq-1963222", "score": 4,
-     "summary": "DEFRA answers a question on funding councils in England and Wales to stop using glyphosate, restating that it is strictly regulated.",
-     "why": "", "action": ""},
-    {"id": "wq-1960369", "score": 2,
-     "summary": "DWP answers a question about the Scottish Government's benefit take-up strategy.",
-     "why": "", "action": ""},
-    {"id": "ws-1964557", "score": 5,
-     "summary": "The Local Government Minister makes a statement on local government finance, describing councils as the foundation for devolution and growth.",
-     "why": "", "action": ""}
+    {
+      "id": "wq-1961924",
+      "score": 9,
+      "summary": "The Wales Office says the UK Government is giving the Welsh Government an extra £450 million for devolved public services on top of its settlement, rising in real terms over the Spending Review period.",
+      "why": "A new headline funding figure for Welsh public services, which the office may be asked about and can test against rural health and GP access locally.",
+      "action": "Consider a press line or a follow-up question on how much of the £450 million reaches rural health services."
+    },
+    {
+      "id": "wq-1961925",
+      "score": 7,
+      "summary": "Asked about transport connectivity and growth in Wales, the Wales Office says transport links are vital and repeats its commitment to transforming Welsh rail.",
+      "why": "Rural transport is a priority, and this puts the Welsh rail commitment on the record for the office to hold the Government to.",
+      "action": "Could follow up asking what the rail commitment means for services in Pembrokeshire."
+    },
+    {
+      "id": "wq-1961930",
+      "score": 7,
+      "summary": "The Wales Office says growth in every postcode is a priority and that the Prime Minister offered, at the National Economic Council on 30 October 2026, to work with the Welsh Government.",
+      "why": "Records a UK–Welsh Government offer on the industrial strategy, a hook for the office's energy and Celtic Sea interests.",
+      "action": "Could ask how the industrial strategy will support floating offshore wind in the Celtic Sea."
+    },
+    {
+      "id": "wq-1963222",
+      "score": 6,
+      "summary": "DEFRA answers two questions on glyphosate in England and Wales, on funding councils to stop using it and on rainwater and crop yields, restating that it is strictly regulated.",
+      "why": "Farming is a priority. There's no policy change here, but it's useful background if Welsh farmers raise glyphosate.",
+      "action": ""
+    },
+    {
+      "id": "wq-1960369",
+      "score": 2,
+      "summary": "DWP answers a question about the Scottish Government's benefit take-up strategy.",
+      "why": "",
+      "action": ""
+    },
+    {
+      "id": "ws-1964557",
+      "score": 5,
+      "summary": "The Local Government Minister makes a statement on local government finance, describing councils as the foundation for devolution and growth.",
+      "why": "",
+      "action": ""
+    }
   ]
 }
