@@ -6,6 +6,7 @@ import tempfile
 import tomllib
 import types
 import unittest
+import urllib.parse
 from pathlib import Path
 
 HERE = Path(__file__).parent
@@ -402,6 +403,86 @@ class TestMemberVoice(Base):
         items = [{"id": "a", "type": "t", "house": "Commons", "title": "t", "who": "", "body": "", "date": "d", "text": "x"}]
         monitor.assess(items, PROFILE, [])
         self.assertEqual(items[0]["post"], "")
+
+
+MG_COMMITTEES = """<?xml version="1.0" encoding="utf-8"?> <committees> <committeescount> 3</committeescount>
+<committee><committeeid>281</committeeid><committeetitle>Cabinet</committeetitle><committeedeleted>False</committeedeleted><committeeexpired>False</committeeexpired><committeecategory>Executive</committeecategory></committee>
+<committee><committeeid>514</committeeid><committeetitle>Audit Committee</committeetitle><committeedeleted>False</committeedeleted><committeeexpired>False</committeeexpired><committeecategory>Defunct Committees</committeecategory></committee>
+<committee><committeeid>290</committeeid><committeetitle>Planning Committee</committeetitle><committeedeleted>False</committeedeleted><committeeexpired>False</committeeexpired><committeecategory>Regulatory</committeecategory></committee>
+</committees>"""
+MG_MEETINGS = {
+    "281": """<?xml version="1.0" encoding="utf-8"?><getmeetings><committee><committeemeetings>
+<meeting><meetingid>6719</meetingid><meetingdate>25/11/2026</meetingdate><meetingstatus>Confirmed</meetingstatus><meetingtime>10.00a.m.</meetingtime></meeting>
+<meeting><meetingid>6720</meetingid><meetingdate>30/11/2026</meetingdate><meetingstatus>Confirmed</meetingstatus><meetingtime>10.00a.m.</meetingtime></meeting>
+</committeemeetings></committee></getmeetings>""",
+    "290": """<?xml version="1.0" encoding="utf-8"?><getmeetings><committee><committeemeetings>
+<meeting><meetingid>6800</meetingid><meetingdate>01/12/2026</meetingdate><meetingstatus>Cancelled</meetingstatus><meetingtime>10.00a.m.</meetingtime></meeting>
+</committeemeetings></committee></getmeetings>""",
+}
+MG_MEETING = {
+    "6719": """<?xml version="1.0" encoding="utf-8"?><meeting><meetingid>6719</meetingid><meetinglocation>County Hall, Haverfordwest</meetinglocation>
+<agendapublished>True</agendapublished><decisionpublished>True</decisionpublished><agendaitems>
+<agendaitem><agendaitemid>1</agendaitemid><agendaitemtitle>Apologies for Absence</agendaitemtitle><decisionnonemptyhtmlbody>&lt;p&gt;Apologies were received.&lt;/p&gt;</decisionnonemptyhtmlbody></agendaitem>
+<agendaitem><agendaitemid>2</agendaitemid><agendaitemtitle>5. TEST: School transport policy review</agendaitemtitle><decisionnonemptyhtmlbody>&lt;p&gt;TEST decision: the revised policy was approved.&lt;/p&gt;</decisionnonemptyhtmlbody></agendaitem>
+<agendaitem><agendaitemid>3</agendaitemid><agendaitemtitle>TEST: Item with no decision yet</agendaitemtitle><decisionnonemptyhtmlbody></decisionnonemptyhtmlbody></agendaitem>
+</agendaitems></meeting>""",
+    "6720": """<?xml version="1.0" encoding="utf-8"?><meeting><meetingid>6720</meetingid><meetinglocation>County Hall, Haverfordwest</meetinglocation>
+<agendapublished>True</agendapublished><decisionpublished>False</decisionpublished><agendaitems>
+<agendaitem><agendaitemid>9</agendaitemid><agendaitemtitle>TEST: Withybush parking charges</agendaitemtitle><agendatext>TEST report on car park charges.</agendatext></agendaitem>
+<agendaitem><agendaitemid>10</agendaitemid><agendaitemtitle>Declarations of Interest</agendaitemtitle></agendaitem>
+</agendaitems></meeting>""",
+}
+
+
+def fake_mg(url):
+    q = dict(urllib.parse.parse_qsl(url.split("?", 1)[1])) if "?" in url else {}
+    if "/GetCommittees" in url: return MG_COMMITTEES
+    if "/GetMeetings" in url:
+        assert q["sFromDate"].count("/") == 2, "dates are sent as dd/mm/yyyy"
+        return MG_MEETINGS.get(q["lCommitteeId"], "<getmeetings/>")
+    if "/GetMeeting" in url: return MG_MEETING[q["lMeetingId"]]
+    return ""
+
+
+class TestCouncils(Base):
+    def setUp(self):
+        super().setUp()
+        monitor.get_text = fake_mg
+        monitor.COUNCILS[:] = [{"name": "Pembrokeshire", "url": "https://mgenglish.pembrokeshire.gov.uk"}]
+
+    def tearDown(self):
+        monitor.COUNCILS[:] = []
+
+    def test_agenda_and_decisions(self):
+        items = {i["title"]: i for i in monitor.fetch_councils("2026-11-26", "2026-11-27")}
+        self.assertEqual(sorted(items), ["TEST: School transport policy review", "TEST: Withybush parking charges"],
+                         "boilerplate, undecided items, defunct committees and cancelled meetings are skipped")
+        d = items["TEST: School transport policy review"]
+        self.assertEqual((d["type"], d["house"], d["council"], d["who"], d["date"], d["upcoming"]),
+                         ("Council decision", "Council", "Pembrokeshire", "Cabinet", "2026-11-25", False))
+        self.assertIn("DECISION: TEST decision: the revised policy was approved.", d["text"])
+        self.assertEqual(d["url"], "https://mgenglish.pembrokeshire.gov.uk/ieListDocuments.aspx?CId=281&MId=6719")
+        u = items["TEST: Withybush parking charges"]
+        self.assertEqual((u["type"], u["upcoming"], u["time"], u["body"]), ("Meeting agenda", True, "10.00am", "Pembrokeshire · County Hall, Haverfordwest"))
+
+    def test_not_repeated(self):
+        self.assertEqual(len(monitor.fetch_councils("2026-11-26", "2026-11-27")), 2)
+        self.assertEqual(monitor.fetch_councils("2026-11-26", "2026-11-27"), [], "remembered in state")
+
+    def test_council_card_and_key(self):
+        it = dict(monitor.fetch_councils("2026-11-26", "2026-11-27")[0], score=7, summary="s", why="w", action="", ai=True)
+        html = monitor.card(it)
+        self.assertIn('class="item c-council', html)
+        self.assertIn("Council · Pembrokeshire", html)
+        page = monitor.render_digest([], 0, "Office", "2026-11-27", "2026-11-26", 6, "./")
+        self.assertIn("var(--council)\"></i>Council", page)
+        self.assertIn("Official council, Senedd and Westminster business", page)
+
+    def test_one_council_failing(self):
+        monitor.COUNCILS[:] = [{"name": "Broken", "url": "https://x.invalid"}, {"name": "Pembrokeshire", "url": "https://mgenglish.pembrokeshire.gov.uk"}]
+        real = monitor.get_text
+        monitor.get_text = lambda url: (_ for _ in ()).throw(OSError("down")) if "x.invalid" in url else real(url)
+        self.assertEqual(len(monitor.fetch_councils("2026-11-26", "2026-11-27")), 2)
 
 
 class TestChamberLabels(unittest.TestCase):
