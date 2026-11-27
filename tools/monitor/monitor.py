@@ -235,11 +235,122 @@ def fetch_commons_divisions(since: str, until: str) -> list[dict]:
     } for d in data]
 
 
+def get_text(url: str) -> str:
+    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.read().decode("utf-8", errors="replace")
+
+
+BLOCK_END = re.compile(r"(?i)<br\s*/?>|</(?:p|div|li|h[1-6]|tr|td|th|section|article|header|footer|ul|ol|table)>|(?=<(?:p|div|li|h[1-6]|tr)[\s>])")
+
+
+def html_lines(page: str) -> list[str]:
+    """Visible text of a page, one line per block element."""
+    page = re.sub(r"(?is)<(script|style|noscript|svg)[^>]*>.*?</\1>", " ", page)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", BLOCK_END.sub("\n", page)))
+    return [ln for ln in (re.sub(r"[ \t\u00a0]+", " ", x).strip() for x in text.split("\n")) if ln]
+
+
+WQ_LINE = re.compile(r"^WQ(\d{4,7})\s*\((?:e|w)\)$", re.I)
+MEMBER_LINE = re.compile(r"^(.+?)\s*\(([^()]+)\)$")
+FOOTER = ("Contact us", "Contact the Senedd", "Senedd Research", "Senedd Commission", "Copyright Welsh Parliament",
+          "Senedd Cymru | Welsh Parliament", "Work opportunities", "Follow us")
+
+
+def iso_uk(d: str) -> str:
+    return f"{d[6:10]}-{d[3:5]}-{d[0:2]}" if re.match(r"\d\d/\d\d/\d{4}$", d) else ""
+
+
+def parse_senedd_questions(page: str, page_url: str) -> list[dict]:
+    lines = html_lines(page)
+    starts = [i for i, ln in enumerate(lines) if WQ_LINE.match(ln)]
+    ministers = {ln.split(":", 1)[1].strip() for ln in lines if ln.startswith("To be answered by:")} | \
+                {ln[len("Answered by"):].strip() for ln in lines if ln.startswith("Answered by ")}
+    out = []
+    for n, i in enumerate(starts):
+        chunk = lines[i:(starts[n + 1] if n + 1 < len(starts) else len(lines))]
+        for j, ln in enumerate(chunk):          # the last question runs into the page footer
+            if ln.startswith(FOOTER):
+                chunk = chunk[:j]
+                break
+        if len(chunk) < 4 or not chunk[1].startswith("Tabled on:"):
+            continue
+        wq = WQ_LINE.match(chunk[0]).group(1)
+        tabled = iso_uk(chunk[1].split(":", 1)[1].strip())
+        m = MEMBER_LINE.match(chunk[2])
+        who = f"{m.group(1)} ({m.group(2)})" if m else chunk[2]
+        question, minister, answered, answer, k = [], "", "", [], 3
+        while k < len(chunk) and not chunk[k].startswith(("To be answered by:", "Answered by ")):
+            if not chunk[k].startswith("Relevant interest declared"):
+                question.append(chunk[k])
+            k += 1
+        if k < len(chunk) and chunk[k].startswith("To be answered by:"):
+            minister = chunk[k].split(":", 1)[1].strip()
+        elif k < len(chunk):
+            minister = chunk[k][len("Answered by"):].strip()
+            rest = chunk[k + 1:]
+            if rest and rest[0].startswith("Answered on:"):
+                answered, rest = iso_uk(rest[0].split(":", 1)[1].strip()), rest[1:]
+            if rest and rest[-1] in ministers:   # the next minister's heading, not part of this answer
+                rest = rest[:-1]
+            answer = rest
+        q_text = " ".join(question)
+        if not q_text:
+            continue
+        out.append({
+            "id": f"swq-{wq}",
+            "type": "Written answer" if answered else "Written question",
+            "house": "Senedd",
+            "ref": f"WQ{wq}",
+            "title": short_title(q_text),
+            "who": who,
+            "body": minister,
+            "date": answered or tabled,
+            "tabled": tabled,
+            "answered": answered,
+            "text": q_text + (" ANSWER: " + " ".join(answer) if answer else ""),
+            "url": page_url,
+        })
+    return out
+
+
+def short_title(q: str, limit: int = 80) -> str:
+    q = q.strip().rstrip("?")
+    if len(q) <= limit:
+        return q
+    return q[:limit].rsplit(" ", 1)[0].rstrip(",;:") + "…"
+
+
+def fetch_senedd_written_questions(since: str, until: str) -> list[dict]:
+    """Senedd written questions tabled or answered in the window. The Senedd publishes one page per answer date."""
+    d = dt.date.fromisoformat(since) - dt.timedelta(days=14)
+    end = dt.date.fromisoformat(until) + dt.timedelta(days=10)
+    seen: dict[str, dict] = {}
+    pages = 0
+    while d <= end:
+        if d.weekday() < 5:
+            url = f"https://record.senedd.wales/OrderPaper/WrittenQuestions/{d:%d-%m-%Y}"
+            try:
+                for it in parse_senedd_questions(get_text(url), url):
+                    seen[it["id"]] = it
+                pages += 1
+            except Exception:
+                pass  # no questions due that day, or the page is missing
+        d += dt.timedelta(days=1)
+    items = [it for it in seen.values() if it["tabled"] >= since or (it["answered"] and it["answered"] >= since)]
+    if os.environ.get("BRIEFING_DEBUG"):
+        print(f"senedd: {pages} pages, {len(seen)} questions seen, {len(items)} in window", file=sys.stderr)
+        for it in sorted(items, key=lambda x: x["answered"], reverse=True)[:3]:
+            print("  SAMPLE", json.dumps(it, ensure_ascii=False)[:700], file=sys.stderr)
+    return items
+
+
 SOURCES = {
     "written_questions": fetch_written_questions,
     "written_statements": fetch_written_statements,
     "bills": fetch_bills,
     "commons_divisions": fetch_commons_divisions,
+    "senedd_written_questions": fetch_senedd_written_questions,
 }
 
 
@@ -366,6 +477,7 @@ def assess_without_ai(items: list[dict]) -> None:
 CSS = """
 :root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;
 --ink:#101A1A;--ink-2:#3D4A49;--muted:#4E5B5A;--hair:#E2E7E5;--edge:#7D8B88;--decision:#9A5D0E;--ai:#5E43A8;
+--commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;
 --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
 --sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
 --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -401,6 +513,18 @@ color:var(--ink);text-transform:none;margin-bottom:4px}
 section.group{padding:28px 0 4px}
 .item{background:var(--paper);border:1px solid var(--hair);border-radius:2px;padding:22px 24px;margin:14px 0}
 .item.top{border-left:3px solid var(--decision)}
+.item{border-top:4px solid var(--edge)}
+.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}
+.tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.chamber{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.chamber i{width:8px;height:8px;border-radius:50%;flex:none}
+.ch-commons{color:var(--commons)}.ch-commons i{background:var(--commons)}
+.ch-lords{color:var(--lords)}.ch-lords i{background:var(--lords)}
+.ch-senedd{color:var(--senedd)}.ch-senedd i{background:var(--senedd)}
+.type{color:var(--ink-2)}
+.key{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+text-transform:uppercase;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:8px}.key i{width:22px;height:4px;border-radius:2px}
 .row{display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;
 text-transform:uppercase;color:var(--muted)}
 .score{flex:none;letter-spacing:.04em}
@@ -419,12 +543,12 @@ border-top:1px solid var(--hair);font-family:var(--mono);font-size:12px;letter-s
 .track{margin:14px 0 4px}
 .segs{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
 .seg{height:8px;border-radius:2px;background:var(--hair)}
-.seg.done.h-commons{background:#4C8C6E}.seg.done.h-lords{background:#A2545F}.seg.done.h-both{background:var(--teal)}
+.seg.done.h-commons{background:var(--commons)}.seg.done.h-lords{background:var(--lords)}.seg.done.h-both{background:var(--teal)}
 .seg.now{background:var(--decision);box-shadow:0 0 0 2px rgba(154,93,14,.18)}
 .tlabels{display:grid;grid-template-columns:5fr 5fr 2fr;gap:3px;margin-top:6px;font-family:var(--mono);font-size:11px;
 letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .tlabels span{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden}
-.hd{width:7px;height:7px;border-radius:50%;flex:none}.hd.h-commons{background:#4C8C6E}.hd.h-lords{background:#A2545F}
+.hd{width:7px;height:7px;border-radius:50%;flex:none}.hd.h-commons{background:var(--commons)}.hd.h-lords{background:var(--lords)}
 .tnow{margin-top:6px;font-size:14px;color:var(--ink-2)}.tnow b{color:var(--decision);font-weight:600}
 footer.site{border-top:1px solid var(--hair);padding:40px 0 52px;margin-top:56px;background:var(--paper)}
 .foot{display:flex;flex-direction:column;gap:12px}
@@ -488,6 +612,22 @@ def stage_track(bill: dict) -> str:
             f'<div class="tnow">Now: <b>{esc(where)}</b> · stage {pos + 1} of {len(steps)}</div></div>')
 
 
+def chamber(it: dict) -> str:
+    h = (it.get("house") or "").lower()
+    return h if h in ("commons", "lords", "senedd") else "commons"
+
+
+def kind_label(it: dict) -> str:
+    t = "Written question · awaiting answer" if it["type"] == "Written question" else it["type"]
+    return f"{t} · {it['ref']}" if it.get("ref") else t
+
+
+def chamber_tag(it: dict) -> str:
+    c = chamber(it)
+    label = "Senedd" if c == "senedd" else f"Westminster · {c.capitalize()}"
+    return f'<span class="chamber ch-{c}"><i></i>{label}</span>'
+
+
 def related_label(it: dict) -> str:
     return f"{it['related']} related questions · " if it.get("related") else ""
 
@@ -495,8 +635,9 @@ def related_label(it: dict) -> str:
 def card(it: dict) -> str:
     who = " · ".join(x for x in (it["who"], it["body"]) if x)
     parts = [
-        f'<article class="item{" top" if it["score"] >= 9 else ""}">',
-        f'<div class="row"><span>{esc(it["type"])} · {esc(it["house"])} · {esc(nice_date(it["date"]))}</span>'
+        f'<article class="item c-{chamber(it)}{" top" if it["score"] >= 9 else ""}">',
+        f'<div class="row"><span class="tags">{chamber_tag(it)}<span class="type">{esc(kind_label(it))}</span>'
+        f'<span>{esc(nice_date(it["date"]))}</span></span>'
         f'<span class="score">{related_label(it)}{it["score"]}/10</span></div>',
         f'<h3><a href="{esc(it["url"])}" target="_blank" rel="noopener">{esc(it["title"])}</a></h3>',
     ]
@@ -566,7 +707,7 @@ def render_digest(items: list[dict], scanned: int, office: str, today: str, sinc
     if rest:
         groups += '<section class="group"><p class="label">Worth knowing</p>\n' + "\n".join(card(i) for i in rest) + "</section>\n"
     headline = "What needs you today" if keep else "Nothing needs you today"
-    lede = (f"{office}. Official Westminster business since {nice_date(since, long=True)}, "
+    lede = (f"{office}. Official Westminster and Senedd business since {nice_date(since, long=True)}, "
             "filtered to your issues, ranked and explained.")
     stats = (f'<div><b>{scanned}</b>updates read</div><div><b>{len(items)}</b>matched your issues</div>'
              f'<div><b>{len(keep)}</b>in this briefing</div>'
@@ -577,6 +718,7 @@ def render_digest(items: list[dict], scanned: int, office: str, today: str, sinc
 <p class="lede">{esc(lede)}</p>
 {f'<div class="note">{esc(note)}</div>' if note else ''}
 <div class="stats">{stats}</div>
+<div class="key"><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
 </section>
 {groups or '<p class="empty">Nothing in this period met the bar for this office.</p>'}"""
     return page(f"Morning briefing · {nice_date(today, long=True)} · Eglur", main, root)

@@ -1,0 +1,22 @@
+name: Briefing test run
+# Runs the briefing against live data on pull requests, without AI and without publishing.
+on:
+  pull_request:
+    paths: ["tools/monitor/**", ".github/workflows/**"]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r tools/monitor/requirements.txt
+      - name: Offline tests
+        run: cd tools/monitor && python -m unittest discover tests
+      - name: Live data, keyword mode, not published
+        env:
+          BRIEFING_DEBUG: "1"
+        run: python tools/monitor/monitor.py --out /tmp/briefing --no-ai --days 3
