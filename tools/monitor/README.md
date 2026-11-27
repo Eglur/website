@@ -3,7 +3,7 @@
 An 80/20 political monitor built only from public data. It's published at **www.eglurtech.com/monitor/**. It isn't linked from the site, and search engines are told not to index it.
 
 Each weekday at 05:40 UTC it:
-1. Reads the previous day's official Westminster business: written questions and answers (both Houses), ministerial statements, bill stages and Commons votes.
+1. Reads the previous day's official Westminster business: written questions and answers (both Houses), ministerial statements, bill stages and Commons votes, plus Senedd written questions and answers.
 2. Keeps the items that match the office's keywords.
 3. Has Claude rank each item 0–10 against a plain-English office profile and explain it: what happened, why it matters to this office, and a suggested next step.
 4. Publishes an Eglur-branded page. Items scoring 9+ go under **Needs you today** and 6–8 under **Worth knowing**. Past briefings are saved at `/monitor/archive.html`.
@@ -44,4 +44,5 @@ python tests/make_preview.py /tmp/preview                # sample briefing from 
 - This repo is public, so the code, the profile and past briefings can be seen. That's fine for public data and an example profile. Don't add a real office's private priorities without their agreement.
 - An unlisted page isn't a password-protected one: anyone with the link can read it.
 - Parliamentary data is reused under the Open Parliament Licence v3.0, credited in the page footer.
-- Next: Senedd Record of Proceedings and written questions, Welsh Government and GOV.UK announcements.
+- Senedd data is reused under the Open Government Licence.
+- Next: Senedd plenary business and votes, Welsh Government and GOV.UK announcements, and a look-ahead of upcoming business.

@@ -53,6 +53,7 @@ class FakeClaude:
 class Base(unittest.TestCase):
     def setUp(self):
         monitor.get_json = fake_api.fake_get_json
+        monitor.get_text = lambda url: ""   # no Senedd pages unless a test supplies one
         self.tmp = Path(tempfile.mkdtemp())
         monitor.OUT = self.tmp / "monitor"
         FakeClaude.calls, FakeClaude.fail_batches, FakeClaude.reply_as_text = [], set(), False
@@ -237,6 +238,82 @@ class TestQuickFixes(Base):
         bills = {b["title"]: b for b in monitor.fetch_bills("2026-11-23", "2026-11-27")}
         self.assertEqual(bills["Financial Services and Markets Bill [HL]"]["bill"]["origin"], "Lords")
         self.assertEqual(bills["Highways (Financing) Bill"]["bill"]["stage_id"], 8)
+
+
+SENEDD_HTML = (HERE / "sample_senedd.html").read_text()
+
+
+def html_escape(t):
+    return t.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+class TestSenedd(Base):
+    def test_parse_page(self):
+        items = monitor.parse_senedd_questions(SENEDD_HTML, "https://record.senedd.wales/OrderPaper/WrittenQuestions/25-11-2026")
+        by_ref = {i["ref"]: i for i in items}
+        self.assertEqual(sorted(by_ref), ["WQ101431", "WQ101457", "WQ101461"], "the WQ inside a script is ignored")
+        a = by_ref["WQ101461"]
+        self.assertEqual((a["type"], a["house"], a["answered"], a["tabled"], a["date"]),
+                         ("Written answer", "Senedd", "2026-11-20", "2026-11-18", "2026-11-20"))
+        self.assertEqual(a["who"], "Iain McIntosh (Brycheiniog Tawe Nedd)")
+        self.assertEqual(a["body"], "Cabinet Minister for Government Effectiveness & the Constitution")
+        self.assertIn("ANSWER: The Welsh Government’s plans", a["text"])
+        self.assertNotIn("Cabinet Minister for Health and Care", a["text"], "next minister heading isn't part of the answer")
+        q = by_ref["WQ101431"]
+        self.assertEqual((q["type"], q["body"], q["answered"]), ("Written question", "Cabinet Minister for Health and Care", ""))
+        self.assertEqual(q["title"], "What steps is the Welsh Government taking to improve accident and emergency…")
+        last = by_ref["WQ101457"]
+        self.assertNotIn("Contact us", last["text"]); self.assertNotIn("Copyright", last["text"])
+
+    def test_parse_clipboard_format(self):
+        text = ("Written Questions tabled on 03/11/2026 for answer on 10/11/2026\n\n"
+                "Deputy First Minister and Cabinet Minister for Social Justice and Equality\n\n"
+                "WQ101156(e)\nTabled on: 03/11/2026\nCai Parry-Jones (Caerdydd Ffynnon Taf)\n"
+                "Does the Welsh Government encourage the wearing of the white poppy?\n\n"
+                "Answered by Deputy First Minister and Cabinet Minister for Social Justice and Equality\n"
+                "Answered on: 10/11/2026\nWe respect the choice of individuals to wear a white poppy.&#160; It is a symbol of peace.\n\n"
+                "Cabinet Minister for Finance\n\nWQ101200(e)\nTabled on: 03/11/2026\nSteven Rodaway (G&#373;yr Abertawe)\n"
+                "How will council tax premiums be reviewed?\nTo be answered by: Cabinet Minister for Finance\n")
+        page = ('<main><a id="copy" class="button fullIcon" data-clipboard-text="' + html_escape(text) + '">Copy</a>'
+                "<div>visible layout we don't rely on</div></main>")
+        items = {i["ref"]: i for i in monitor.parse_senedd_questions(page, "u")}
+        self.assertEqual(sorted(items), ["WQ101156", "WQ101200"])
+        a = items["WQ101156"]
+        self.assertEqual((a["answered"], a["who"]), ("2026-11-10", "Cai Parry-Jones (Caerdydd Ffynnon Taf)"))
+        self.assertTrue(a["text"].endswith("ANSWER: We respect the choice of individuals to wear a white poppy. It is a symbol of peace."))
+        self.assertEqual(items["WQ101200"]["who"], "Steven Rodaway (Gŵyr Abertawe)")
+        self.assertEqual(items["WQ101200"]["type"], "Written question")
+
+    def test_window_and_pages(self):
+        asked = []
+        def fake(url):
+            asked.append(url)
+            return SENEDD_HTML if url.endswith("/25-11-2026") else ""
+        monitor.get_text = fake
+        self.assertEqual({i["ref"] for i in monitor.fetch_senedd_written_questions("2026-11-19", "2026-11-27")}, {"WQ101461"},
+                         "only the answer given on 20 Nov is new since 19 Nov")
+        self.assertEqual(len(monitor.fetch_senedd_written_questions("2026-11-18", "2026-11-27")), 3)
+        self.assertTrue(all("/OrderPaper/WrittenQuestions/" in u for u in asked))
+        self.assertFalse(any(dt.date(int(u[-4:]), int(u[-7:-5]), int(u[-10:-8])).weekday() > 4 for u in asked), "weekdays only")
+
+    def test_senedd_card_labels(self):
+        it = monitor.parse_senedd_questions(SENEDD_HTML, "u")[1]
+        html = monitor.card(dict(it, score=7, summary="s", why="w", action="", ai=True))
+        self.assertIn('class="item c-senedd"', html)
+        self.assertIn('<span class="chamber ch-senedd"><i></i>Senedd</span>', html)
+        self.assertIn("Written question · awaiting answer · WQ101431", html)
+
+
+class TestChamberLabels(unittest.TestCase):
+    def test_westminster_tags(self):
+        base = {"id": "x", "title": "t", "who": "", "body": "", "date": "2026-11-26", "text": "", "url": "u",
+                "score": 6, "summary": "s", "why": "", "action": "", "ai": True}
+        lords = monitor.card(dict(base, type="Written answer", house="Lords"))
+        self.assertIn('class="item c-lords"', lords)
+        self.assertIn("Westminster · Lords", lords)
+        commons = monitor.card(dict(base, type="Written question", house="Commons"))
+        self.assertIn("Westminster · Commons", commons)
+        self.assertIn("Written question · awaiting answer", commons)
 
 
 class TestBatching(Base):

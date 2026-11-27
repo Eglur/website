@@ -33,6 +33,7 @@ written_questions = true
 written_statements = true
 bills = true
 commons_divisions = true
+senedd_written_questions = true
 
 [model]
 # Model used to score and summarise. One batched call per ~30 items.
