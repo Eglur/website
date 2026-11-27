@@ -1,10 +1,9 @@
 name: Discover council meeting systems
 
 on:
-  workflow_dispatch:
-  push:
-    branches: [council-discovery]
-    paths: [tools/monitor/councils/discover.py, .github/workflows/councils-discover.yml]
+  workflow_dispatch:          # run by hand to look again for councils not yet found
+  schedule:
+    - cron: "17 3 1 * *"      # and monthly, as councils change systems
 
 permissions:
   contents: write
