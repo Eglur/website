@@ -85,8 +85,16 @@ class NationRouting(unittest.TestCase):
     ITEMS = [{"house": h, "council": c} for h, c in
              [("Senedd", ""), ("Holyrood", ""), ("Stormont", ""), ("Commons", ""), ("Council", "Fife"), ("Council", "Ceredigion")]]
 
+    CODES = {"Fife": "S12000047", "Ceredigion": "W06000008"}
+
+    def setUp(self):
+        p = mock.patch.dict(subscribers.REGISTRY, {"S12000047": {"name": "Fife", "url": "https://fife.example"}})
+        p.start()
+        self.addCleanup(p.stop)
+
     def kept(self, country, council):
-        return [(i["house"], i["council"]) for i in self.ITEMS if subscribers.relevant_place(i, {"country": country, "council": council})]
+        geo = {"country": country, "council": council, "codes": [self.CODES[council]] if council in self.CODES else []}
+        return [(i["house"], i["council"]) for i in self.ITEMS if subscribers.relevant_place(i, geo)]
 
     def test_scotland(self):
         self.assertEqual(self.kept("Scotland", "Fife"), [("Holyrood", ""), ("Commons", ""), ("Council", "Fife")])
@@ -139,3 +147,37 @@ class EmailQuality(unittest.TestCase):
         got = subscribers.for_subscriber(items, sub, {"country": "Wales", "council": "Pembrokeshire"}, use_ai=False)
         self.assertIn("mine", [i["id"] for i in got])
         self.assertGreaterEqual(next(i for i in got if i["id"] == "mine")["score"], 7)
+
+
+class TwoTierCouncils(unittest.TestCase):
+    """England's two-tier areas: a district council plus a county council (schools, roads, social care)."""
+    REG = {"E07000105": {"name": "Ashford", "url": "https://ashford.example"},
+           "E10000016": {"name": "Kent", "url": "https://kent.example"}}
+
+    def setUp(self):
+        p = mock.patch.dict(subscribers.REGISTRY, self.REG)
+        p.start()
+        self.addCleanup(p.stop)
+
+    def geo(self, codes):
+        return {"country": "England", "council": "Ashford", "county": "Kent", "codes": codes}
+
+    def test_both_councils_fetched_and_kept(self):
+        g = self.geo(["E07000105", "E10000016"])
+        self.assertEqual([c["name"] for c in subscribers.councils_for(g)], ["Ashford", "Kent"])
+        for name in ("Ashford", "Kent"):
+            self.assertTrue(subscribers.relevant_place({"house": "Council", "council": name}, g))
+        self.assertFalse(subscribers.relevant_place({"house": "Council", "council": "Fife"}, g))
+
+    def render(self, g):
+        return subscribers.render_email([{"house": "Commons", "title": "t", "summary": "s", "score": 8, "date": "2026-11-27", "url": "u"}],
+                                        {"frequency": "daily"}, g, monitor.dt.date(2026, 11, 27))[1]
+
+    def test_partial_coverage_note(self):
+        with mock.patch.dict(subscribers.REGISTRY, {}, clear=True):
+            subscribers.REGISTRY.update({"E10000016": self.REG["E10000016"]})
+            html_doc = self.render(self.geo(["E07000105", "E10000016"]))
+        self.assertIn("This briefing covers Kent Council. Coverage of Ashford Council is coming soon.", html_doc)
+
+    def test_full_coverage_no_note(self):
+        self.assertNotIn("coming soon", self.render(self.geo(["E07000105", "E10000016"])))

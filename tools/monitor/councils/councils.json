@@ -1,0 +1,1274 @@
+{
+ "E06000002": {
+  "name": "Middlesbrough",
+  "url": "https://moderngov.middlesbrough.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000004": {
+  "name": "Stockton-on-Tees",
+  "url": "https://moderngov.stockton.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000005": {
+  "name": "Darlington",
+  "url": "https://democracy.darlington.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000008": {
+  "name": "Blackburn with Darwen",
+  "url": "https://democracy.blackburn.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000009": {
+  "name": "Blackpool",
+  "url": "https://democracy.blackpool.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000013": {
+  "name": "North Lincolnshire",
+  "url": "https://northlincolnshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000014": {
+  "name": "York",
+  "url": "https://democracy.york.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000016": {
+  "name": "Leicester",
+  "url": "https://leicester.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000019": {
+  "name": "Herefordshire",
+  "url": "https://councillors.herefordshire.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000020": {
+  "name": "Telford and Wrekin",
+  "url": "https://democracy.telford.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000021": {
+  "name": "Stoke-on-Trent",
+  "url": "https://moderngov.stoke.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000023": {
+  "name": "City of Bristol",
+  "url": "https://democracy.bristol.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000024": {
+  "name": "North Somerset",
+  "url": "https://n-somerset.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000025": {
+  "name": "South Gloucestershire",
+  "url": "https://council.southglos.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000027": {
+  "name": "Torbay",
+  "url": "https://torbay.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000031": {
+  "name": "Peterborough",
+  "url": "https://democracy.peterborough.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000033": {
+  "name": "Southend-on-Sea",
+  "url": "https://democracy.southend.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000034": {
+  "name": "Thurrock",
+  "url": "https://democracy.thurrock.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000036": {
+  "name": "Bracknell Forest",
+  "url": "https://bracknell-forest.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000038": {
+  "name": "Reading",
+  "url": "https://democracy.reading.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000039": {
+  "name": "Slough",
+  "url": "https://democracy.slough.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000040": {
+  "name": "Windsor and Maidenhead",
+  "url": "https://rbwm.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000041": {
+  "name": "Wokingham",
+  "url": "https://wokingham.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000042": {
+  "name": "Milton Keynes",
+  "url": "https://milton-keynes.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000043": {
+  "name": "Brighton and Hove",
+  "url": "https://democracy.brighton-hove.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000044": {
+  "name": "Portsmouth",
+  "url": "https://democracy.portsmouth.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000045": {
+  "name": "Southampton",
+  "url": "https://www.southampton.gov.uk/moderngov",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000046": {
+  "name": "Isle of Wight",
+  "url": "https://iow.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000047": {
+  "name": "County Durham",
+  "url": "https://durham.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000052": {
+  "name": "Cornwall",
+  "url": "https://democracy.cornwall.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000053": {
+  "name": "Isles of Scilly",
+  "url": "https://committees.scilly.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000057": {
+  "name": "Northumberland",
+  "url": "https://northumberland.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000058": {
+  "name": "Bournemouth, Christchurch and Poole",
+  "url": "https://democracy.bcpcouncil.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000060": {
+  "name": "Buckinghamshire",
+  "url": "https://buckinghamshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000061": {
+  "name": "North Northamptonshire",
+  "url": "https://northnorthants.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000062": {
+  "name": "West Northamptonshire",
+  "url": "https://westnorthants.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000063": {
+  "name": "Cumberland",
+  "url": "https://cumberland.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000064": {
+  "name": "Westmorland and Furness",
+  "url": "https://westmorlandandfurness.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000066": {
+  "name": "Somerset",
+  "url": "https://democracy.somerset.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E07000008": {
+  "name": "Cambridge",
+  "url": "https://democracy.cambridge.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000012": {
+  "name": "South Cambridgeshire",
+  "url": "https://scambs.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000033": {
+  "name": "Bolsover",
+  "url": "https://committees.bolsover.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000034": {
+  "name": "Chesterfield",
+  "url": "https://chesterfield.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000035": {
+  "name": "Derbyshire Dales",
+  "url": "https://democracy.derbyshiredales.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000036": {
+  "name": "Erewash",
+  "url": "https://moderngov.erewash.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000037": {
+  "name": "High Peak",
+  "url": "https://democracy.highpeak.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000038": {
+  "name": "North East Derbyshire",
+  "url": "https://ne-derbyshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000041": {
+  "name": "Exeter",
+  "url": "https://modgov.exeter.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000061": {
+  "name": "Eastbourne",
+  "url": "https://democracy.lewes-eastbourne.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000062": {
+  "name": "Hastings",
+  "url": "https://hastings.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000063": {
+  "name": "Lewes",
+  "url": "https://democracy.lewes-eastbourne.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000064": {
+  "name": "Rother",
+  "url": "https://rother.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000068": {
+  "name": "Brentwood",
+  "url": "https://brentwood.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000072": {
+  "name": "Epping Forest",
+  "url": "https://eppingforest.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000073": {
+  "name": "Harlow",
+  "url": "https://harlow.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000074": {
+  "name": "Maldon",
+  "url": "https://democracy.maldon.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000075": {
+  "name": "Rochford",
+  "url": "https://rochford.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000077": {
+  "name": "Uttlesford",
+  "url": "https://uttlesford.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000081": {
+  "name": "Gloucester",
+  "url": "https://democracy.gloucester.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000082": {
+  "name": "Stroud",
+  "url": "https://stroud.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000084": {
+  "name": "Basingstoke and Deane",
+  "url": "https://democracy.basingstoke.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000085": {
+  "name": "East Hampshire",
+  "url": "https://easthants.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000086": {
+  "name": "Eastleigh",
+  "url": "https://eastleigh.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000087": {
+  "name": "Fareham",
+  "url": "https://moderngov.fareham.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000088": {
+  "name": "Gosport",
+  "url": "https://democracy.gosport.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000089": {
+  "name": "Hart",
+  "url": "https://hart.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000090": {
+  "name": "Havant",
+  "url": "https://havant.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000092": {
+  "name": "Rushmoor",
+  "url": "https://democracy.rushmoor.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000093": {
+  "name": "Test Valley",
+  "url": "https://democracy.testvalley.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000094": {
+  "name": "Winchester",
+  "url": "https://democracy.winchester.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000095": {
+  "name": "Broxbourne",
+  "url": "https://broxbourne.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000098": {
+  "name": "Hertsmere",
+  "url": "https://hertsmere.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000099": {
+  "name": "North Hertfordshire",
+  "url": "https://democracy.north-herts.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000102": {
+  "name": "Three Rivers",
+  "url": "https://moderngov.threerivers.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000103": {
+  "name": "Watford",
+  "url": "https://watford.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000105": {
+  "name": "Ashford",
+  "url": "https://ashford.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000107": {
+  "name": "Dartford",
+  "url": "https://dartford.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000108": {
+  "name": "Dover",
+  "url": "https://moderngov.dover.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000109": {
+  "name": "Gravesham",
+  "url": "https://democracy.gravesham.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000110": {
+  "name": "Maidstone",
+  "url": "https://meetings.maidstone.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000111": {
+  "name": "Sevenoaks",
+  "url": "https://sevenoaks.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000112": {
+  "name": "Folkestone and Hythe",
+  "url": "https://www.folkestone-hythe.gov.uk/moderngov",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000113": {
+  "name": "Swale",
+  "url": "https://democracy.swale.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000114": {
+  "name": "Thanet",
+  "url": "https://democracy.thanet.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000116": {
+  "name": "Tunbridge Wells",
+  "url": "https://democracy.tunbridgewells.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000117": {
+  "name": "Burnley",
+  "url": "https://burnley.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000118": {
+  "name": "Chorley",
+  "url": "https://democracy.chorley.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000120": {
+  "name": "Hyndburn",
+  "url": "https://democracy.hyndburnbc.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000123": {
+  "name": "Preston",
+  "url": "https://preston.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000124": {
+  "name": "Ribble Valley",
+  "url": "https://democracy.ribblevalley.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000126": {
+  "name": "South Ribble",
+  "url": "https://southribble.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000127": {
+  "name": "West Lancashire",
+  "url": "https://democracy.westlancs.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000128": {
+  "name": "Wyre",
+  "url": "https://wyre.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000130": {
+  "name": "Charnwood",
+  "url": "https://charnwood.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000132": {
+  "name": "Hinckley and Bosworth",
+  "url": "https://moderngov.hinckley-bosworth.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000133": {
+  "name": "Melton",
+  "url": "https://democracy.melton.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000134": {
+  "name": "North West Leicestershire",
+  "url": "https://nwleics.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000138": {
+  "name": "City of Lincoln",
+  "url": "https://lincoln.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000141": {
+  "name": "South Kesteven",
+  "url": "https://moderngov.southkesteven.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000144": {
+  "name": "Broadland",
+  "url": "https://democracy.southnorfolkandbroadland.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000146": {
+  "name": "Kings Lynn and West Norfolk",
+  "url": "https://democracy.west-norfolk.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000149": {
+  "name": "South Norfolk",
+  "url": "https://democracy.southnorfolkandbroadland.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000170": {
+  "name": "Ashfield",
+  "url": "https://democracy.ashfield.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000171": {
+  "name": "Bassetlaw",
+  "url": "https://bassetlaw.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000172": {
+  "name": "Broxtowe",
+  "url": "https://democracy.broxtowe.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000173": {
+  "name": "Gedling",
+  "url": "https://democracy.gedling.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000174": {
+  "name": "Mansfield",
+  "url": "https://mansfield.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000176": {
+  "name": "Rushcliffe",
+  "url": "https://democracy.rushcliffe.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000178": {
+  "name": "Oxford",
+  "url": "https://mycouncil.oxford.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000179": {
+  "name": "South Oxfordshire",
+  "url": "https://southoxon.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000180": {
+  "name": "Vale of White Horse",
+  "url": "https://whitehorsedc.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000194": {
+  "name": "Lichfield",
+  "url": "https://democracy.lichfielddc.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000198": {
+  "name": "Staffordshire Moorlands",
+  "url": "https://democracy.staffsmoorlands.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000199": {
+  "name": "Tamworth",
+  "url": "https://tamworth.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000208": {
+  "name": "Epsom and Ewell",
+  "url": "https://democracy.epsom-ewell.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000209": {
+  "name": "Guildford",
+  "url": "https://democracy.guildford.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000211": {
+  "name": "Reigate and Banstead",
+  "url": "https://reigate-banstead.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000212": {
+  "name": "Runnymede",
+  "url": "https://democracy.runnymede.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000213": {
+  "name": "Spelthorne",
+  "url": "https://democracy.spelthorne.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000214": {
+  "name": "Surrey Heath",
+  "url": "https://surreyheath.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000215": {
+  "name": "Tandridge",
+  "url": "https://tandridge.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000217": {
+  "name": "Woking",
+  "url": "https://moderngov.woking.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000218": {
+  "name": "North Warwickshire",
+  "url": "https://northwarwickshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000221": {
+  "name": "Stratford-on-Avon",
+  "url": "https://democracy.stratford.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000223": {
+  "name": "Adur",
+  "url": "https://democracy.adur-worthing.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000224": {
+  "name": "Arun",
+  "url": "https://democracy.arun.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000225": {
+  "name": "Chichester",
+  "url": "https://chichester.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000226": {
+  "name": "Crawley",
+  "url": "https://democracy.crawley.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000227": {
+  "name": "Horsham",
+  "url": "https://horsham.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000228": {
+  "name": "Mid Sussex",
+  "url": "https://midsussex.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000229": {
+  "name": "Worthing",
+  "url": "https://democracy.adur-worthing.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000234": {
+  "name": "Bromsgrove",
+  "url": "https://moderngovwebpublic.bromsgrove.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000235": {
+  "name": "Malvern Hills",
+  "url": "https://moderngov.malvernhills.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000236": {
+  "name": "Redditch",
+  "url": "https://moderngovwebpublic.redditchbc.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000238": {
+  "name": "Wychavon",
+  "url": "https://mgov.wychavon.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000240": {
+  "name": "St Albans",
+  "url": "https://stalbans.moderngov.co.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E08000001": {
+  "name": "Bolton",
+  "url": "https://bolton.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000003": {
+  "name": "Manchester",
+  "url": "https://democracy.manchester.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000004": {
+  "name": "Oldham",
+  "url": "https://committees.oldham.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000005": {
+  "name": "Rochdale",
+  "url": "https://democracy.rochdale.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000006": {
+  "name": "Salford",
+  "url": "https://salford.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000008": {
+  "name": "Tameside",
+  "url": "https://tameside.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000010": {
+  "name": "Wigan",
+  "url": "https://democracy.wigan.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000012": {
+  "name": "Liverpool",
+  "url": "https://councillors.liverpool.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000013": {
+  "name": "St. Helens",
+  "url": "https://sthelens.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000015": {
+  "name": "Wirral",
+  "url": "https://democracy.wirral.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000017": {
+  "name": "Doncaster",
+  "url": "https://doncaster.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000018": {
+  "name": "Rotherham",
+  "url": "https://moderngov.rotherham.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000019": {
+  "name": "Sheffield",
+  "url": "https://democracy.sheffield.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000022": {
+  "name": "North Tyneside",
+  "url": "https://northtyneside.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000028": {
+  "name": "Sandwell",
+  "url": "https://sandwell.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000031": {
+  "name": "Wolverhampton",
+  "url": "https://wolverhampton.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000032": {
+  "name": "Bradford",
+  "url": "https://bradford.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000033": {
+  "name": "Calderdale",
+  "url": "https://calderdale.moderngov.co.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000034": {
+  "name": "Kirklees",
+  "url": "https://democracy.kirklees.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000036": {
+  "name": "Wakefield",
+  "url": "https://mg.wakefield.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000037": {
+  "name": "Gateshead",
+  "url": "https://democracy.gateshead.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E09000001": {
+  "name": "City of London",
+  "url": "https://democracy.cityoflondon.gov.uk",
+  "nation": "England",
+  "type": "CC"
+ },
+ "E09000002": {
+  "name": "Barking and Dagenham",
+  "url": "https://lbbd.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000003": {
+  "name": "Barnet",
+  "url": "https://barnet.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000004": {
+  "name": "Bexley",
+  "url": "https://democracy.bexley.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000005": {
+  "name": "Brent",
+  "url": "https://democracy.brent.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000008": {
+  "name": "Croydon",
+  "url": "https://democracy.croydon.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000009": {
+  "name": "Ealing",
+  "url": "https://ealing.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000010": {
+  "name": "Enfield",
+  "url": "https://enfield.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000011": {
+  "name": "Greenwich",
+  "url": "https://committees.royalgreenwich.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000012": {
+  "name": "Hackney",
+  "url": "https://hackney.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000013": {
+  "name": "Hammersmith and Fulham",
+  "url": "https://democracy.lbhf.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000015": {
+  "name": "Harrow",
+  "url": "https://moderngov.harrow.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000017": {
+  "name": "Hillingdon",
+  "url": "https://modgov.hillingdon.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000018": {
+  "name": "Hounslow",
+  "url": "https://democraticservices.hounslow.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000019": {
+  "name": "Islington",
+  "url": "https://democracy.islington.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000021": {
+  "name": "Kingston upon Thames",
+  "url": "https://moderngov.kingston.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000023": {
+  "name": "Lewisham",
+  "url": "https://lewisham.moderngov.co.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000024": {
+  "name": "Merton",
+  "url": "https://democracy.merton.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000026": {
+  "name": "Redbridge",
+  "url": "https://moderngov.redbridge.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000028": {
+  "name": "Southwark",
+  "url": "https://moderngov.southwark.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000029": {
+  "name": "Sutton",
+  "url": "https://moderngov.sutton.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000030": {
+  "name": "Tower Hamlets",
+  "url": "https://democracy.towerhamlets.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000032": {
+  "name": "Wandsworth",
+  "url": "https://democracy.wandsworth.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E09000033": {
+  "name": "Westminster",
+  "url": "https://committees.westminster.gov.uk",
+  "nation": "England",
+  "type": "LBO"
+ },
+ "E10000007": {
+  "name": "Derbyshire",
+  "url": "https://democracy.derbyshire.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000011": {
+  "name": "East Sussex",
+  "url": "https://democracy.eastsussex.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000013": {
+  "name": "Gloucestershire",
+  "url": "https://gloucestershire.moderngov.co.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000014": {
+  "name": "Hampshire",
+  "url": "https://democracy.hants.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000016": {
+  "name": "Kent",
+  "url": "https://democracy.kent.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000017": {
+  "name": "Lancashire",
+  "url": "https://council.lancashire.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000019": {
+  "name": "Lincolnshire",
+  "url": "https://lincolnshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000028": {
+  "name": "Staffordshire",
+  "url": "https://moderngov.staffordshire.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000031": {
+  "name": "Warwickshire",
+  "url": "https://democracy.warwickshire.gov.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000032": {
+  "name": "West Sussex",
+  "url": "https://westsussex.moderngov.co.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "E10000034": {
+  "name": "Worcestershire",
+  "url": "https://worcestershire.moderngov.co.uk",
+  "nation": "England",
+  "type": "CTY"
+ },
+ "S12000026": {
+  "name": "The Scottish Borders",
+  "url": "https://scottishborders.moderngov.co.uk",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "S12000033": {
+  "name": "Aberdeen City",
+  "url": "https://aberdeen.moderngov.co.uk",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "S12000034": {
+  "name": "Aberdeenshire",
+  "url": "https://aberdeenshire.moderngov.co.uk",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "S12000035": {
+  "name": "Argyll and Bute",
+  "url": "https://www.argyll-bute.gov.uk/moderngov",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "S12000036": {
+  "name": "City of Edinburgh",
+  "url": "https://democracy.edinburgh.gov.uk",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "S12000045": {
+  "name": "East Dunbartonshire",
+  "url": "https://eastdunbarton.moderngov.co.uk",
+  "nation": "Scotland",
+  "type": "SCO"
+ },
+ "W06000002": {
+  "name": "Gwynedd",
+  "url": "https://democracy.gwynedd.llyw.cymru",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000008": {
+  "name": "Ceredigion",
+  "url": "https://council.ceredigion.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000009": {
+  "name": "Pembrokeshire",
+  "url": "https://mgenglish.pembrokeshire.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000010": {
+  "name": "Carmarthenshire",
+  "url": "https://democracy.carmarthenshire.gov.wales",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000011": {
+  "name": "Swansea",
+  "url": "https://democracy.swansea.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000013": {
+  "name": "Bridgend",
+  "url": "https://moderngov.bridgend.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000015": {
+  "name": "Cardiff",
+  "url": "https://cardiff.moderngov.co.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000016": {
+  "name": "Rhondda Cynon Taff",
+  "url": "https://rctcbc.moderngov.co.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000019": {
+  "name": "Blaenau Gwent",
+  "url": "https://democracy.blaenau-gwent.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000020": {
+  "name": "Torfaen",
+  "url": "https://torfaen.moderngov.co.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000021": {
+  "name": "Monmouthshire",
+  "url": "https://democracy.monmouthshire.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000022": {
+  "name": "Newport",
+  "url": "https://democracy.newport.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000023": {
+  "name": "Powys",
+  "url": "https://powys.moderngov.co.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ },
+ "W06000024": {
+  "name": "Merthyr Tydfil",
+  "url": "https://democracy.merthyr.gov.uk",
+  "nation": "Wales",
+  "type": "WPA"
+ }
+}

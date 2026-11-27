@@ -30,11 +30,19 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 import monitor  # noqa: E402
 
-# ModernGov council sites we can read. Add councils here as they're checked.
-COUNCIL_SITES = {
-    "Pembrokeshire": "https://mgenglish.pembrokeshire.gov.uk",
-    "Ceredigion": "https://council.ceredigion.gov.uk",
-}
+# Councils whose meetings we can read (ModernGov), keyed by ONS/GSS code. Built by councils/discover.py.
+def load_registry() -> dict:
+    try:
+        return json.loads((Path(__file__).parent / "councils" / "councils.json").read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+REGISTRY = load_registry()
+REGISTRY.setdefault("W06000009", {"name": "Pembrokeshire", "url": "https://mgenglish.pembrokeshire.gov.uk", "nation": "Wales", "type": "WPA"})
+REGISTRY.setdefault("W06000008", {"name": "Ceredigion", "url": "https://council.ceredigion.gov.uk", "nation": "Wales", "type": "WPA"})
+BY_NAME = {c["name"].lower(): code for code, c in REGISTRY.items()}
+NO_AREA = re.compile(r"^[ENSW]99999999$")   # postcodes.io's "not applicable" code
 
 TOPIC_KEYWORDS = {
     "Planning": ["planning", "planning application*", "development management", "local development plan"],
@@ -102,21 +110,35 @@ def get_json(url: str):
 def locate(area: str) -> dict:
     """Postcode or place name -> council area, constituency and country (postcodes.io, free and open)."""
     area = (area or "").strip()
-    geo = {"area": area, "council": "", "constituency": "", "country": ""}
+    geo = {"area": area, "council": "", "county": "", "codes": [], "constituency": "", "country": ""}
     try:
         m = POSTCODE.match(area)
         if m:
             r = get_json("https://api.postcodes.io/postcodes/" + urllib.parse.quote(f"{m.group(1)} {m.group(2)}"))["result"]
+            codes = r.get("codes") or {}
             geo.update(council=r.get("admin_district") or "", country=r.get("country") or "",
-                       constituency=r.get("parliamentary_constituency_2024") or r.get("parliamentary_constituency") or "")
+                       county=r.get("admin_county") or "",
+                       constituency=r.get("parliamentary_constituency_2024") or r.get("parliamentary_constituency") or "",
+                       codes=[c for c in (codes.get("admin_district"), codes.get("admin_county")) if c and not NO_AREA.match(c)])
         elif area:
             res = get_json("https://api.postcodes.io/places?" + urllib.parse.urlencode({"q": area, "limit": 1})).get("result") or []
             if res:
-                geo.update(council=res[0].get("county_unitary") or res[0].get("district_borough") or "",
-                           country=res[0].get("country") or "")
+                district, county = res[0].get("district_borough") or "", res[0].get("county_unitary") or ""
+                geo.update(council=district or county, county=county if district and county != district else "",
+                           country=res[0].get("country") or "",
+                           codes=[BY_NAME[n.lower()] for n in (district, county) if n and n.lower() in BY_NAME])
     except Exception as e:  # a lookup failure just means less local targeting
         print(f"  location lookup failed for an area: {e}", file=sys.stderr)
     return geo
+
+
+def councils_for(geo: dict) -> list[dict]:
+    """The council sites we can read for this person: their district/unitary council, and county council if any."""
+    return [{"name": REGISTRY[c]["name"], "url": REGISTRY[c]["url"]} for c in geo.get("codes", []) if c in REGISTRY]
+
+
+def council_names(geo: dict) -> list[str]:
+    return [n for n in (geo.get("council"), geo.get("county")) if n]
 
 
 # ------------------------------------------------------------------ profile
@@ -146,13 +168,13 @@ def build_profile(sub: dict, geo: dict) -> dict:
         keywords += TOPIC_KEYWORDS.get(t, [t])
     for p in places + people:
         keywords.append(p)
-    for k in (geo.get("council"), geo.get("constituency")):
+    for k in (geo.get("council"), geo.get("county"), geo.get("constituency")):
         if k:
             keywords.append(k)
     area = geo.get("area", "")
     if area and not POSTCODE.match(area.replace(" ", "")):
         keywords.append(area)
-    where = ", ".join(x for x in (area, f"{geo['council']} council area" if geo.get("council") else "",
+    where = ", ".join(x for x in (area, f"{' and '.join(council_names(geo))} council area" if geo.get("council") else "",
                                   f"Westminster constituency {geo['constituency']}" if geo.get("constituency") else "",
                                   geo.get("country")) if x)
     description = (f"A member of the public living in {where or 'the UK'}.\n"
@@ -240,9 +262,14 @@ def render_email(items: list[dict], sub: dict, geo: dict, today: dt.date) -> tup
             '<p style="margin:30px 0 0;font-size:13px;line-height:1.6;color:#5F6B6A">Summaries are written by AI and can be wrong, so every item links to the official record. '
             'Reply to this email to change what you follow.</p>')
     council_note = ""
-    if geo.get("council") and geo["council"] not in COUNCIL_SITES:
-        council_note = (f'<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#5F6B6A">Coverage of {esc(geo["council"])} Council is coming soon. '
+    covered = {x["name"] for x in councils_for(geo)}
+    missing = [n for n in council_names(geo) if n not in covered]
+    if missing and not covered:
+        council_note = (f'<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#5F6B6A">Coverage of {esc(" and ".join(missing))} Council is coming soon. '
                         f'For now your briefing covers {esc(levels(geo, council=False))}.</p>')
+    elif missing:
+        council_note = (f'<p style="margin:10px 0 0;font-size:13px;line-height:1.6;color:#5F6B6A">This briefing covers {esc(" and ".join(sorted(covered)))} Council. '
+                        f'Coverage of {esc(" and ".join(missing))} Council is coming soon.</p>')
     html_doc = frame(body + council_note, f"{subject_line(keep)}" if keep else "Your briefing")
     text = "\n".join([f"{day}: {headline}.", ""] + [
         f"- {where_label(i)}: {heading(i)}\n  {i['summary']}\n  {i.get('why', '')}\n  {i['url']}" for i in keep
@@ -271,7 +298,8 @@ def collect_all(subs_geo: list[tuple[dict, dict]], today: dt.date, days: int) ->
     monitor.OUT = Path("daily-email")
     monitor.OUT.mkdir(exist_ok=True)
     monitor.load_state()
-    monitor.COUNCILS[:] = [{"name": c, "url": COUNCIL_SITES[c]} for c in sorted({g["council"] for _, g in subs_geo if g.get("council") in COUNCIL_SITES})]
+    wanted = {c["url"]: c for _, g in subs_geo for c in councils_for(g)}
+    monitor.COUNCILS[:] = sorted(wanted.values(), key=lambda c: c["name"])
     profile = {"sources": {k: True for k in monitor.SOURCES}}
     since = (today - dt.timedelta(days=days)).isoformat()
     items = monitor.collect(profile, since, today.isoformat())
@@ -283,7 +311,7 @@ def relevant_place(it: dict, geo: dict) -> bool:
     """Council items only from their own council; devolved items only from their own nation's parliament."""
     c = monitor.chamber(it)
     if c == "council":
-        return it.get("council") == geo.get("council")
+        return it.get("council") in {x["name"] for x in councils_for(geo)}
     if c in monitor.DEVOLVED:
         return NATION_HOUSE.get(geo.get("country", "")) == c
     return True

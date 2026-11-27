@@ -15,7 +15,7 @@ import subscribers as S
 SUB = {"email": "jane@example.com", "area": "SA43 1AB", "topics": "Planning, Health and the NHS",
        "topics_other": "bus routes", "places": "Cardigan, Fishguard", "people": "Cllr Jane Smith, Paul Davies MS",
        "frequency": "daily"}
-GEO = {"area": "SA43 1AB", "council": "Ceredigion", "constituency": "Ceredigion Preseli", "country": "Wales"}
+GEO = {"area": "SA43 1AB", "council": "Ceredigion", "constituency": "Ceredigion Preseli", "country": "Wales", "codes": ["W06000008"]}
 
 
 def item(**kw):
@@ -83,8 +83,8 @@ class TestEmail(unittest.TestCase):
         self.assertNotIn("jane@example.com", html)
 
     def test_council_not_yet_covered(self):
-        _, html, _ = S.render_email([item()], SUB, dict(GEO, council="Cardiff"), dt.date(2026, 11, 27))
-        self.assertIn("Coverage of Cardiff Council is coming soon", html)
+        _, html, _ = S.render_email([item()], SUB, dict(GEO, council="Wrexham", codes=["W06000006"]), dt.date(2026, 11, 27))
+        self.assertIn("Coverage of Wrexham Council is coming soon", html)
 
     def test_escaping(self):
         _, html, _ = S.render_email([item(title="<script>x</script>", url='https://e.x/?a=1&b="2"')], SUB, GEO, dt.date(2026, 11, 27))
