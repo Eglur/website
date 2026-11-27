@@ -540,8 +540,9 @@ def uk_date(d: str) -> str:
     return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else ""
 
 
-def mg_xml(host: str, op: str, params: dict) -> ET.Element:
-    return ET.fromstring(get_text(f"https://{host}/mgWebService.asmx/{op}?" + urllib.parse.urlencode(params)).strip().encode("utf-8"))
+def mg_xml(base: str, op: str, params: dict) -> ET.Element:
+    """base: the ModernGov site, e.g. 'democracy.example.gov.uk' or 'www.example.gov.uk/moderngov'."""
+    return ET.fromstring(get_text(f"https://{base}/mgWebService.asmx/{op}?" + urllib.parse.urlencode(params)).strip().encode("utf-8"))
 
 
 def xt(el: ET.Element | None, tag: str) -> str:
@@ -551,7 +552,7 @@ def xt(el: ET.Element | None, tag: str) -> str:
 
 def fetch_council(name: str, url: str, since: str, until: str) -> list[dict]:
     """Agenda items coming up in the next week, and decisions published since the last briefing."""
-    host = re.sub(r"^https?://", "", url).strip("/").split("/")[0]
+    host = re.sub(r"^https?://", "", url).strip("/")   # may include a path, e.g. www.example.gov.uk/moderngov
     shown = set(STATE.get("council_shown", []))
     back = dt.date.fromisoformat(since) - dt.timedelta(days=7 if shown else 2)
     ahead = dt.date.fromisoformat(until) + dt.timedelta(days=7)

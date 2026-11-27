@@ -20,11 +20,23 @@ from pathlib import Path
 HERE = Path(__file__).parent
 UA = "EglurMonitor/1.0 (+https://www.eglurtech.com/monitor/; council discovery)"
 SUBDOMAINS = ["democracy", "moderngov", "mgenglish", "committees", "councillors", "meetings", "mg", "modgov",
-              "democraticservices", "decisions", "decisionmaking", "cmis", "minutes", "council", "public", "www"]
+              "democraticservices", "decisions", "decisionmaking", "cmis", "minutes", "council", "public", "www",
+              "mycouncil", "minutes1", "minutes2", "minutes3", "democratic", "moderngovwebpublic", "cmttpublic",
+              "councilmeetings", "governance", "mgov", "modgovwebsite", "moderngovpublic", "democracy-cymraeg"]
+# Councils GOV.UK has no homepage for (newer unitaries and renamed slugs).
+HOMEPAGES = {
+    "Bournemouth, Christchurch and Poole": "https://www.bcpcouncil.gov.uk", "Buckinghamshire": "https://www.buckinghamshire.gov.uk",
+    "Cumberland": "https://www.cumberland.gov.uk", "Dorset Council": "https://www.dorsetcouncil.gov.uk",
+    "East Suffolk": "https://www.eastsuffolk.gov.uk", "Folkestone and Hythe": "https://www.folkestone-hythe.gov.uk",
+    "North Northamptonshire": "https://www.northnorthants.gov.uk", "North Yorkshire": "https://www.northyorks.gov.uk",
+    "Somerset": "https://www.somerset.gov.uk", "St. Helens": "https://www.sthelens.gov.uk",
+    "West Northamptonshire": "https://www.westnorthants.gov.uk", "West Suffolk": "https://www.westsuffolk.gov.uk",
+    "Westmorland and Furness": "https://www.westmorlandandfurness.gov.uk",
+}
 PATHS = ["", "/moderngov", "/mgov", "/democracy"]
 
 
-def get(url: str, timeout: int = 12) -> tuple[int, str]:
+def get(url: str, timeout: int = 20) -> tuple[int, str]:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     try:
         with urllib.request.urlopen(req, timeout=timeout) as r:
@@ -60,7 +72,7 @@ def candidates(home: str, slug: str) -> list[str]:
 
 def discover(row: dict) -> tuple[str, dict | None, str]:
     slug, name = row["gov-uk-slug"], row["nice-name"]
-    home = homepage(slug) if slug else ""
+    home = HOMEPAGES.get(name) or (homepage(slug) if slug else "")
     if not home:
         return row["gss-code"], None, f"{name}: no GOV.UK homepage"
     for base in candidates(home, slug):
@@ -72,8 +84,14 @@ def discover(row: dict) -> tuple[str, dict | None, str]:
 def main() -> None:
     rows = [r for r in csv.DictReader(open(HERE / "uk_local_authorities.csv", encoding="utf-8"))
             if r["current-authority"] == "True" and r["gss-code"] and r["local-authority-type"] not in ("COMB", "SRA")]
-    print(f"{len(rows)} councils to check", file=sys.stderr)
-    found, missing = {}, []
+    try:   # keep what earlier runs found; only look again for the rest
+        found = json.loads((HERE / "councils.json").read_text())
+    except (OSError, ValueError):
+        found = {}
+    total = len(rows)
+    rows = [r for r in rows if r["gss-code"] not in found]
+    print(f"{len(rows)} of {total} councils to check", file=sys.stderr)
+    missing = []
     with ThreadPoolExecutor(max_workers=24) as pool:
         for gss, hit, note in pool.map(discover, rows):
             print(note, file=sys.stderr)
@@ -83,7 +101,7 @@ def main() -> None:
                 missing.append(note)
     (HERE / "councils.json").write_text(json.dumps(dict(sorted(found.items())), indent=1, ensure_ascii=False) + "\n")
     (HERE / "not_found.txt").write_text("\n".join(sorted(missing)) + "\n")
-    print(f"ModernGov: {len(found)} of {len(rows)}", file=sys.stderr)
+    print(f"ModernGov: {len(found)} of {total}", file=sys.stderr)
 
 
 if __name__ == "__main__":
