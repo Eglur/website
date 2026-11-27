@@ -22,7 +22,7 @@
 
 :root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;
 --ink:#101A1A;--ink-2:#3D4A49;--muted:#4E5B5A;--hair:#E2E7E5;--edge:#7D8B88;--decision:#9A5D0E;--ai:#5E43A8;
---commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;
+--commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;--council:#7A5C2E;
 --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
 --sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
 --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -59,13 +59,14 @@ section.group{padding:28px 0 4px}
 .item{background:var(--paper);border:1px solid var(--hair);border-radius:2px;padding:22px 24px;margin:14px 0}
 .item.top{border-left:3px solid var(--decision)}
 .item{border-top:4px solid var(--edge)}
-.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}
+.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}.item.c-council{border-top-color:var(--council)}
 .tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
 .chamber{display:inline-flex;align-items:center;gap:6px;font-weight:600}
 .chamber i{width:8px;height:8px;border-radius:50%;flex:none}
 .ch-commons{color:var(--commons)}.ch-commons i{background:var(--commons)}
 .ch-lords{color:var(--lords)}.ch-lords i{background:var(--lords)}
 .ch-senedd{color:var(--senedd)}.ch-senedd i{background:var(--senedd)}
+.ch-council{color:var(--council)}.ch-council i{background:var(--council)}
 .type{color:var(--ink-2)}
 .key{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
 text-transform:uppercase;color:var(--muted)}
@@ -130,55 +131,64 @@ nav .chip{display:none}.row{letter-spacing:.04em;font-size:11px}ul.archive a{fon
 <section class="hero">
 <p class="label">Morning briefing · Friday 27 November 2026</p>
 <h1>What needs you today<span class="stop">.</span></h1>
-<p class="lede">Paul Davies MS, Ceredigion Penfro (demo profile from public sources, not affiliated). Official Westminster and Senedd business since Thursday 26 November 2026, filtered to your issues, ranked and explained.</p>
+<p class="lede">Paul Davies MS, Ceredigion Penfro (demo profile from public sources, not affiliated). Official council, Senedd and Westminster business since Thursday 26 November 2026, filtered to your issues, ranked and explained.</p>
 
-<div class="stats"><div><b>653</b>updates read</div><div><b>89</b>matched your issues</div><div><b>5</b>in this briefing</div><div><b>2 min</b>to read</div></div>
-<div class="key"><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
+<div class="stats"><div><b>728</b>updates read</div><div><b>160</b>matched your issues</div><div><b>6</b>in this briefing</div><div><b>2 min</b>to read</div></div>
+<div class="key"><span><i style="background:var(--council)"></i>Council</span><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
 </section>
 <section class="group"><p class="label">Worth knowing</p>
 <article class="item c-commons">
 <div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Written answer</span><span>26 Nov</span></span><span class="score">2 related questions · 6/10</span></div>
 <h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-20/45322" target="_blank" rel="noopener">Bank Services: Rural Areas</a></h3>
 <div class="who">Adam Dance (LD, Yeovil) · Treasury</div>
-<p>Commons answers cite the independent Review on Access to Banking Services, published 16 November, on in-person banking gaps and minimum standards in rural areas.</p>
-<p class="why"><span class="k">Why it matters</span>The review&#x27;s findings are relevant to Paul Davies&#x27;s campaigning on bank branch closures in Haverfordwest and Aberystwyth.</p>
-<p class="next"><span class="k">Next step</span>Read the Lloyd review and check its recommendations on branch closures and rural in-person banking for use in the Haverfordwest and Aberystwyth campaigns.</p>
+<p>The Treasury answered on in-person banking gaps and minimum standards, pointing to the Review on Access to Banking Services (Richard Lloyd) published on 16 November.</p>
+<p class="why"><span class="k">Why it matters</span>The review is relevant to his campaigning on bank branch closures in Haverfordwest and Aberystwyth and to rural banking access.</p>
+<p class="next"><span class="k">Next step</span>Review the Lloyd report&#x27;s recommendations and consider a question or letter on how they apply to Haverfordwest and Aberystwyth.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-20/45322" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
 <article class="item c-commons">
 <div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Bill stage</span><span>27 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://bills.parliament.uk/bills/4178" target="_blank" rel="noopener">Hospice Funding Bill</a></h3>
 <div class="track" aria-label="Bill stage: 2nd reading, Commons"><div class="segs"><span class="seg done h-commons" title="Commons: 1st reading"></span><span class="seg now h-commons" title="Commons: 2nd reading"></span><span class="seg todo h-commons" title="Commons: Committee"></span><span class="seg todo h-commons" title="Commons: Report"></span><span class="seg todo h-commons" title="Commons: 3rd reading"></span><span class="seg todo h-lords" title="Lords: 1st reading"></span><span class="seg todo h-lords" title="Lords: 2nd reading"></span><span class="seg todo h-lords" title="Lords: Committee"></span><span class="seg todo h-lords" title="Lords: Report"></span><span class="seg todo h-lords" title="Lords: 3rd reading"></span><span class="seg todo h-both" title="Both: Final stages"></span><span class="seg todo h-both" title="Both: Royal Assent"></span></div><div class="tlabels"><span><i class="hd h-commons"></i>Commons</span><span><i class="hd h-lords"></i>Lords</span><span>Final</span></div><div class="tnow">Now: <b>2nd reading, Commons</b> · stage 2 of 12</div></div>
-<p>The Hospice Funding Bill is due its Commons second reading on 27 November 2026.</p>
-<p class="why"><span class="k">Why it matters</span>Hospice and palliative care funding is one of Paul Davies&#x27;s constituency priorities.</p>
-<p class="next"><span class="k">Next step</span>Check the bill&#x27;s content and whether any Welsh hospices are affected. Consider a note to Welsh hospices once the debate has taken place.</p>
+<p>The Hospice Funding Bill is listed for second reading in the Commons on 27 November 2026.</p>
+<p class="why"><span class="k">Why it matters</span>Hospices and palliative care are one of Paul Davies&#x27;s constituency campaigning priorities, though the Bill is a Westminster one and its scope for Wales is not stated.</p>
+<p class="next"><span class="k">Next step</span>Check the Bill text for application to Wales and whether hospice funding is devolved, then consider a line on Welsh hospices.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://bills.parliament.uk/bills/4178" target="_blank" rel="noopener">Official record ↗</a></div>
 </article></section>
 <section class="group"><p class="label">Coming up this week</p>
 <article class="item c-commons">
 <div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Main Chamber · Private Members&#x27; Bills</span><span>Fri 27 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://whatson.parliament.uk/" target="_blank" rel="noopener">Hospice Funding Bill: Second Reading</a></h3>
-<p>The Hospice Funding Bill, a Private Members&#x27; Bill, is listed for second reading in the Commons on 27 November.</p>
-<p class="why"><span class="k">Why it matters</span>Hospice and palliative care funding is one of Paul Davies&#x27;s constituency priorities.</p>
-<p class="next"><span class="k">Next step</span>Check what the bill would do for hospice funding and whether the Welsh hospice sector is affected.</p>
+<p>The Hospice Funding Bill, introduced by Mr Paul Foster, is down for second reading in the Commons on 27 November.</p>
+<p class="why"><span class="k">Why it matters</span>Hospices and palliative care are one of Paul Davies&#x27;s campaigning priorities, though the Bill&#x27;s application to Wales is not stated.</p>
+<p class="next"><span class="k">Next step</span>Check the Bill&#x27;s territorial extent and the outcome of the debate.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://whatson.parliament.uk/" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
-<article class="item c-commons">
-<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Select &amp; Joint Committees · Oral evidence</span><span>Mon 30 Nov · 13:00</span></span><span class="score">6/10</span></div>
-<h3><a href="https://committees.parliament.uk/committee/378/" target="_blank" rel="noopener">Digital, Culture, Media and Sport Committee: Tourism</a></h3>
-<div class="who">Portrait Gallery, Edinburgh</div>
-<p>The DCMS Committee holds an oral evidence session on tourism at 13:00 on 30 November, listed at the Portrait Gallery, Edinburgh.</p>
-<p class="why"><span class="k">Why it matters</span>Tourism is in Paul Davies&#x27;s shadow portfolio, and the evidence could bear on the visitor levy and Welsh tourism, though the location suggests a Scottish focus.</p>
-<p class="next"><span class="k">Next step</span>Check the committee&#x27;s witness list and whether Welsh tourism or the visitor levy features; watch the session rather than attend.</p>
-<div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://committees.parliament.uk/committee/378/" target="_blank" rel="noopener">Official record ↗</a></div>
+<article class="item c-council">
+<div class="row"><span class="tags"><span class="chamber ch-council"><i></i>Council · Pembrokeshire</span><span class="type">Meeting agenda</span><span>Mon 30 Nov · 10.00am</span></span><span class="score">6/10</span></div>
+<h3><a href="https://mgenglish.pembrokeshire.gov.uk/ieListDocuments.aspx?CId=281&amp;MId=6720" target="_blank" rel="noopener">Welsh in Education Strategic Plan (WESP)</a></h3>
+<div class="who">Cabinet · Pembrokeshire · County Hall, Haverfordwest</div>
+<p>Pembrokeshire Cabinet on 30 November will consider the Welsh in Education Strategic Plan (WESP).</p>
+<p class="why"><span class="k">Why it matters</span>Welsh language is part of Paul Davies&#x27;s shadow portfolio, and the WESP sets out how the county plans Welsh-medium education.</p>
+<p class="next"><span class="k">Next step</span>Read the report for Welsh-medium targets in Pembrokeshire.</p>
+<div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://mgenglish.pembrokeshire.gov.uk/ieListDocuments.aspx?CId=281&amp;MId=6720" target="_blank" rel="noopener">Official record ↗</a></div>
+</article>
+<article class="item c-council">
+<div class="row"><span class="tags"><span class="chamber ch-council"><i></i>Council · Ceredigion</span><span class="type">Meeting agenda</span><span>Tue 1 Dec · 10.00 am</span></span><span class="score">6/10</span></div>
+<h3><a href="https://council.ceredigion.gov.uk/ieListDocuments.aspx?CId=148&amp;MId=751" target="_blank" rel="noopener">To consider the report of the Executive Corporate Lead Officer: Schools, Lifelong Learning and Culture upon the Ceredigion Museum Policy Amendments including feedback from the Overview and Scrutiny Committee</a></h3>
+<div class="who">Cabinet · Ceredigion · Neuadd Cyngor Ceredigion, Penmorfa, Aberaeron / remotely via video conference</div>
+<p>Ceredigion Cabinet on 1 December will consider amendments to the Ceredigion Museum Policy, including Overview and Scrutiny Committee feedback.</p>
+<p class="why"><span class="k">Why it matters</span>Museums fall within his culture portfolio and the policy covers a service in his Ceredigion constituency area.</p>
+<p class="next"><span class="k">Next step</span>Check the cabinet report for changes affecting museum access, collections or Welsh-language provision.</p>
+<div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://council.ceredigion.gov.uk/ieListDocuments.aspx?CId=148&amp;MId=751" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
 <article class="item c-commons">
-<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Select &amp; Joint Committees · Oral evidence</span><span>Wed 2 Dec · 14:00</span></span><span class="score">6/10</span></div>
+<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Select &amp; Joint Committees · Oral evidence</span><span>Wed 2 Dec · 14:00</span></span><span class="score">7/10</span></div>
 <h3><a href="https://committees.parliament.uk/committee/162/" target="_blank" rel="noopener">Welsh Affairs Committee: The work of the Secretary of State for Wales</a></h3>
 <div class="who">The Thatcher Room, Portcullis House</div>
-<p>The Welsh Affairs Committee will take evidence on the work of the Secretary of State for Wales on 2 December at 14:00.</p>
-<p class="why"><span class="k">Why it matters</span>The session may produce lines on UK Government work in Wales that bear on the Welsh Conservative group&#x27;s scrutiny of both governments.</p>
-<p class="next"><span class="k">Next step</span>Have staff watch the session and note anything on west Wales, rural services or the Welsh language.</p>
+<p>The Welsh Affairs Committee will take oral evidence on the work of the Secretary of State for Wales on 2 December at 14:00.</p>
+<p class="why"><span class="k">Why it matters</span>This Westminster session on the Welsh Secretary&#x27;s work affects Wales and could touch on west Wales priorities, so the office should watch it.</p>
+<p class="next"><span class="k">Next step</span>Watch the session for comments on rural Wales, farming, broadband or tourism.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://committees.parliament.uk/committee/162/" target="_blank" rel="noopener">Official record ↗</a></div>
 </article></section>
 
