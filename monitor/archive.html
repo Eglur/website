@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-GB"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#286A6C">
+<title>Past briefings · Eglur</title>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-48.png" type="image/png" sizes="48x48">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/dm-serif-display-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>/* Copied from the eglurtech.com stylesheet: same files, same declarations. */
+@font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'DM Serif Display';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-italic-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'DM Serif Display';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-italic-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Geist';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-mono-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+
+:root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;
+--ink:#101A1A;--ink-2:#3D4A49;--muted:#4E5B5A;--hair:#E2E7E5;--edge:#7D8B88;--decision:#9A5D0E;--ai:#5E43A8;
+--serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+--sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+--mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;
+-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--teal-deep)}
+.wrap{max-width:820px;margin:0 auto;padding:0 32px}
+header.site{position:sticky;top:0;z-index:10;background:rgba(252,255,254,.94);backdrop-filter:blur(8px);
+-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
+.bar{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px}
+.brand{display:block;flex:none;color:var(--ink)}
+.wm{display:block;height:30px;width:auto;color:var(--ink)}.wm .dot{fill:var(--teal)}
+nav{display:flex;align-items:center;gap:22px;font-size:15px}
+nav a{color:var(--ink-2);text-decoration:none}nav a:hover{color:var(--teal-deep)}
+.chip{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;
+color:var(--muted);border:1px solid var(--hair);border-radius:2px;padding:4px 8px}
+.label{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;font-weight:500;
+letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+.label::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal);flex:none}
+.label.decide::before{background:var(--decision)}
+.hero{padding:56px 0 24px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,6.4vw,64px);line-height:1;letter-spacing:-.02em;
+margin:18px 0;text-wrap:balance}
+.stop{color:var(--teal)}
+.lede{margin:0;color:var(--ink-2);font-size:19px;max-width:52ch}
+.note{margin:24px 0 0;padding:12px 16px;border:1px solid var(--hair);border-left:3px solid var(--decision);
+border-radius:2px;background:var(--paper);font-size:15px;color:var(--ink-2)}
+.stats{display:flex;flex-wrap:wrap;gap:14px 44px;margin:32px 0 0;padding:22px 0 0;border-top:1px solid var(--hair)}
+.stats div{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stats b{display:block;font-family:var(--serif);font-weight:400;font-size:40px;line-height:1.05;letter-spacing:-.01em;
+color:var(--ink);text-transform:none;margin-bottom:4px}
+section.group{padding:28px 0 4px}
+.item{background:var(--paper);border:1px solid var(--hair);border-radius:2px;padding:22px 24px;margin:14px 0}
+.item.top{border-left:3px solid var(--decision)}
+.row{display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;
+text-transform:uppercase;color:var(--muted)}
+.score{flex:none;letter-spacing:.04em}
+.item h3{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15;margin:10px 0 6px;text-wrap:balance}
+.item h3 a{color:var(--ink);text-decoration:none}
+.item h3 a:hover{color:var(--teal-deep);text-decoration:underline;text-underline-offset:3px}
+.who{font-size:15px;color:var(--muted)}
+.item p{margin:12px 0 0}
+.k{display:block;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
+.why{color:var(--teal-deep);font-weight:500}.why .k{color:var(--teal)}
+.next{color:var(--decision)}
+.src{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;margin-top:16px;padding-top:12px;
+border-top:1px solid var(--hair);font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--muted)}
+.src .ai{color:var(--ai)}.src a{color:var(--teal-deep)}
+.empty{color:var(--ink-2);font-size:19px}
+footer.site{border-top:1px solid var(--hair);padding:40px 0 52px;margin-top:56px;background:var(--paper)}
+.foot{display:flex;flex-direction:column;gap:12px}
+.fbrand{display:flex;align-items:center;gap:16px;margin-bottom:6px}.fbrand .wm{height:24px}
+.fbrand small,.fine{font-size:13px;color:var(--muted);font-family:var(--mono);letter-spacing:.02em}
+.fine{margin:0;max-width:72ch}.fine a{color:var(--muted)}
+ul.archive{list-style:none;padding:0;margin:12px 0 0;border-top:1px solid var(--hair)}
+ul.archive li{border-bottom:1px solid var(--hair)}
+ul.archive a{display:flex;justify-content:space-between;gap:16px;padding:18px 0;font-family:var(--serif);font-size:26px;
+line-height:1.15;color:var(--ink);text-decoration:none}
+ul.archive a span{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);align-self:center}
+ul.archive a:hover{color:var(--teal-deep)}
+@media (max-width:600px){.wrap{padding:0 20px}.bar{height:64px}.wm{height:26px}.hero{padding:36px 0 16px}
+.lede{font-size:17px}.item{padding:18px}.item h3{font-size:23px}.stats{gap:14px 28px}.stats b{font-size:34px}
+nav .chip{display:none}.row{letter-spacing:.04em;font-size:11px}ul.archive a{font-size:22px}}
+</style></head>
+<body>
+<header class="site"><div class="wrap bar">
+<a class="brand" href="/" aria-label="Eglur, home"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg></a>
+<nav><span class="chip">Prototype</span><a href="./archive.html">Past briefings</a></nav>
+</div></header>
+<main class="wrap">
+<section class="hero"><p class="label">Archive</p>
+<h1>Past briefings<span class="stop">.</span></h1></section>
+<ul class="archive"><li><a href="./digests/2026-11-27.html">Friday 27 November 2026<span>Read</span></a></li></ul>
+</main>
+<footer class="site"><div class="wrap foot">
+<div class="fbrand"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg><small>clarity for public servants</small></div>
+<p class="fine">Built from public data published by UK Parliament under the
+<a href="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/">Open Parliament Licence v3.0</a>.
+Summaries are drafted by AI and can be wrong, so every item links to the official record.</p>
+<p class="fine">Eglur Technologies · In development · Eglur is Welsh for clear</p>
+</div></footer>
+</body></html>
