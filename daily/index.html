@@ -2,14 +2,15 @@
 <html lang="en-GB"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#286A6C">
-<title>Eglur Daily · Your council, the Senedd and Westminster in one email</title>
-<meta name="description" content="One short, plain-English email each morning covering your council, the Senedd and Westminster, filtered to what you care about.">
+<meta name="theme-color" content="#FCFFFE">
+<title>Eglur Daily: your council, the Senedd and Westminster in one email</title>
+<meta name="description" content="One short, plain-English email each weekday morning covering your council, the Senedd and Westminster, filtered to what you follow.">
 <link rel="icon" href="/favicon.ico" sizes="any"><link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/dm-serif-display-latin.woff2" as="font" type="font/woff2" crossorigin>
-<style>/* Copied from the eglurtech.com stylesheet: same files, same declarations. */
+<style>
+/* Copied from the eglurtech.com stylesheet: same files, same declarations. */
 @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'DM Serif Display';font-style:italic;font-weight:400;font-display:swap;src:url(/fonts/dm-serif-display-italic-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
@@ -19,88 +20,287 @@
 @font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url(/fonts/geist-mono-latin-ext.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 
-:root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;--ink:#101A1A;--ink-2:#3D4A49;
---muted:#4E5B5A;--hair:#E2E7E5;--decision:#9A5D0E;--ai:#5E43A8;--council:#7A5C2E;--senedd:#2F6690;--commons:#3F7F5F;--lords:#A2475A;
---serif:'DM Serif Display',Georgia,'Times New Roman',serif;--sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
---mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:var(--teal-deep)}.wrap{max-width:1040px;margin:0 auto;padding:0 40px}
-header.site{position:sticky;top:0;z-index:10;background:rgba(252,255,254,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--hair)}
-.bar{display:flex;align-items:center;justify-content:space-between;height:72px}.wm{display:block;height:30px;width:auto;color:var(--ink)}.wm .dot{fill:var(--teal)}
-.label{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
-.label::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal)}
-h1{font-family:var(--serif);font-weight:400;font-size:clamp(46px,7.4vw,96px);line-height:.98;letter-spacing:-.025em;margin:26px 0 26px;max-width:14ch;text-wrap:balance}
-h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.2vw,52px);line-height:1.05;letter-spacing:-.02em;margin:16px 0 0;text-wrap:balance}
-.stop{color:var(--teal)}.lede{font-size:21px;color:var(--ink-2);max-width:40ch;margin:0}
-.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:2px;font-weight:600;font-size:16px;text-decoration:none;border:1px solid var(--teal)}
-.btn.primary{background:var(--teal);color:var(--paper)}.btn.primary:hover{background:var(--teal-deep)}.btn.ghost{color:var(--ink)}.btn.ghost:hover{border-color:var(--ink)}
-.ctas{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}.fine{font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:.02em}
-section.block{padding:88px 0;border-top:1px solid var(--hair)}.hero{padding:96px 0 88px}
-.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px}
-.level{background:var(--paper);border:1px solid var(--hair);border-top:4px solid var(--edge,#7D8B88);border-radius:2px;padding:24px}
-.level h3{font-family:var(--serif);font-weight:400;font-size:28px;margin:8px 0 8px}.level p{margin:0;color:var(--ink-2);font-size:16px}
-.l-council{border-top-color:var(--council)}.l-senedd{border-top-color:var(--senedd)}.l-west{border-top-color:var(--commons)}
-.mail{margin-top:40px;max-width:640px;background:var(--paper);border:1px solid var(--hair);border-radius:2px;box-shadow:0 40px 80px -48px rgba(16,26,26,.30)}
-.mail-head{padding:16px 22px;border-bottom:1px solid var(--hair);font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.04em}
-.mail-body{padding:22px}.mail-item{padding:14px 0;border-bottom:1px solid var(--hair)}.mail-item:last-child{border-bottom:0}
-.tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
-.mail-item h4{font-family:var(--serif);font-weight:400;font-size:22px;margin:4px 0}.mail-item p{margin:0;font-size:15px;color:var(--ink-2)}
-.plans{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:40px;max-width:820px}
-.plan{border:1px solid var(--hair);border-radius:2px;padding:28px;background:var(--paper)}.plan.main{box-shadow:inset 0 0 0 1.5px var(--teal)}
-.price{font-family:var(--serif);font-size:48px;line-height:1;margin:12px 0 4px}.price small{font-family:var(--sans);font-size:16px;color:var(--muted)}
-.plan ul{margin:16px 0 0;padding-left:18px;color:var(--ink-2);font-size:16px}
-.faq{display:grid;grid-template-columns:1fr 1fr;gap:28px 48px;margin-top:40px}.faq h3{font-size:18px;margin:0 0 6px}.faq p{margin:0;color:var(--ink-2);font-size:16px}
-footer.site{border-top:1px solid var(--hair);padding:44px 0 52px}.foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
-.fbrand{display:flex;align-items:center;gap:16px}.fbrand .wm{height:24px}
-@media (max-width:860px){.wrap{padding:0 22px}.levels,.plans,.faq{grid-template-columns:1fr}.hero{padding:64px 0 56px}section.block{padding:64px 0}}
-</style></head><body>
-<header class="site"><div class="wrap bar"><a href="/" aria-label="Eglur, home"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg></a>
-<a class="btn primary" href="mailto:monitor@eglurtech.com?subject=Eglur%20Daily%20waitlist&amp;body=Hi%20Toby%2C%0A%0APlease%20add%20me%20to%20the%20Eglur%20Daily%20waitlist.%0A%0AMy%20postcode%20%28or%20area%29%3A%0ATopics%20I%20care%20about%20%28e.g.%20planning%2C%20schools%2C%20NHS%2C%20farming%2C%20transport%29%3A%0ADaily%20or%20weekly%3A%0A%0AThanks">Join the waitlist</a></div></header>
+:root{
+  --paper:#FCFFFE; --ink:#101A1A; --ink-2:#3D4A49; --muted:#5F6B6A; --hair:#E3E8E6;
+  --teal:#286A6C; --teal-deep:#1E5153; --mist:#F1F6F5;
+  --council:#8A6A3B; --senedd:#2F6690; --west:#3F7F5F;
+  --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
+  --ease:cubic-bezier(.2,.7,.1,1);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:18px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;font-feature-settings:"ss01","cv11"}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1160px;margin:0 auto;padding:0 48px}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;height:88px}
+.wm{display:block;height:30px;width:auto;color:var(--ink)}.wm .dot{fill:var(--teal)}
+.btn{appearance:none;border:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 24px;
+  border-radius:999px;background:var(--teal);color:var(--paper);font:600 16px/1 var(--sans);letter-spacing:-.005em;text-decoration:none;
+  transition:background .2s var(--ease),transform .2s var(--ease)}
+.btn:hover{background:var(--teal-deep)}.btn:active{transform:scale(.98)}
+.btn.small{height:40px;padding:0 18px;font-size:15px}
+.textlink{font-weight:500;color:var(--teal-deep);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:5px}
+.textlink:hover{text-decoration-thickness:2px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:72px;align-items:center;padding-top:56px;padding-bottom:120px}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(48px,6.6vw,88px);line-height:.98;letter-spacing:-.028em;margin:0 0 28px;max-width:11ch}
+.lede{margin:0 0 40px;max-width:30em;font-size:20px;line-height:1.55;color:var(--ink-2)}
+.actions{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.reassure{margin:22px 0 0;font-size:14px;color:var(--muted)}
+
+/* the email: the one memorable object */
+.letter{background:#fff;border-radius:14px;box-shadow:0 1px 0 rgba(16,26,26,.04),0 30px 60px -30px rgba(16,26,26,.22),0 0 0 1px rgba(16,26,26,.06);
+  overflow:hidden}
+.letter-head{padding:22px 28px 18px;border-bottom:1px solid var(--hair)}
+.from{display:flex;align-items:center;gap:12px;font-size:15px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--teal);display:grid;place-items:center;flex:none}
+.avatar svg{width:20px;height:auto;color:#fff}.avatar svg .dot{fill:var(--paper)}
+.from b{font-weight:600}.from span{color:var(--muted)}
+.subject{margin:12px 0 0;font-family:var(--serif);font-size:24px;line-height:1.2;letter-spacing:-.01em}
+.letter-body{padding:8px 28px 18px}
+.entry{display:grid;grid-template-columns:3px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid var(--hair)}
+.entry:last-child{border-bottom:0}
+.bar{border-radius:3px}.council .bar{background:var(--council)}.senedd .bar{background:var(--senedd)}.west .bar{background:var(--west)}
+.where{font-size:13px;font-weight:600;letter-spacing:.01em}
+.council .where{color:var(--council)}.senedd .where{color:var(--senedd)}.west .where{color:var(--west)}
+.entry h3{margin:2px 0 4px;font-size:17px;line-height:1.35;font-weight:600;letter-spacing:-.01em}
+.entry p{margin:0;font-size:15px;line-height:1.5;color:var(--ink-2)}
+@media (prefers-reduced-motion:no-preference){
+  .entry{opacity:0;transform:translateY(8px);animation:arrive .7s var(--ease) forwards}
+  .entry:nth-child(1){animation-delay:.35s}.entry:nth-child(2){animation-delay:.6s}.entry:nth-child(3){animation-delay:.85s}
+  @keyframes arrive{to{opacity:1;transform:none}}
+}
+
+/* distances */
+.section{padding:112px 0;border-top:1px solid var(--hair)}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(36px,4.4vw,56px);line-height:1.04;letter-spacing:-.022em;margin:0 0 56px;max-width:16ch}
+.distances{margin:0;padding:0;list-style:none}
+.distances li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:48px;align-items:baseline;padding:30px 0;border-top:1px solid var(--hair)}
+.distances li:last-child{border-bottom:1px solid var(--hair)}
+.distances strong{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.4vw,44px);line-height:1.05;letter-spacing:-.02em;display:flex;align-items:center;gap:16px}
+.distances strong i{width:10px;height:10px;border-radius:50%;flex:none;transform:translateY(-2px)}
+.distances p{margin:0;font-size:18px;color:var(--ink-2);max-width:34em}
+.distances small{display:block;margin-top:4px;font-size:14px;color:var(--muted)}
+
+/* how + price */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:72px}
+.prose p{margin:0 0 18px;font-size:18px;color:var(--ink-2);max-width:34em}
+.price{margin:0;padding:0;list-style:none;border-top:1px solid var(--ink)}
+.price li{display:flex;justify-content:space-between;align-items:baseline;gap:24px;padding:22px 0;border-bottom:1px solid var(--hair)}
+.price b{font-weight:600}.price span{color:var(--muted);font-size:16px}
+.price em{font-style:normal;font-family:var(--serif);font-size:32px;letter-spacing:-.01em;white-space:nowrap}
+.note{margin:16px 0 0;font-size:14px;color:var(--muted)}
+.closing{padding:120px 0;text-align:center;border-top:1px solid var(--hair)}
+.closing h2{margin:0 auto 32px;max-width:18ch}
+footer{border-top:1px solid var(--hair);padding:40px 0 56px;font-size:14px;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap}
+.foot .wm{height:22px}
+
+/* waitlist sheet */
+dialog{border:0;padding:0;margin:auto auto 0;width:min(640px,100%);max-height:92vh;border-radius:20px 20px 0 0;background:var(--paper);color:var(--ink);
+  box-shadow:0 -20px 60px -20px rgba(16,26,26,.35)}
+@media (min-width:720px){dialog{margin:auto;border-radius:20px}}
+dialog::backdrop{background:rgba(16,26,26,.42);backdrop-filter:blur(3px)}
+@media (prefers-reduced-motion:no-preference){
+  dialog[open]{animation:rise .42s var(--ease)}dialog[open]::backdrop{animation:fade .3s ease}
+  @keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+  @keyframes fade{from{opacity:0}}
+}
+.sheet{padding:32px 36px 32px;overflow:auto;max-height:92vh}
+.sheet-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:8px}
+.sheet h2{font-size:34px;margin:0;max-width:none}
+.close{appearance:none;border:0;background:var(--mist);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:20px;line-height:1;color:var(--ink-2);flex:none}
+.close:hover{background:var(--hair)}
+.sheet .intro{margin:0 0 26px;color:var(--ink-2);font-size:16px}
+.field{margin:0 0 22px}
+.field > label,.legend{display:block;font-weight:600;font-size:15px;margin-bottom:8px}
+.hint{font-weight:400;color:var(--muted)}
+input[type=email],input[type=text]{width:100%;height:50px;padding:0 16px;border:1px solid #CBD3D1;border-radius:12px;background:#fff;
+  font:16px var(--sans);color:var(--ink);transition:border-color .15s,box-shadow .15s}
+input[type=email]:focus,input[type=text]:focus{outline:0;border-color:var(--teal);box-shadow:0 0 0 4px rgba(40,106,108,.14)}
+fieldset{border:0;margin:0 0 22px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip input,.seg input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:inline-flex;align-items:center;height:38px;padding:0 15px;border:1px solid #CBD3D1;border-radius:999px;font-size:15px;cursor:pointer;
+  user-select:none;transition:background .15s,border-color .15s,color .15s}
+.chip span:hover{border-color:var(--ink-2)}
+.chip input:checked + span{background:var(--teal);border-color:var(--teal);color:#fff}
+.chip input:focus-visible + span,.seg input:focus-visible + span{outline:2px solid var(--teal);outline-offset:2px}
+.seg{display:inline-grid;grid-auto-flow:column;background:var(--mist);border-radius:999px;padding:4px}
+.seg span{display:inline-flex;align-items:center;height:38px;padding:0 20px;border-radius:999px;font-size:15px;cursor:pointer;transition:background .15s}
+.seg input:checked + span{background:#fff;box-shadow:0 1px 3px rgba(16,26,26,.12);font-weight:600}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:14px;color:var(--ink-2);margin:6px 0 24px}
+.consent input{width:18px;height:18px;margin-top:2px;accent-color:var(--teal);flex:none}
+.hp{position:absolute;left:-9999px}
+.form-error{color:#9A2E2E;font-size:15px;margin:0 0 14px;min-height:0}
+.sheet .btn{width:100%;height:54px;font-size:17px}
+.done{text-align:center;padding:24px 0 8px}
+.done .tick{width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;margin:0 auto 18px;font-size:26px}
+.done h2{margin:0 0 10px}.done p{color:var(--ink-2);margin:0 auto 24px;max-width:28em}
+
+@media (max-width:900px){
+  .wrap{padding:0 22px}.top{height:72px}
+  .hero{grid-template-columns:1fr;gap:56px;padding-top:28px;padding-bottom:80px}
+  .section,.closing{padding:80px 0}
+  .distances li,.two{grid-template-columns:1fr;gap:10px}
+  .two{gap:56px}
+  .sheet{padding:26px 22px}
+}
+</style></head>
+<body>
+<header class="wrap top">
+  <a href="/" aria-label="Eglur, home"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg></a>
+  <button class="btn small" type="button" data-open>Join the waitlist</button>
+</header>
+
 <main>
 <section class="wrap hero">
-<p class="label">Eglur Daily · Coming soon</p>
-<h1>Your politics, in one short email<span class="stop">.</span></h1>
-<p class="lede">Your council, the Senedd and Westminster, filtered to what you care about and explained in plain English. Every morning, in under three minutes.</p>
-<div class="ctas"><a class="btn primary" href="mailto:monitor@eglurtech.com?subject=Eglur%20Daily%20waitlist&amp;body=Hi%20Toby%2C%0A%0APlease%20add%20me%20to%20the%20Eglur%20Daily%20waitlist.%0A%0AMy%20postcode%20%28or%20area%29%3A%0ATopics%20I%20care%20about%20%28e.g.%20planning%2C%20schools%2C%20NHS%2C%20farming%2C%20transport%29%3A%0ADaily%20or%20weekly%3A%0A%0AThanks">Join the waitlist</a><a class="btn ghost" href="/monitor/">See a live example</a></div>
-<p class="fine" style="margin-top:18px">The button opens an email to us. No account, no payment.</p>
+  <div>
+    <h1>Your council, the Senedd and Westminster. One email<span style="color:var(--teal)">.</span></h1>
+    <p class="lede">Every weekday morning, a short briefing on the decisions that reach your street, written in plain English and filtered to what you follow.</p>
+    <div class="actions">
+      <button class="btn" type="button" data-open>Join the waitlist</button>
+      <a class="textlink" href="/monitor/">See a live example</a>
+    </div>
+    <p class="reassure">Free while we test it. No card needed.</p>
+  </div>
+  <figure class="letter" aria-label="An example Eglur Daily email" style="margin:0">
+    <div class="letter-head">
+      <div class="from"><span class="avatar"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg></span><div><b>Eglur Daily</b> <span>to you, 7:00</span></div></div>
+      <p class="subject">Friday: three things near you</p>
+    </div>
+    <div class="letter-body">
+      <div class="entry council"><span class="bar"></span><div><span class="where">Pembrokeshire Council</span><h3>Planning committee meets on Tuesday</h3><p>An application on your road is on the agenda. You can still comment.</p></div></div>
+      <div class="entry senedd"><span class="bar"></span><div><span class="where">Senedd</span><h3>New station plans reach the business case stage</h3><p>You follow rail. This is the next step before funding is decided.</p></div></div>
+      <div class="entry west"><span class="bar"></span><div><span class="where">Westminster</span><h3>Rural transport bill has its second reading</h3><p>It could change how buses are funded in rural Wales.</p></div></div>
+    </div>
+  </figure>
 </section>
-<section class="block"><div class="wrap">
-<p class="label">What you get</p>
-<h2>Three levels of government. One place<span class="stop">.</span></h2>
-<div class="levels">
-<div class="level l-council"><span class="tag" style="color:var(--council)">Council</span><h3>Down the road</h3><p>Planning committees, decisions and meetings that affect your area.</p></div>
-<div class="level l-senedd"><span class="tag" style="color:var(--senedd)">Senedd</span><h3>Cardiff Bay</h3><p>Questions, answers and debates on health, schools, transport and more.</p></div>
-<div class="level l-west"><span class="tag" style="color:var(--commons)">Westminster</span><h3>London</h3><p>Commons and Lords business, bills and votes that reach Wales and your interests.</p></div>
-</div></div></section>
-<section class="block"><div class="wrap">
-<p class="label">What it looks like</p>
-<h2>Only what matters to you, and why<span class="stop">.</span></h2>
-<div class="mail"><div class="mail-head">From: Eglur Daily · Subject: Your morning briefing, Friday 27 November</div>
-<div class="mail-body">
-<div class="mail-item"><span class="tag" style="color:var(--senedd)">Senedd · Written answer</span><h4>New station plans reach business case stage</h4><p>Why it matters to you: you follow rail and rural transport.</p></div>
-<div class="mail-item"><span class="tag" style="color:var(--commons)">Westminster · Bill</span><h4>Rural Public Transport Bill has its second reading</h4><p>Why it matters to you: it could change bus services in rural areas like yours.</p></div>
-<div class="mail-item"><span class="tag" style="color:var(--council)">Council · Coming up</span><h4>Planning committee meets on Tuesday</h4><p>Why it matters to you: an application near your postcode is on the agenda.</p></div>
-</div></div>
-<p class="fine" style="margin-top:14px">An illustration of the format. Council coverage is in development.</p>
+
+<section class="section"><div class="wrap">
+  <h2>Three places decide what happens where you live</h2>
+  <ul class="distances">
+    <li><strong><i style="background:var(--council)"></i>Down the road</strong><p>Your county council: planning applications, schools, roads, bins, budgets and council tax.<small>From the council's own meeting papers and decisions.</small></p></li>
+    <li><strong><i style="background:var(--senedd)"></i>Cardiff Bay</strong><p>The Senedd and Welsh Government: health, education, transport, farming and the Welsh language.<small>From Senedd questions, answers and business.</small></p></li>
+    <li><strong><i style="background:var(--west)"></i>London</strong><p>Parliament: the bills, votes and announcements that still reach Wales.<small>From Commons and Lords records.</small></p></li>
+  </ul>
 </div></section>
-<section class="block"><div class="wrap">
-<p class="label">Planned pricing</p>
-<h2>Free to start<span class="stop">.</span></h2>
-<div class="plans">
-<div class="plan"><span class="tag" style="color:var(--muted)">Weekly</span><div class="price">Free</div><ul><li>One email every Friday</li><li>Your area and up to three topics</li></ul></div>
-<div class="plan main"><span class="tag" style="color:var(--teal-deep)">Daily</span><div class="price">£5 <small>a month, planned</small></div><ul><li>Every weekday morning</li><li>Unlimited topics, your MS, MP and councillors</li><li>What's coming up this week</li></ul></div>
-</div>
-<div class="ctas"><a class="btn primary" href="mailto:monitor@eglurtech.com?subject=Eglur%20Daily%20waitlist&amp;body=Hi%20Toby%2C%0A%0APlease%20add%20me%20to%20the%20Eglur%20Daily%20waitlist.%0A%0AMy%20postcode%20%28or%20area%29%3A%0ATopics%20I%20care%20about%20%28e.g.%20planning%2C%20schools%2C%20NHS%2C%20farming%2C%20transport%29%3A%0ADaily%20or%20weekly%3A%0A%0AThanks">Join the waitlist</a></div>
+
+<section class="section"><div class="wrap two">
+  <div class="prose">
+    <h2 style="margin-bottom:28px">Only what you follow, and why it matters</h2>
+    <p>You tell us your area and what you care about: a town, a topic, a councillor, your MS or MP. Each morning we read everything published the day before and keep the few things that touch your list.</p>
+    <p>Every item says why it was picked and links to the official record, so you can always check the source. AI does the reading and writes the summaries, and it can get things wrong, which is why the source is always one click away.</p>
+    <p>It covers every party and doesn't tell you what to think.</p>
+  </div>
+  <div>
+    <h2 style="margin-bottom:28px">Simple pricing</h2>
+    <ul class="price">
+      <li><div><b>Weekly</b><br><span>Fridays, your area and three topics</span></div><em>Free</em></li>
+      <li><div><b>Daily</b><br><span>Every weekday, everything you follow, plus the week ahead</span></div><em>£5 a month</em></li>
+    </ul>
+    <p class="note">Planned prices. Everyone on the waitlist starts free.</p>
+  </div>
 </div></section>
-<section class="block"><div class="wrap">
-<p class="label">Questions</p>
-<div class="faq">
-<div><h3>Where does it come from?</h3><p>Official public records: UK Parliament, the Senedd and your council. Every item links to its source.</p></div>
-<div><h3>Is it written by AI?</h3><p>AI picks what's relevant and explains it. It can make mistakes, so every summary links to the official record.</p></div>
-<div><h3>Is it political?</h3><p>No. It covers what every party and representative does, and doesn't tell you what to think.</p></div>
-<div><h3>What happens to my email?</h3><p>We use it only to tell you when Eglur Daily launches. We never share it, and you can ask us to delete it at any time.</p></div>
-</div></div></section>
+
+<section class="closing"><div class="wrap">
+  <h2>Know what's being decided before it's decided</h2>
+  <button class="btn" type="button" data-open>Join the waitlist</button>
+</div></section>
 </main>
-<footer class="site"><div class="wrap foot"><div class="fbrand"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg><span class="fine">clarity for public servants, and the people they serve</span></div>
-<span class="fine">Eglur Technologies · In development · Eglur is Welsh for clear</span></div></footer>
+
+<footer><div class="wrap foot"><span><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg></span><span>Eglur Technologies. Eglur is Welsh for clear.</span></div></footer>
+
+<dialog id="waitlist" aria-labelledby="wl-title">
+  <div class="sheet">
+    <form id="wl-form" novalidate>
+      <div class="sheet-top"><h2 id="wl-title">Join the waitlist</h2><button class="close" type="button" aria-label="Close" data-close>&times;</button></div>
+      <p class="intro">Tell us what to watch and we'll set up your briefing when it launches.</p>
+      <div class="field"><label for="wl-email">Email</label><input id="wl-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com"></div>
+      <div class="field"><label for="wl-area">Postcode or area</label><input id="wl-area" name="area" type="text" autocomplete="postal-code" required placeholder="SA43 1AB or Cardigan"></div>
+      <fieldset><legend class="legend">Topics</legend><div class="chips">
+<label class="chip"><input type="checkbox" name="topics" value="Planning"><span>Planning</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Schools"><span>Schools</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Health and the NHS"><span>Health and the NHS</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Transport and roads"><span>Transport and roads</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Housing"><span>Housing</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Environment"><span>Environment</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Farming"><span>Farming</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Business and jobs"><span>Business and jobs</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Council tax and budgets"><span>Council tax and budgets</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Welsh language"><span>Welsh language</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Culture and sport"><span>Culture and sport</span></label>
+<label class="chip"><input type="checkbox" name="topics" value="Social care"><span>Social care</span></label>
+      </div>
+      <input name="topics_other" type="text" aria-label="Other topics" placeholder="Anything else? e.g. bus routes, wind farms" style="margin-top:10px"></fieldset>
+      <div class="field"><label for="wl-places">Other places <span class="hint">(optional)</span></label><input id="wl-places" name="places" type="text" placeholder="e.g. Aberystwyth, Fishguard, Ceredigion"></div>
+      <div class="field"><label for="wl-people">People to follow <span class="hint">(optional)</span></label><input id="wl-people" name="people" type="text" placeholder="Your councillor, MS or MP, by name"></div>
+      <fieldset><legend class="legend">How often</legend><div class="seg">
+        <label><input type="radio" name="frequency" value="daily" checked><span>Every weekday</span></label>
+        <label><input type="radio" name="frequency" value="weekly"><span>Weekly</span></label>
+      </div></fieldset>
+      <label class="hp" aria-hidden="true">Leave this empty<input name="website" type="text" tabindex="-1" autocomplete="off"></label>
+      <label class="consent"><input type="checkbox" name="consent" required><span>Email me when Eglur Daily launches. We use your answers only to set up your briefing, never share them, and delete them if you ask.</span></label>
+      <p class="form-error" id="wl-error" role="alert"></p>
+      <button class="btn" type="submit">Join the waitlist</button>
+    </form>
+    <div class="done" id="wl-done" hidden>
+      <div class="tick" aria-hidden="true">&#10003;</div>
+      <h2>You're on the list</h2>
+      <p>We'll email you when your first briefing is ready.</p>
+      <button class="btn small" type="button" data-close>Close</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+// Where sign-ups are saved. Fill in with the Supabase project URL and its publishable (anon) key.
+var WAITLIST = { url: "https://dqkhccwtwfyxgimafcad.supabase.co", key: "sb_publishable_ArmKmsYcSOgwmNGuUpn9Cg_G5RPIfmk" };
+
+function waitlistHeaders() {
+  var h = { "apikey": WAITLIST.key, "Content-Type": "application/json", "Prefer": "return=minimal" };
+  // Older "anon" keys are JWTs and also go in Authorization; newer sb_publishable_ keys must not.
+  if (WAITLIST.key.indexOf("sb_") !== 0) h["Authorization"] = "Bearer " + WAITLIST.key;
+  return h;
+}
+
+(function () {
+  var dlg = document.getElementById("waitlist"), form = document.getElementById("wl-form"),
+      err = document.getElementById("wl-error"), done = document.getElementById("wl-done");
+  document.querySelectorAll("[data-open]").forEach(function (b) {
+    b.addEventListener("click", function () { dlg.showModal(); setTimeout(function () { document.getElementById("wl-email").focus(); }, 60); });
+  });
+  dlg.addEventListener("click", function (e) { if (e.target === dlg || e.target.closest("[data-close]")) dlg.close(); });
+  form.addEventListener("submit", function (e) {
+    e.preventDefault(); err.textContent = "";
+    var f = new FormData(form);
+    if (f.get("website")) return;                                   // bots fill hidden fields
+    var email = (f.get("email") || "").trim(), area = (f.get("area") || "").trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Enter an email address, like name@example.com."; return; }
+    if (!area) { err.textContent = "Enter a postcode or area so we know which council to watch."; return; }
+    if (!f.get("consent")) { err.textContent = "Tick the box so we can email you at launch."; return; }
+    if (!WAITLIST.url || !WAITLIST.key) { err.textContent = "Sign-ups open soon. Please check back shortly."; return; }
+    var row = { email: email, area: area, topics: f.getAll("topics"), topics_other: f.get("topics_other") || "",
+                places: f.get("places") || "", people: f.get("people") || "", frequency: f.get("frequency") };
+    var btn = form.querySelector("[type=submit]"); btn.disabled = true; btn.textContent = "Joining…";
+    fetch(WAITLIST.url.replace(/\/$/, "") + "/rest/v1/waitlist", {
+      method: "POST",
+      headers: waitlistHeaders(),
+      body: JSON.stringify(row)
+    }).then(function (r) {
+      if (!r.ok && r.status !== 409) throw new Error(r.status);
+      form.hidden = true; done.hidden = false;
+    }).catch(function () {
+      err.textContent = "That didn't go through. Check your connection and try again.";
+      btn.disabled = false; btn.textContent = "Join the waitlist";
+    });
+  });
+})();
+</script>
 </body></html>
