@@ -34,8 +34,32 @@ Add two repository secrets at https://github.com/Eglur/website/settings/secrets/
 
 After that it runs on its own every weekday at 06:10 UTC. Weekly subscribers get theirs on Fridays. Daily subscribers with nothing relevant that day get no email rather than an empty one.
 
+## 5. Send from monitor@eglurtech.com (Microsoft 365)
+Until this is done, emails come from eglurtech@gmail.com. Afterwards they come from **monitor@eglurtech.com** through your Microsoft 365, signed with your domain, so they're far less likely to land in spam, and the limit rises to thousands a day.
+
+**a. Make monitor@ a mailbox of its own** (Microsoft's sending service needs a real mailbox, not an alias). Shared mailboxes are free.
+1. Go to **admin.exchange.microsoft.com → Recipients → Mailboxes**, open your own mailbox, then **Email addresses** (or "Manage email address types"). Remove `monitor@eglurtech.com` and save.
+2. Back in **Mailboxes**, choose **Add a shared mailbox**. Display name **Eglur Daily**, email **monitor@eglurtech.com**. Then add yourself as a member, so replies appear in your Outlook.
+
+**b. Give the sheet permission to send** (about 5 minutes, at **entra.microsoft.com**):
+1. **App registrations → New registration.** Name it `Eglur Daily mailer`, choose *Accounts in this organizational directory only*, and click **Register**.
+2. Copy the **Application (client) ID** and **Directory (tenant) ID** from the overview page.
+3. **API permissions → Add a permission → Microsoft Graph → Application permissions →** tick **Mail.Send → Add permissions**, then click **Grant admin consent for Eglur Technologies**.
+4. **Certificates & secrets → New client secret** (24 months). Copy the **Value** straight away; Microsoft only shows it once.
+
+**c. Tell the script** (in the sheet's **Extensions → Apps Script**):
+1. Paste in the updated `apps-script.gs` and **Save**.
+2. Click the **gear (Project Settings) → Script properties → Add**, and add three properties:
+   - `MS_TENANT_ID`: the Directory (tenant) ID
+   - `MS_CLIENT_ID`: the Application (client) ID
+   - `MS_CLIENT_SECRET`: the secret's Value
+3. Choose **testSend** in the function menu and click **Run**. Allow the new permission ("connect to an external service") when asked. A test email arrives in eglurtech@gmail.com **from monitor@eglurtech.com**.
+4. **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy**, so the live web app uses the new code. The URL stays the same.
+
+Optional hardening: as set up, the Mail.Send permission could send as any mailbox in your organisation. Microsoft's "RBAC for Applications" can limit it to monitor@ only; worth doing before anyone else joins your Microsoft 365.
+
 ## Good to know
-- **Gmail's limit:** an ordinary Gmail account can email about 100 people a day. The job checks the remaining quota and stops before it. Beyond that, switch to a sending service such as Resend.
+- **Limits:** from Gmail, about 100 emails a day (the job stops before that). From Microsoft 365, thousands a day.
 - **Changing what someone follows:** edit their row in the sheet. Changes apply from the next morning.
 - **Unsubscribing:** every email has a link. It sets their Status to Unsubscribed, and nothing more is sent to them. You can also change Status by hand.
 - **Privacy:** sign-ups are stored in Supabase (EU) and in this sheet. Only you can see either.
