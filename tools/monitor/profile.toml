@@ -47,7 +47,7 @@ keywords = [
   "Welsh language", "Cymraeg", "S4C", "Eisteddfod", "culture", "sport", "Trefnydd",
 ]
 # Hard cap on items sent to the AI per run (controls cost).
-max_items = 120
+max_items = 160
 # Items scoring at or above this go in the digest (0–10).
 min_score = 6
 
@@ -57,8 +57,18 @@ written_statements = true
 bills = true
 commons_divisions = true
 senedd_written_questions = true
-look_ahead = true   # Westminster committee sessions, debates and bill stages in the coming week
+look_ahead = true
+councils = true   # meetings and decisions from the councils listed below   # Westminster committee sessions, debates and bill stages in the coming week
 
 [model]
 # Model used to score and summarise. One batched call per ~30 items.
 name = "claude-sonnet-5-5"
+
+# Councils to cover. Any council whose committee site runs on ModernGov works the same way.
+[[councils]]
+name = "Pembrokeshire"
+url = "https://mgenglish.pembrokeshire.gov.uk"
+
+[[councils]]
+name = "Ceredigion"
+url = "https://council.ceredigion.gov.uk"

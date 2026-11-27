@@ -22,12 +22,14 @@ import sys
 import tomllib
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).parent
 BRAND = ROOT / "brand"
 OUT = Path("site")  # set by --out; the briefing is published here (index, archive, digests/)
 STATE: dict = {}    # remembered between runs in OUT/state.json (which Senedd questions were already shown)
+COUNCILS: list[dict] = []   # from the profile: [{name, url}] of ModernGov council sites
 UA = "EglurBriefing/0.1 (+https://www.eglurtech.com)"
 
 
@@ -427,6 +429,94 @@ def fetch_member_news(url: str, limit: int = 10) -> list[dict]:
     return out
 
 
+# ---------------- councils (ModernGov) ----------------
+BOILERPLATE = re.compile(r"^(apolog|declarations? of|disclosures? of|minutes|to (confirm|approve|receive) the minutes|"
+                         r"date of (the )?next|exclusion of the|urgent (business|items)|announcements|welcome|"
+                         r"chair'?s? (announcements|remarks)|questions? from the public|any other business|public question)", re.I)
+
+
+def uk_date(d: str) -> str:
+    m = re.match(r"(\d\d)/(\d\d)/(\d{4})", (d or "").strip())
+    return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else ""
+
+
+def mg_xml(host: str, op: str, params: dict) -> ET.Element:
+    return ET.fromstring(get_text(f"https://{host}/mgWebService.asmx/{op}?" + urllib.parse.urlencode(params)).strip().encode("utf-8"))
+
+
+def xt(el: ET.Element | None, tag: str) -> str:
+    found = el.find(tag) if el is not None else None
+    return (found.text or "").strip() if found is not None and found.text else ""
+
+
+def fetch_council(name: str, url: str, since: str, until: str) -> list[dict]:
+    """Agenda items coming up in the next week, and decisions published since the last briefing."""
+    host = re.sub(r"^https?://", "", url).strip("/").split("/")[0]
+    shown = set(STATE.get("council_shown", []))
+    back = dt.date.fromisoformat(since) - dt.timedelta(days=7 if shown else 2)
+    ahead = dt.date.fromisoformat(until) + dt.timedelta(days=7)
+    today = until
+    items, new_keys = [], set()
+    for c in mg_xml(host, "GetCommittees", {"lCommitteeType": 0}).iter("committee"):
+        title, cat = xt(c, "committeetitle"), xt(c, "committeecategory")
+        if xt(c, "committeedeleted") == "True" or xt(c, "committeeexpired") == "True" or "defunct" in (title + cat).lower():
+            continue
+        cid = xt(c, "committeeid")
+        meetings = mg_xml(host, "GetMeetings", {"lCommitteeId": cid, "sFromDate": f"{back:%d/%m/%Y}", "sToDate": f"{ahead:%d/%m/%Y}"})
+        for m in meetings.iter("meeting"):
+            mid, date = xt(m, "meetingid"), uk_date(xt(m, "meetingdate"))
+            if not mid or not date or "cancel" in xt(m, "meetingstatus").lower():
+                continue
+            upcoming = date >= today
+            meeting = mg_xml(host, "GetMeeting", {"lMeetingId": mid})
+            if upcoming and xt(meeting, "agendapublished") != "True":
+                continue
+            if not upcoming and xt(meeting, "decisionpublished") != "True":
+                continue
+            link = f"https://{host}/ieListDocuments.aspx?CId={cid}&MId={mid}"
+            for a in meeting.iter("agendaitem"):
+                item_title = re.sub(r"^\s*\d+[a-z]?[.)]?\s*", "", clean(xt(a, "agendaitemtitle")))
+                if not item_title or BOILERPLATE.match(item_title):
+                    continue
+                decision = clean(xt(a, "decisionnonemptyhtmlbody"))
+                if not upcoming and not decision:
+                    continue
+                key = f"{host}:{mid}:{xt(a, 'agendaitemid')}:{'u' if upcoming else 'd'}"
+                new_keys.add(key)
+                if key in shown:
+                    continue
+                detail = decision if not upcoming else clean(xt(a, "agendatext"))
+                items.append({
+                    "id": f"council-{key}",
+                    "type": "Meeting agenda" if upcoming else "Council decision",
+                    "house": "Council",
+                    "council": name,
+                    "title": item_title,
+                    "who": title,
+                    "body": f"{name} · {xt(meeting, 'meetinglocation')}".strip(" ·"),
+                    "date": date,
+                    "time": xt(m, "meetingtime").replace("a.m.", "am").replace("p.m.", "pm"),
+                    "upcoming": upcoming,
+                    "text": (f"Coming up on {date}. " if upcoming else f"Decided on {date}. ")
+                            + f"{name} {title}: {item_title}. " + (("DECISION: " if not upcoming else "") + detail[:700] if detail else ""),
+                    "url": link,
+                })
+    STATE["council_shown"] = sorted(shown | new_keys)[-8000:]
+    return items
+
+
+def fetch_councils(since: str, until: str) -> list[dict]:
+    out = []
+    for c in COUNCILS:
+        try:
+            got = fetch_council(c["name"], c["url"], since, until)
+            print(f"  council {c['name']}: {len(got)}", file=sys.stderr)
+            out += got
+        except Exception as e:  # one council failing shouldn't stop the others
+            print(f"WARNING: council {c['name']} failed: {e}", file=sys.stderr)
+    return out
+
+
 SOURCES = {
     "written_questions": fetch_written_questions,
     "written_statements": fetch_written_statements,
@@ -434,6 +524,7 @@ SOURCES = {
     "commons_divisions": fetch_commons_divisions,
     "senedd_written_questions": fetch_senedd_written_questions,
     "look_ahead": fetch_calendar,
+    "councils": fetch_councils,
 }
 
 
@@ -501,6 +592,7 @@ SYSTEM = """You are a parliamentary researcher in a UK elected representative's 
 You read official updates and decide which ones this office genuinely needs to know about.
 Be strict: most items are noise, and a short briefing is a good briefing.
 Items whose text starts "Coming up on" are future business: judge whether the office should prepare, attend or watch.
+Council items are local authority meetings and decisions; weigh them by local impact on the office's area and issues.
 Never state anything that is not in the item text. Use British English."""
 
 
@@ -575,7 +667,7 @@ def assess_without_ai(items: list[dict]) -> None:
 CSS = """
 :root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;
 --ink:#101A1A;--ink-2:#3D4A49;--muted:#4E5B5A;--hair:#E2E7E5;--edge:#7D8B88;--decision:#9A5D0E;--ai:#5E43A8;
---commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;
+--commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;--council:#7A5C2E;
 --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
 --sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
 --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -612,13 +704,14 @@ section.group{padding:28px 0 4px}
 .item{background:var(--paper);border:1px solid var(--hair);border-radius:2px;padding:22px 24px;margin:14px 0}
 .item.top{border-left:3px solid var(--decision)}
 .item{border-top:4px solid var(--edge)}
-.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}
+.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}.item.c-council{border-top-color:var(--council)}
 .tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
 .chamber{display:inline-flex;align-items:center;gap:6px;font-weight:600}
 .chamber i{width:8px;height:8px;border-radius:50%;flex:none}
 .ch-commons{color:var(--commons)}.ch-commons i{background:var(--commons)}
 .ch-lords{color:var(--lords)}.ch-lords i{background:var(--lords)}
 .ch-senedd{color:var(--senedd)}.ch-senedd i{background:var(--senedd)}
+.ch-council{color:var(--council)}.ch-council i{background:var(--council)}
 .type{color:var(--ink-2)}
 .key{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
 text-transform:uppercase;color:var(--muted)}
@@ -723,7 +816,7 @@ def stage_track(bill: dict) -> str:
 
 def chamber(it: dict) -> str:
     h = (it.get("house") or "").lower()
-    return h if h in ("commons", "lords", "senedd") else "commons"
+    return h if h in ("commons", "lords", "senedd", "council") else "commons"
 
 
 def when_label(it: dict) -> str:
@@ -744,7 +837,8 @@ def kind_label(it: dict) -> str:
 
 def chamber_tag(it: dict) -> str:
     c = chamber(it)
-    label = "Senedd" if c == "senedd" else f"Westminster · {c.capitalize()}"
+    label = ("Senedd" if c == "senedd" else f"Council · {it.get('council', '')}".rstrip(" ·") if c == "council"
+             else f"Westminster · {c.capitalize()}")
     return f'<span class="chamber ch-{c}"><i></i>{label}</span>'
 
 
@@ -854,7 +948,8 @@ def render_digest(items: list[dict], scanned: int, office: str, today: str, sinc
     if ahead:
         groups += '<section class="group"><p class="label">Coming up this week</p>\n' + "\n".join(card(i) for i in ahead) + "</section>\n"
     headline = "What needs you today" if keep else "Nothing needs you today"
-    lede = (f"{office}. Official Westminster and Senedd business since {nice_date(since, long=True)}, "
+    levels = "council, Senedd and Westminster" if COUNCILS else "Westminster and Senedd"
+    lede = (f"{office}. Official {levels} business since {nice_date(since, long=True)}, "
             "filtered to your issues, ranked and explained.")
     stats = (f'<div><b>{scanned}</b>updates read</div><div><b>{len(items)}</b>matched your issues</div>'
              f'<div><b>{len(keep)}</b>in this briefing</div>'
@@ -865,7 +960,7 @@ def render_digest(items: list[dict], scanned: int, office: str, today: str, sinc
 <p class="lede">{esc(lede)}</p>
 {f'<div class="note">{esc(note)}</div>' if note else ''}
 <div class="stats">{stats}</div>
-<div class="key"><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
+<div class="key">{'<span><i style="background:var(--council)"></i>Council</span>' if COUNCILS else ''}<span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
 </section>
 {groups or '<p class="empty">Nothing in this period met the bar for this office.</p>'}
 {statements_section(statements or [], member)}"""
@@ -915,6 +1010,7 @@ def load_state() -> None:
 
 def run(profile: dict, today: dt.date, days: int, use_ai: bool, extra_note: str = "") -> None:
     load_state()
+    COUNCILS[:] = profile.get("councils", [])
     since = (today - dt.timedelta(days=days)).isoformat()
     items = collect(profile, since, today.isoformat())
     scanned = len(items)
