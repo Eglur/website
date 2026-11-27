@@ -26,6 +26,7 @@ class FakeClaude:
     ToolUseBlock, the same shape the live API returns."""
     calls: list = []
     fail_batches: set = set()
+    reply_as_text = False
 
     def __init__(self, *a, **k):
         self.messages = self
@@ -34,13 +35,16 @@ class FakeClaude:
         FakeClaude.calls.append(kw)
         if len(FakeClaude.calls) in FakeClaude.fail_batches:
             raise RuntimeError("simulated API outage")
-        assert kw["tool_choice"] == {"type": "tool", "name": "record_assessments"}
+        assert kw["tool_choice"] == {"type": "auto"}, "forced tool choice is rejected by the live model"
         assert kw["tools"][0]["name"] == "record_assessments"
         assert kw["model"] == PROFILE["model"]["name"]
         content = kw["messages"][0]["content"]
         assert "OFFICE PROFILE" in content and "Pembrokeshire" in content
         ids = [i["id"] for i in json.loads(content.split("ITEMS:\n", 1)[1].split("\n\nAssess", 1)[0])]
         out = [a for a in ASSESSMENTS if a["id"] in ids]
+        if FakeClaude.reply_as_text:
+            text = anthropic.types.TextBlock(type="text", text="Here you go:\n" + json.dumps({"assessments": out}))
+            return types.SimpleNamespace(content=[text])
         block = anthropic.types.ToolUseBlock(id="toolu_test", type="tool_use",
                                              name="record_assessments", input={"assessments": out})
         return types.SimpleNamespace(content=[block])
@@ -51,7 +55,7 @@ class Base(unittest.TestCase):
         monitor.get_json = fake_api.fake_get_json
         self.tmp = Path(tempfile.mkdtemp())
         monitor.OUT = self.tmp / "monitor"
-        FakeClaude.calls, FakeClaude.fail_batches = [], set()
+        FakeClaude.calls, FakeClaude.fail_batches, FakeClaude.reply_as_text = [], set(), False
         anthropic.Anthropic = FakeClaude
 
 
@@ -170,6 +174,12 @@ class TestPipeline(Base):
         html = self.run_pipeline()
         self.assertIn("AI step failed", html)
         self.assertIn("Matched:", html)
+
+    def test_json_text_reply_is_accepted(self):
+        FakeClaude.reply_as_text = True
+        html = self.run_pipeline()
+        self.assertNotIn("AI step failed", html)
+        self.assertEqual(html.count("AI-drafted · check the source"), 4)
 
     def test_keyword_only_mode(self):
         html = self.run_pipeline(use_ai=False)
