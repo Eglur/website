@@ -34,6 +34,7 @@ written_statements = true
 bills = true
 commons_divisions = true
 senedd_written_questions = true
+look_ahead = true   # Westminster committee sessions, debates and bill stages in the coming week
 
 [model]
 # Model used to score and summarise. One batched call per ~30 items.

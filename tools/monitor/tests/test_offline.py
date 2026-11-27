@@ -56,6 +56,7 @@ class Base(unittest.TestCase):
         monitor.get_text = lambda url: ""   # no Senedd pages unless a test supplies one
         self.tmp = Path(tempfile.mkdtemp())
         monitor.OUT = self.tmp / "monitor"
+        monitor.STATE.clear()
         FakeClaude.calls, FakeClaude.fail_batches, FakeClaude.reply_as_text = [], set(), False
         anthropic.Anthropic = FakeClaude
 
@@ -132,7 +133,7 @@ class TestPipeline(Base):
         self.assertNotIn("TEST ONLY", html)
         self.assertNotIn("Armed Forces Bill", html)          # filtered before the AI
         self.assertEqual(html.count('<article class="item'), 4)
-        self.assertIn("<b>23</b>updates read", html)
+        self.assertIn("<b>25</b>updates read", html)
         self.assertIn("<b>6</b>matched your issues", html)
         self.assertIn('content="noindex,nofollow"', html)
         self.assertNotIn('class="note"', html)
@@ -140,7 +141,7 @@ class TestPipeline(Base):
     def test_outputs_and_links(self):
         self.run_pipeline()
         out = monitor.OUT
-        self.assertEqual(sorted(p.name for p in out.iterdir()), ["archive.html", "digests", "index.html"])
+        self.assertEqual(sorted(p.name for p in out.iterdir()), ["archive.html", "digests", "index.html", "state.json"])
         index = (out / "index.html").read_text()
         self.assertIn('href="./archive.html"', index)
         self.assertNotIn(">Latest<", index)
@@ -290,9 +291,10 @@ class TestSenedd(Base):
             asked.append(url)
             return SENEDD_HTML if url.endswith("/25-11-2026") else ""
         monitor.get_text = fake
-        self.assertEqual({i["ref"] for i in monitor.fetch_senedd_written_questions("2026-11-19", "2026-11-27")}, {"WQ101461"},
-                         "only the answer given on 20 Nov is new since 19 Nov")
-        self.assertEqual(len(monitor.fetch_senedd_written_questions("2026-11-18", "2026-11-27")), 3)
+        self.assertEqual({i["ref"] for i in monitor.fetch_senedd_written_questions("2026-11-21", "2026-11-27")}, {"WQ101461"},
+                         "no memory yet: look back 2 days, so only the answer given on 20 Nov counts")
+        monitor.STATE.clear()
+        self.assertEqual(len(monitor.fetch_senedd_written_questions("2026-11-20", "2026-11-27")), 3)
         self.assertTrue(all("/OrderPaper/WrittenQuestions/" in u for u in asked))
         self.assertFalse(any(dt.date(int(u[-4:]), int(u[-7:-5]), int(u[-10:-8])).weekday() > 4 for u in asked), "weekdays only")
 
@@ -302,6 +304,49 @@ class TestSenedd(Base):
         self.assertIn('class="item c-senedd"', html)
         self.assertIn('<span class="chamber ch-senedd"><i></i>Senedd</span>', html)
         self.assertIn("Written question · awaiting answer · WQ101431", html)
+
+
+class TestLookAhead(Base):
+    def test_calendar_items(self):
+        items = {i["id"]: i for i in monitor.fetch_calendar("2026-11-26", "2026-11-27")}
+        self.assertEqual(sorted(items), ["cal-27668", "cal-28436"], "private meetings are skipped")
+        ha = items["cal-27668"]
+        self.assertEqual(ha["title"], "Home Affairs Committee: Police reform")
+        self.assertEqual((ha["date"], ha["time"], ha["house"], ha["upcoming"]), ("2026-12-01", "14:00", "Commons", True))
+        self.assertEqual(ha["url"], "https://committees.parliament.uk/committee/83/")
+        self.assertTrue(ha["text"].startswith("Coming up on 2026-12-01 14:00."))
+        self.assertEqual(ha["type"], "Select & Joint Committees · Oral evidence")
+
+    def test_coming_up_section(self):
+        ev = dict(monitor.fetch_calendar("2026-11-26", "2026-11-27")[0], score=7, summary="s", why="w", action="", ai=True)
+        past = {"id": "p", "type": "Written answer", "house": "Lords", "title": "Past item", "who": "", "body": "", "date": "2026-11-26",
+                "text": "", "url": "u", "score": 9, "summary": "s", "why": "w", "action": "", "ai": True}
+        html = monitor.render_digest([past, ev], 2, "Office", "2026-11-27", "2026-11-26", 6, "./")
+        self.assertIn('<p class="label">Coming up this week</p>', html)
+        self.assertLess(html.index("Needs you today"), html.index("Coming up this week"))
+        self.assertIn("Tue 1 Dec · 14:00", html)
+        self.assertLess(html.index("Past item"), html.index("Home Affairs Committee"))
+
+
+class TestSeneddMemory(Base):
+    def test_shown_questions_are_not_repeated(self):
+        monitor.get_text = lambda url: SENEDD_HTML if url.endswith("/25-11-2026") else ""
+        first = monitor.fetch_senedd_written_questions("2026-11-20", "2026-11-27")
+        self.assertEqual(len(first), 3, "first run (no memory) looks back 2 days")
+        again = monitor.fetch_senedd_written_questions("2026-11-21", "2026-11-28")
+        self.assertEqual(again, [], "already shown, so not repeated")
+        self.assertIn("swq-101461:a", monitor.STATE["senedd_shown"])
+
+    def test_late_answers_caught_with_memory(self):
+        monitor.get_text = lambda url: SENEDD_HTML if url.endswith("/25-11-2026") else ""
+        monitor.STATE["senedd_shown"] = ["swq-000001:q"]          # memory exists, so look back a week
+        got = monitor.fetch_senedd_written_questions("2026-11-26", "2026-11-27")
+        self.assertEqual({i["ref"] for i in got}, {"WQ101461"},
+                         "an answer dated 20 Nov, first seen on the 27th, still appears; questions tabled 18 Nov are over a week old")
+
+    def test_state_saved_with_briefing(self):
+        monitor.run(PROFILE, TODAY, 4, False)
+        self.assertIn("senedd_shown", json.loads((monitor.OUT / "state.json").read_text()))
 
 
 class TestChamberLabels(unittest.TestCase):
