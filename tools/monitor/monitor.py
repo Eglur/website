@@ -606,7 +606,7 @@ def context_block(profile: dict, statements: list[dict]) -> str:
     return out
 
 
-def assess(items: list[dict], profile: dict, statements: list[dict] | None = None) -> int:
+def assess(items: list[dict], profile: dict, statements: list[dict] | None = None, system: str | None = None) -> int:
     """Score and explain items with Claude. Returns the number of failed batches."""
     import anthropic  # imported here so keyword-only runs don't need the package
     client = anthropic.Anthropic()
@@ -620,7 +620,7 @@ def assess(items: list[dict], profile: dict, statements: list[dict] | None = Non
             msg = client.messages.create(
                 model=model,
                 max_tokens=8000,
-                system=SYSTEM,
+                system=system or SYSTEM,
                 tools=[TOOL],
                 tool_choice={"type": "auto"},  # this model doesn't accept a forced tool choice
                 messages=[{"role": "user", "content":
