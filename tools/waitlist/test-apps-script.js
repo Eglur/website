@@ -25,6 +25,7 @@ const ctx = {
   Logger: { log() {} },
   PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] || null, setProperty: (k, v) => { props[k] = v; } }) },
   SpreadsheetApp: {
+    openById: id => ({ rename() {}, getSheetByName: () => sheet, insertSheet: () => sheet, getSheets: () => [sheet], deleteSheet() {} }),
     getActiveSpreadsheet: () => ({ rename() {}, getSheetByName: () => sheet, insertSheet: () => sheet, getSheets: () => [sheet], deleteSheet() {} }),
     newDataValidation: () => ({ requireValueInList() { return this; }, build() { return {}; } }),
     newConditionalFormatRule: () => ({ whenTextEqualTo() { return this; }, setFontColor() { return this; }, setBackground() { return this; }, setRanges() { return this; }, build() { return {}; } }),
