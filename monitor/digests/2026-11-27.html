@@ -22,6 +22,7 @@
 
 :root{--teal:#286A6C;--teal-deep:#1E5153;--dot:#8FD1C6;--paper:#FCFFFE;--ground:#FAFBF9;
 --ink:#101A1A;--ink-2:#3D4A49;--muted:#4E5B5A;--hair:#E2E7E5;--edge:#7D8B88;--decision:#9A5D0E;--ai:#5E43A8;
+--commons:#3F7F5F;--lords:#A2475A;--senedd:#2F6690;
 --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
 --sans:'Geist',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
 --mono:'Geist Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
@@ -57,6 +58,18 @@ color:var(--ink);text-transform:none;margin-bottom:4px}
 section.group{padding:28px 0 4px}
 .item{background:var(--paper);border:1px solid var(--hair);border-radius:2px;padding:22px 24px;margin:14px 0}
 .item.top{border-left:3px solid var(--decision)}
+.item{border-top:4px solid var(--edge)}
+.item.c-commons{border-top-color:var(--commons)}.item.c-lords{border-top-color:var(--lords)}.item.c-senedd{border-top-color:var(--senedd)}
+.tags{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.chamber{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.chamber i{width:8px;height:8px;border-radius:50%;flex:none}
+.ch-commons{color:var(--commons)}.ch-commons i{background:var(--commons)}
+.ch-lords{color:var(--lords)}.ch-lords i{background:var(--lords)}
+.ch-senedd{color:var(--senedd)}.ch-senedd i{background:var(--senedd)}
+.type{color:var(--ink-2)}
+.key{display:flex;flex-wrap:wrap;gap:8px 20px;margin:18px 0 0;font-family:var(--mono);font-size:12px;letter-spacing:.06em;
+text-transform:uppercase;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:8px}.key i{width:22px;height:4px;border-radius:2px}
 .row{display:flex;justify-content:space-between;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;
 text-transform:uppercase;color:var(--muted)}
 .score{flex:none;letter-spacing:.04em}
@@ -75,12 +88,12 @@ border-top:1px solid var(--hair);font-family:var(--mono);font-size:12px;letter-s
 .track{margin:14px 0 4px}
 .segs{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
 .seg{height:8px;border-radius:2px;background:var(--hair)}
-.seg.done.h-commons{background:#4C8C6E}.seg.done.h-lords{background:#A2545F}.seg.done.h-both{background:var(--teal)}
+.seg.done.h-commons{background:var(--commons)}.seg.done.h-lords{background:var(--lords)}.seg.done.h-both{background:var(--teal)}
 .seg.now{background:var(--decision);box-shadow:0 0 0 2px rgba(154,93,14,.18)}
 .tlabels{display:grid;grid-template-columns:5fr 5fr 2fr;gap:3px;margin-top:6px;font-family:var(--mono);font-size:11px;
 letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .tlabels span{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden}
-.hd{width:7px;height:7px;border-radius:50%;flex:none}.hd.h-commons{background:#4C8C6E}.hd.h-lords{background:#A2545F}
+.hd{width:7px;height:7px;border-radius:50%;flex:none}.hd.h-commons{background:var(--commons)}.hd.h-lords{background:var(--lords)}
 .tnow{margin-top:6px;font-size:14px;color:var(--ink-2)}.tnow b{color:var(--decision);font-weight:600}
 footer.site{border-top:1px solid var(--hair);padding:40px 0 52px;margin-top:56px;background:var(--paper)}
 .foot{display:flex;flex-direction:column;gap:12px}
@@ -106,53 +119,64 @@ nav .chip{display:none}.row{letter-spacing:.04em;font-size:11px}ul.archive a{fon
 <section class="hero">
 <p class="label">Morning briefing · Friday 27 November 2026</p>
 <h1>What needs you today<span class="stop">.</span></h1>
-<p class="lede">Example office. Official Westminster business since Thursday 26 November 2026, filtered to your issues, ranked and explained.</p>
+<p class="lede">Example office. Official Westminster and Senedd business since Thursday 26 November 2026, filtered to your issues, ranked and explained.</p>
 
-<div class="stats"><div><b>501</b>updates read</div><div><b>63</b>matched your issues</div><div><b>5</b>in this briefing</div><div><b>2 min</b>to read</div></div>
+<div class="stats"><div><b>501</b>updates read</div><div><b>63</b>matched your issues</div><div><b>6</b>in this briefing</div><div><b>2 min</b>to read</div></div>
+<div class="key"><span><i style="background:var(--commons)"></i>Commons</span><span><i style="background:var(--lords)"></i>Lords</span><span><i style="background:var(--senedd)"></i>Senedd</span></div>
 </section>
 <section class="group"><p class="label">Worth knowing</p>
-<article class="item">
-<div class="row"><span>Bill stage · Commons · 27 Nov</span><span class="score">7/10</span></div>
+<article class="item c-commons">
+<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Bill stage</span><span>27 Nov</span></span><span class="score">7/10</span></div>
 <h3><a href="https://bills.parliament.uk/bills/4248" target="_blank" rel="noopener">Rural Public Transport Bill</a></h3>
 <div class="track" aria-label="Bill stage: 2nd reading, Commons"><div class="segs"><span class="seg done h-commons" title="Commons: 1st reading"></span><span class="seg now h-commons" title="Commons: 2nd reading"></span><span class="seg todo h-commons" title="Commons: Committee"></span><span class="seg todo h-commons" title="Commons: Report"></span><span class="seg todo h-commons" title="Commons: 3rd reading"></span><span class="seg todo h-lords" title="Lords: 1st reading"></span><span class="seg todo h-lords" title="Lords: 2nd reading"></span><span class="seg todo h-lords" title="Lords: Committee"></span><span class="seg todo h-lords" title="Lords: Report"></span><span class="seg todo h-lords" title="Lords: 3rd reading"></span><span class="seg todo h-both" title="Both: Final stages"></span><span class="seg todo h-both" title="Both: Royal Assent"></span></div><div class="tlabels"><span><i class="hd h-commons"></i>Commons</span><span><i class="hd h-lords"></i>Lords</span><span>Final</span></div><div class="tnow">Now: <b>2nd reading, Commons</b> · stage 2 of 12</div></div>
 <p>The Rural Public Transport Bill is scheduled for second reading in the Commons on 27 November 2026.</p>
-<p class="why"><span class="k">Why it matters</span>Rural transport is a core priority for a Pembrokeshire constituency, so the Bill&#x27;s content and any Welsh application are worth checking, though the item gives no detail on either.</p>
-<p class="next"><span class="k">Next step</span>Obtain the Bill text and explanatory notes to check whether it applies to Wales or touches devolved transport; consider whether to brief on or contribute to the debate.</p>
+<p class="why"><span class="k">Why it matters</span>Rural transport is a core priority for a Pembrokeshire office. Transport is largely devolved, so check whether the Bill extends to Wales or touches Welsh Government responsibilities.</p>
+<p class="next"><span class="k">Next step</span>Obtain the Bill text and explanatory notes to check territorial extent and any Welsh provisions. Decide whether to speak or brief ahead of the debate.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://bills.parliament.uk/bills/4248" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
-<article class="item">
-<div class="row"><span>Written answer · Lords · 26 Nov</span><span class="score">6/10</span></div>
+<article class="item c-lords">
+<div class="row"><span class="tags"><span class="chamber ch-lords"><i></i>Westminster · Lords</span><span class="type">Written answer</span><span>26 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-10/HL5211" target="_blank" rel="noopener">Bovine Tuberculosis: Disease Control</a></h3>
 <div class="who">Lord Wigley (PC, Life peer) · Department for Environment, Food and Rural Affairs</div>
-<p>Lord Wigley (Plaid Cymru) asked about the efficacy of badger culling for TB control. The answer cites 2024 analyses of 52 areas in England under the badger control policy.</p>
-<p class="why"><span class="k">Why it matters</span>Bovine TB is a major issue for Pembrokeshire farmers. The answer covers England only, but it sets the comparison against Welsh Government policy.</p>
-<p class="next"><span class="k">Next step</span>Consider comparing the English evidence with the Welsh Government&#x27;s approach to TB in the Pembrokeshire area.</p>
+<p>Lord Wigley (Plaid Cymru) asked about the efficacy of badger culling and advice to farmers in England; DEFRA cited 2024 analyses of 52 areas under the English badger control policy.</p>
+<p class="why"><span class="k">Why it matters</span>Bovine TB is a major issue for Pembrokeshire farmers, and Wales takes a different policy approach. The answer covers England only, but it is useful for comparison.</p>
+<p class="next"><span class="k">Next step</span>Note for any bTB comparison with Welsh Government policy.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-10/HL5211" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
-<article class="item">
-<div class="row"><span>Written answer · Lords · 26 Nov</span><span class="score">6/10</span></div>
+<article class="item c-commons">
+<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Written answer</span><span>26 Nov</span></span><span class="score">6/10</span></div>
+<h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-10-28/38992" target="_blank" rel="noopener">Department for Environment, Food and Rural Affairs: Public Expenditure</a></h3>
+<div class="who">Tim Farron (LD, Westmorland and Lonsdale) · Department for Environment, Food and Rural Affairs</div>
+<p>DEFRA must contribute 1% of its capital budget in 2026–27, rising to 2% a year from 2027–28 to 2029–30, to support the Defence Investment Plan.</p>
+<p class="why"><span class="k">Why it matters</span>Defra capital cuts could affect funding for farming, flood defence and rural schemes. Wales receives consequentials from these budgets, so the effect on Welsh funding is worth checking.</p>
+<p class="next"><span class="k">Next step</span>Ask whether the Defra capital reallocation affects Barnett consequentials for Wales.</p>
+<div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-10-28/38992" target="_blank" rel="noopener">Official record ↗</a></div>
+</article>
+<article class="item c-lords">
+<div class="row"><span class="tags"><span class="chamber ch-lords"><i></i>Westminster · Lords</span><span class="type">Written answer</span><span>26 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-18/HL5568" target="_blank" rel="noopener">Public Sector: Wales</a></h3>
 <div class="who">Baroness Wilcox of Newport (Lab, Life peer) · Wales Office</div>
-<p>Wales Office says the UK Government is giving the Welsh Government a further £450 million for devolved public services, with the settlement rising in real terms over the Spending Review period.</p>
-<p class="why"><span class="k">Why it matters</span>Directly concerns UK–Welsh Government funding and the devolution settlement, which is useful for lines on Welsh public service funding.</p>
-<p class="next"><span class="k">Next step</span>Note the £450 million figure for use in any response on Welsh public services funding.</p>
+<p>Wales Office says the UK Government is providing the Welsh Government with a further £450 million for devolved public services, with the settlement rising in real terms over the Spending Review period.</p>
+<p class="why"><span class="k">Why it matters</span>Funding for devolved services and the devolution settlement bear directly on Welsh Government interaction and on the budgets behind rural health and transport in Wales.</p>
+<p class="next"><span class="k">Next step</span>Note the £450 million figure and the real-terms settlement claim for use in any Senedd or constituency lines on Welsh funding.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-18/HL5568" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
-<article class="item">
-<div class="row"><span>Written question · Commons · 26 Nov</span><span class="score">6/10</span></div>
+<article class="item c-commons">
+<div class="row"><span class="tags"><span class="chamber ch-commons"><i></i>Westminster · Commons</span><span class="type">Written question · awaiting answer</span><span>26 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-26/46924" target="_blank" rel="noopener">Question to DEFRA</a></h3>
 <div class="who">Dr Al Pinkerton (LD, Surrey Heath) · Department for Environment, Food and Rural Affairs</div>
-<p>Dr Al Pinkerton asks Defra to estimate additional costs to British food and drink exporters of implementing the UK-EU SPS Agreement on 1 March 2028.</p>
-<p class="why"><span class="k">Why it matters</span>The SPS agreement affects Welsh farming and food exporters, including agri-food businesses in Pembrokeshire, so the answer will be worth watching.</p>
-<p class="next"><span class="k">Next step</span>Monitor for the Defra answer, which may give cost estimates relevant to Welsh producers.</p>
+<p>Dr Al Pinkerton asks DEFRA for an estimate of additional costs to British food and drink exporters of implementing the UK-EU SPS Agreement on 1 March 2028.</p>
+<p class="why"><span class="k">Why it matters</span>The SPS agreement affects Welsh agri-food exporters, including Pembrokeshire farmers and producers, and the cost estimate may bear on them.</p>
+<p class="next"><span class="k">Next step</span>Watch for the answer for any Wales-specific cost or implementation detail.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-26/46924" target="_blank" rel="noopener">Official record ↗</a></div>
 </article>
-<article class="item">
-<div class="row"><span>Written answer · Lords · 26 Nov</span><span class="score">6/10</span></div>
+<article class="item c-lords">
+<div class="row"><span class="tags"><span class="chamber ch-lords"><i></i>Westminster · Lords</span><span class="type">Written answer</span><span>26 Nov</span></span><span class="score">6/10</span></div>
 <h3><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-18/HL5567" target="_blank" rel="noopener">Transport: Wales</a></h3>
 <div class="who">Baroness Wilcox of Newport (Lab, Life peer) · Wales Office</div>
-<p>Wales Office says the UK Government recognises transport connectivity as vital to Welsh economic growth and cites a commitment to transforming Welsh rail.</p>
-<p class="why"><span class="k">Why it matters</span>Relevant to rural transport and UK–Welsh Government interaction, though the extract is general and gives no detail on west Wales.</p>
+<p>Wales Office says the UK Government recognises transport connectivity as vital to Welsh growth and has made a generational commitment to transforming Welsh rail.</p>
+<p class="why"><span class="k">Why it matters</span>Welsh transport connectivity is a priority for this office, although the answer as shown is general and gives no west Wales detail.</p>
+<p class="next"><span class="k">Next step</span>Read the full answer for any specific commitments on west Wales rail or ports.</p>
 <div class="src"><span class="ai">AI-drafted · check the source</span><a href="https://questions-statements.parliament.uk/written-questions/detail/2026-11-18/HL5567" target="_blank" rel="noopener">Official record ↗</a></div>
 </article></section>
 
@@ -160,7 +184,8 @@ nav .chip{display:none}.row{letter-spacing:.04em;font-size:11px}ul.archive a{fon
 <footer class="site"><div class="wrap foot">
 <div class="fbrand"><svg xmlns="http://www.w3.org/2000/svg" class="wm" role="img" aria-label="eglur." viewBox="0 0 350.2 141.8"><path d="M38.56 32.34Q48.18 32.34 54.98 36.26Q61.79 40.18 65.42 46.92Q69.04 53.65 69.04 62.24Q69.04 63.86 68.90 65.57Q68.75 67.27 68.30 68.6H24.2Q24.35 84.58 29.90 91.61Q35.45 98.64 46.4 98.64Q53.8 98.64 58.39 96.28Q62.98 93.91 66.97 89.32L68.45 90.65Q63.86 98.79 56.24 103.38Q48.62 107.97 37.96 107.97Q27.46 107.97 19.32 103.45Q11.18 98.94 6.59 90.50Q2.0 82.07 2.0 70.38Q2.0 58.24 7.33 49.73Q12.66 41.22 21.02 36.78Q29.38 32.34 38.56 32.34ZM38.11 35.3Q33.82 35.3 30.79 37.89Q27.75 40.48 26.05 47.07Q24.35 53.65 24.2 65.64H49.51Q50.99 49.51 48.32 42.40Q45.66 35.3 38.11 35.3Z" fill="currentColor"/><path d="M104.71 80.14Q94.50 80.14 87.39 76.74V81.77Q87.39 86.36 91.98 87.25L119.80 92.43Q126.76 93.76 132.38 95.91Q138.01 98.05 141.41 101.97Q144.82 105.90 144.82 112.70Q144.82 119.96 140.08 126.10Q135.34 132.24 126.09 136.01Q116.84 139.79 103.08 139.79Q91.24 139.79 84.28 137.35Q77.33 134.90 74.44 131.06Q71.56 127.21 71.56 122.92Q71.56 117.59 75.18 112.19Q78.81 106.78 84.14 103.53Q79.55 101.75 77.48 98.94Q75.40 96.13 75.40 92.87Q75.40 89.91 76.96 87.32Q78.51 84.73 80.73 82.07L85.62 75.85Q74.81 69.64 74.81 56.32Q74.81 45.66 82.43 39.00Q90.06 32.34 104.86 32.34Q112.40 32.34 118.10 34.12Q123.80 35.89 127.5 39.15Q132.24 38.41 136.45 36.71Q140.67 35.00 144.08 32.04L146.15 33.52V41.07H129.42Q134.75 46.99 134.75 56.32Q134.75 66.68 127.13 73.41Q119.51 80.14 104.71 80.14ZM104.56 77.18Q110.48 77.18 113.22 72.3Q115.96 67.42 115.96 56.02Q115.96 44.62 113.22 39.96Q110.48 35.3 104.86 35.3Q99.38 35.3 96.57 40.11Q93.76 44.92 93.76 56.32Q93.76 67.71 96.35 72.45Q98.94 77.18 104.56 77.18ZM82.51 118.18Q82.51 126.91 87.91 131.35Q93.31 135.79 105.00 135.79Q117.29 135.79 123.50 131.80Q129.72 127.80 129.72 120.55Q129.72 116.40 126.69 113.89Q123.65 111.37 116.4 110.04L89.61 105.01Q88.43 104.71 87.24 104.42Q85.17 107.38 83.84 111.15Q82.51 114.92 82.51 118.18Z" fill="currentColor"/><path d="M147.48 105.75V104.27L149.25 103.68Q154.58 101.90 154.58 96.28V17.10Q154.58 14.14 153.40 12.58Q152.21 11.03 149.25 10.29L147.33 9.84V8.36L174.41 2.0L176.19 3.33L175.60 24.05V74.67Q175.60 80.14 175.67 85.55Q175.74 90.95 175.74 96.28Q175.74 99.24 176.93 101.09Q178.11 102.94 180.92 103.82L182.85 104.27V105.75Z" fill="currentColor"/><path d="M212.15 107.97Q206.38 107.97 201.57 105.75Q196.76 103.53 194.02 98.57Q191.28 93.61 191.43 85.47L191.87 47.44Q191.87 44.03 190.69 42.55Q189.50 41.07 186.99 40.48L185.21 39.89V38.41L211.70 33.23L213.18 34.71L212.44 55.72V91.39Q212.44 96.13 215.18 98.35Q217.92 100.57 222.06 100.57Q226.21 100.57 229.46 99.38Q232.72 98.20 235.98 95.83L236.57 47.58Q236.57 44.18 235.53 42.77Q234.50 41.37 231.68 40.78L230.20 40.33V38.85L256.10 33.23L257.58 34.71L257.14 55.72V95.83Q257.14 99.09 258.03 100.86Q258.92 102.64 261.88 103.82L263.36 104.27V105.75L237.46 107.23L236.12 98.50Q231.24 102.49 225.54 105.23Q219.84 107.97 212.15 107.97Z" fill="currentColor"/><path d="M265.28 105.75V104.27L267.50 103.68Q270.46 102.79 271.57 101.01Q272.68 99.24 272.68 96.42V50.10Q272.68 46.84 271.57 45.29Q270.46 43.74 267.50 43.14L265.28 42.55V41.07L290.73 32.49L292.21 33.97L293.54 46.70V47.88Q295.62 43.74 298.95 40.26Q302.28 36.78 306.35 34.56Q310.42 32.34 314.41 32.34Q320.04 32.34 323.00 35.45Q325.96 38.56 325.96 43.29Q325.96 48.32 323.07 51.06Q320.18 53.80 316.19 53.80Q309.97 53.80 305.24 47.58L304.94 47.29Q303.46 45.22 301.54 44.99Q299.61 44.77 297.98 46.84Q296.50 48.18 295.54 50.03Q294.58 51.88 293.69 54.24V95.54Q293.69 101.46 298.87 102.94L303.61 104.27V105.75Z" fill="currentColor"/><path d="M335.42 107.97Q330.10 107.97 326.40 104.27Q322.70 100.57 322.70 95.39Q322.70 90.21 326.40 86.36Q330.10 82.51 335.42 82.51Q340.75 82.51 344.45 86.36Q348.15 90.21 348.15 95.39Q348.15 100.57 344.45 104.27Q340.75 107.97 335.42 107.97Z" class="dot"/></svg><small>clarity for public servants</small></div>
 <p class="fine">Built from public data published by UK Parliament under the
-<a href="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/">Open Parliament Licence v3.0</a>.
+<a href="https://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/">Open Parliament Licence v3.0</a>
+and by the Senedd under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence</a>.
 Summaries are drafted by AI and can be wrong, so every item links to the official record.</p>
 <p class="fine">Eglur Technologies · In development · Eglur is Welsh for clear</p>
 </div></footer>
