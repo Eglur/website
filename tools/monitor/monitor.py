@@ -261,8 +261,17 @@ def iso_uk(d: str) -> str:
     return f"{d[6:10]}-{d[3:5]}-{d[0:2]}" if re.match(r"\d\d/\d\d/\d{4}$", d) else ""
 
 
+def senedd_lines(page: str) -> list[str]:
+    """The page's own plain-text copy (behind its Copy button) if present, else its visible text."""
+    m = re.search(r'id="copy"[^>]*data-clipboard-text="([^"]*)"', page) or re.search(r'data-clipboard-text="([^"]*WQ\d[^"]*)"', page)
+    if m:
+        text = html.unescape(html.unescape(m.group(1)))
+        return [ln for ln in (re.sub(r"[ \t\u00a0]+", " ", x).strip() for x in text.split("\n")) if ln]
+    return html_lines(page)
+
+
 def parse_senedd_questions(page: str, page_url: str) -> list[dict]:
-    lines = html_lines(page)
+    lines = senedd_lines(page)
     starts = [i for i, ln in enumerate(lines) if WQ_LINE.match(ln)]
     ministers = {ln.split(":", 1)[1].strip() for ln in lines if ln.startswith("To be answered by:")} | \
                 {ln[len("Answered by"):].strip() for ln in lines if ln.startswith("Answered by ")}
@@ -335,8 +344,6 @@ def fetch_senedd_written_questions(since: str, until: str) -> list[dict]:
                 for it in parse_senedd_questions(page, url):
                     seen[it["id"]] = it
                 pages += 1
-                if os.environ.get("BRIEFING_DEBUG") and not seen and (m := re.search(r"WQ\d{5,7}\s*\(e\)", page)):
-                    print("SENEDD-CONTEXT", repr(page[max(0, m.start() - 1500): m.start() + 600]), file=sys.stderr)
             except Exception:
                 pass  # no questions due that day, or the page is missing
         d += dt.timedelta(days=1)

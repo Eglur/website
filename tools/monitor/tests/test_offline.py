@@ -243,6 +243,10 @@ class TestQuickFixes(Base):
 SENEDD_HTML = (HERE / "sample_senedd.html").read_text()
 
 
+def html_escape(t):
+    return t.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 class TestSenedd(Base):
     def test_parse_page(self):
         items = monitor.parse_senedd_questions(SENEDD_HTML, "https://record.senedd.wales/OrderPaper/WrittenQuestions/25-11-2026")
@@ -260,6 +264,25 @@ class TestSenedd(Base):
         self.assertEqual(q["title"], "What steps is the Welsh Government taking to improve accident and emergency…")
         last = by_ref["WQ101457"]
         self.assertNotIn("Contact us", last["text"]); self.assertNotIn("Copyright", last["text"])
+
+    def test_parse_clipboard_format(self):
+        text = ("Written Questions tabled on 03/11/2026 for answer on 10/11/2026\n\n"
+                "Deputy First Minister and Cabinet Minister for Social Justice and Equality\n\n"
+                "WQ101156(e)\nTabled on: 03/11/2026\nCai Parry-Jones (Caerdydd Ffynnon Taf)\n"
+                "Does the Welsh Government encourage the wearing of the white poppy?\n\n"
+                "Answered by Deputy First Minister and Cabinet Minister for Social Justice and Equality\n"
+                "Answered on: 10/11/2026\nWe respect the choice of individuals to wear a white poppy.&#160; It is a symbol of peace.\n\n"
+                "Cabinet Minister for Finance\n\nWQ101200(e)\nTabled on: 03/11/2026\nSteven Rodaway (G&#373;yr Abertawe)\n"
+                "How will council tax premiums be reviewed?\nTo be answered by: Cabinet Minister for Finance\n")
+        page = ('<main><a id="copy" class="button fullIcon" data-clipboard-text="' + html_escape(text) + '">Copy</a>'
+                "<div>visible layout we don't rely on</div></main>")
+        items = {i["ref"]: i for i in monitor.parse_senedd_questions(page, "u")}
+        self.assertEqual(sorted(items), ["WQ101156", "WQ101200"])
+        a = items["WQ101156"]
+        self.assertEqual((a["answered"], a["who"]), ("2026-11-10", "Cai Parry-Jones (Caerdydd Ffynnon Taf)"))
+        self.assertTrue(a["text"].endswith("ANSWER: We respect the choice of individuals to wear a white poppy. It is a symbol of peace."))
+        self.assertEqual(items["WQ101200"]["who"], "Steven Rodaway (Gŵyr Abertawe)")
+        self.assertEqual(items["WQ101200"]["type"], "Written question")
 
     def test_window_and_pages(self):
         asked = []
