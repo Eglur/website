@@ -1,0 +1,39 @@
+# Office profile: edit this to tailor the digest.
+# This is an EXAMPLE profile. Replace it with the office you're testing for.
+
+[office]
+name = "Example office"
+# Plain-English description. The AI reads this to judge relevance and write "why it matters".
+description = """
+A Welsh elected representative for a rural west Wales constituency (Pembrokeshire).
+Priorities: farming and agriculture, rural health services and GP access, ferries and
+ports (Fishguard, Pembroke Dock, Milford Haven), energy and the Celtic Sea, rural
+transport, and anything with a specific Welsh angle or Welsh Government interaction.
+Interested in how UK Government decisions affect Wales.
+"""
+
+[filter]
+# Items mentioning any of these go through to AI scoring. Not case-sensitive.
+# A plain word matches the whole word plus plurals: "GP" matches GP and GPs, not "GPS".
+# End with * to match word beginnings: "farm*" matches farm, farmer, farming.
+# Leave empty to send everything (more cost, more noise).
+keywords = [
+  "Wales", "Welsh", "Cymru", "Senedd", "devol*",
+  "Pembrokeshire", "Milford Haven", "Fishguard", "Pembroke Dock", "Haverfordwest",
+  "farm*", "agricultur*", "livestock", "bovine TB", "rural", "crop*",
+  "GP", "port", "ferry", "ferries", "Celtic Sea", "floating offshore wind",
+]
+# Hard cap on items sent to the AI per run (controls cost).
+max_items = 120
+# Items scoring at or above this go in the digest (0–10).
+min_score = 6
+
+[sources]
+written_questions = true
+written_statements = true
+bills = true
+commons_divisions = true
+
+[model]
+# Model used to score and summarise. One batched call per ~30 items.
+name = "claude-sonnet-5-5"
