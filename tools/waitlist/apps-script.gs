@@ -11,6 +11,7 @@
  * unsubscribe links in emails.
  */
 
+var SHEET_ID = '';   // set for a standalone script project; leave empty when the script lives inside the sheet
 var SHEET_NAME = 'Sign-ups';
 var HEADERS = ['Joined', 'Email', 'Postcode or area', 'Topics', 'Other topics', 'Places', 'People',
                'How often', 'Status', 'Welcome sent', 'Last briefing'];
@@ -23,12 +24,16 @@ var SITE = 'https://www.eglurtech.com';
 
 /* ------------------------------------------------------------------ setup */
 
+function spreadsheet_() {
+  return SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
 function setup() {
   var props = PropertiesService.getScriptProperties();
   if (!props.getProperty('TOKEN')) {
     props.setProperty('TOKEN', Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, ''));
   }
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = spreadsheet_();
   ss.rename('Eglur Daily: sign-ups');
   var sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME, 0);
   ss.getSheets().forEach(function (s) { if (s.getName() !== SHEET_NAME && s.getLastRow() === 0) ss.deleteSheet(s); });
@@ -131,7 +136,7 @@ function sendBriefing_(b) {
 }
 
 function sheet_() {
-  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var ss = spreadsheet_();
   return ss.getSheetByName(SHEET_NAME) || (setup(), ss.getSheetByName(SHEET_NAME));
 }
 
