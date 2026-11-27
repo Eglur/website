@@ -2,7 +2,8 @@
 // Run: node tools/waitlist/test-apps-script.js [preview-dir]
 const fs = require("fs"), path = require("path"), vm = require("vm"), crypto = require("crypto"), assert = require("assert");
 
-const sent = [], props = {};
+const sent = [], props = {}, fetches = [], cache = {};
+let graphStatus = 202;
 function makeSheet() {
   const rows = [];   // row 1 = headers
   const cell = (r, c) => (rows[r - 1] || [])[c - 1];
@@ -37,6 +38,13 @@ const ctx = {
   MailApp: { sendEmail: o => sent.push(o), getRemainingDailyQuota: () => 99 },
   ScriptApp: { getService: () => ({ getUrl: () => "https://script.google.com/macros/s/TEST/exec" }) },
   LockService: { getScriptLock: () => ({ waitLock() {}, releaseLock() {} }) },
+  CacheService: { getScriptCache: () => ({ get: k => cache[k] || null, put: (k, v) => { cache[k] = v; } }) },
+  Session: { getEffectiveUser: () => ({ getEmail: () => "eglurtech@gmail.com" }) },
+  UrlFetchApp: { fetch: (url, opts) => {
+    fetches.push({ url, opts });
+    if (url.includes("login.microsoftonline.com")) return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ access_token: "tok123", expires_in: 3600 }) };
+    return { getResponseCode: () => graphStatus, getContentText: () => (graphStatus === 202 ? "" : '{"error":{"code":"ErrorAccessDenied"}}') };
+  } },
   ContentService: { createTextOutput: t => ({ text: t, setMimeType() { return this; } }), MimeType: { JSON: "json" } },
   HtmlService: { createHtmlOutput: h => ({ html: h, setTitle() { return this; } }) },
 };
@@ -98,6 +106,38 @@ assert.strictEqual(post({ action: "send", to: "jane@example.com", subject: "x", 
 // HTML in sign-up answers is escaped in the welcome email
 post({ type: "INSERT", record: { email: "x@y.co", area: "<b>Hi</b>", topics: [], frequency: "weekly" } });
 assert.ok(sent[2].htmlBody.includes("&lt;b&gt;Hi&lt;/b&gt;") && sent[2].htmlBody.includes("Fridays"));
+
+// ---- Microsoft 365: once the MS_* properties are set, mail goes from monitor@eglurtech.com via Graph
+Object.assign(props, { MS_TENANT_ID: "tenant-1", MS_CLIENT_ID: "client-1", MS_CLIENT_SECRET: "secret-1" });
+const gmailBefore = sent.length;
+assert.deepStrictEqual(post({ type: "INSERT", record: { email: "ms@example.com", area: "SA65", topics: ["Housing"], frequency: "daily" } }), { ok: true });
+assert.strictEqual(sent.length, gmailBefore, "no Gmail send once Microsoft is configured");
+const tokenCalls = fetches.filter(f => f.url.includes("login.microsoftonline.com"));
+assert.strictEqual(tokenCalls.length, 1);
+assert.strictEqual(tokenCalls[0].opts.payload.grant_type, "client_credentials");
+assert.strictEqual(tokenCalls[0].opts.payload.scope, "https://graph.microsoft.com/.default");
+const g = fetches.filter(f => f.url.includes("graph.microsoft.com")).pop();
+assert.strictEqual(g.url, "https://graph.microsoft.com/v1.0/users/monitor%40eglurtech.com/sendMail");
+assert.strictEqual(g.opts.headers.Authorization, "Bearer tok123");
+const m = JSON.parse(g.opts.payload).message;
+assert.strictEqual(m.toRecipients[0].emailAddress.address, "ms@example.com");
+assert.strictEqual(m.replyTo[0].emailAddress.address, "monitor@eglurtech.com");
+assert.strictEqual(m.body.contentType, "HTML");
+assert.ok(m.subject === "You're on the list for Eglur Daily" && m.body.content.includes("You're on the list"));
+assert.ok(Object.prototype.toString.call(sheet.rows[sheet.rows.length - 1][9]) === "[object Date]", "welcome recorded as sent");
+// briefings go the same way, reusing the cached sign-in
+assert.deepStrictEqual(post({ action: "send", to: "ms@example.com", subject: "Today", html: "<a href='{{UNSUBSCRIBE}}'>u</a>", text: "" }), { ok: true });
+assert.strictEqual(fetches.filter(f => f.url.includes("login.microsoftonline.com")).length, 1, "sign-in token reused");
+assert.ok(JSON.parse(fetches[fetches.length - 1].opts.payload).message.body.content.includes("action=unsubscribe&e=ms%40example.com"));
+assert.strictEqual(out(get({ action: "list", token: T })).quota, 5000);
+// if Microsoft refuses, the failure is recorded on the row rather than lost
+graphStatus = 403;
+post({ type: "INSERT", record: { email: "fail@example.com", area: "SA65", topics: [], frequency: "daily" } });
+assert.ok(String(sheet.rows[sheet.rows.length - 1][9]).startsWith("Failed: Microsoft send failed (403)"));
+graphStatus = 202;
+// testSend works from the editor
+call("testSend");
+assert.strictEqual(JSON.parse(fetches[fetches.length - 1].opts.payload).message.toRecipients[0].emailAddress.address, "eglurtech@gmail.com");
 
 if (process.argv[2]) {
   fs.mkdirSync(process.argv[2], { recursive: true });

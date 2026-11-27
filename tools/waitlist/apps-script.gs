@@ -4,6 +4,8 @@
  * Lives in a Google Sheet on eglurtech@gmail.com (Extensions > Apps Script).
  * Setup: paste this file, run setup() once, then Deploy > New deployment > Web app
  * (Execute as: Me, Who has access: Anyone). See tools/waitlist/SETUP.md.
+ * To send from monitor@eglurtech.com, add MS_TENANT_ID, MS_CLIENT_ID and MS_CLIENT_SECRET
+ * as script properties (Project Settings) and run testSend(). Until then it sends from Gmail.
  *
  * Every request must carry the secret token that setup() creates, except the signed
  * unsubscribe links in emails.
@@ -15,6 +17,7 @@ var HEADERS = ['Joined', 'Email', 'Postcode or area', 'Topics', 'Other topics', 
 var COL = {};
 HEADERS.forEach(function (h, i) { COL[h] = i + 1; });
 var REPLY_TO = 'monitor@eglurtech.com';
+var SENDER = 'monitor@eglurtech.com';   // sends from this Microsoft 365 mailbox once MS_* script properties are set
 var FROM_NAME = 'Eglur Daily';
 var SITE = 'https://www.eglurtech.com';
 
@@ -65,7 +68,7 @@ function doGet(e) {
   var p = (e && e.parameter) || {};
   if (p.action === 'unsubscribe') return unsubscribePage_(p.e || '', p.s || '');
   if (!authorised_(e)) return json_({ ok: false, error: 'unauthorised' });
-  if (p.action === 'list') return json_({ ok: true, subscribers: activeSubscribers_(), quota: MailApp.getRemainingDailyQuota() });
+  if (p.action === 'list') return json_({ ok: true, subscribers: activeSubscribers_(), quota: quota_() });
   return json_({ ok: true });
 }
 
@@ -116,12 +119,12 @@ function activeSubscribers_() {
 function sendBriefing_(b) {
   var email = String(b.to || '').trim().toLowerCase(), sh = sheet_(), row = findRow_(sh, email);
   if (!row || sh.getRange(row, COL['Status']).getValue() !== 'Active') return { ok: false, error: 'not an active subscriber' };
-  if (MailApp.getRemainingDailyQuota() < 1) return { ok: false, error: 'daily email quota used up' };
+  if (quota_() < 1) return { ok: false, error: 'daily email quota used up' };
   var unsub = unsubscribeUrl_(email);
-  MailApp.sendEmail({
-    to: email, name: FROM_NAME, replyTo: REPLY_TO, subject: String(b.subject || 'Your Eglur Daily briefing'),
-    htmlBody: String(b.html || '').split('{{UNSUBSCRIBE}}').join(unsub),
-    body: String(b.text || '').split('{{UNSUBSCRIBE}}').join(unsub)
+  sendMail_({
+    to: email, subject: String(b.subject || 'Your Eglur Daily briefing'),
+    html: String(b.html || '').split('{{UNSUBSCRIBE}}').join(unsub),
+    text: String(b.text || '').split('{{UNSUBSCRIBE}}').join(unsub)
   });
   sh.getRange(row, COL['Last briefing']).setValue(new Date());
   return { ok: true };
@@ -200,10 +203,69 @@ function sendWelcome_(email, r) {
     (daily ? 'every weekday morning' : 'every Friday') + ' covering your council, the Senedd and Westminster.\n\n' +
     rows.map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') +
     '\n\nWant to change anything? Just reply to this email.\n\nSee a live example: ' + SITE + '/monitor/\n\nUnsubscribe: ' + unsubscribeUrl_(email);
-  MailApp.sendEmail({
-    to: email, name: FROM_NAME, replyTo: REPLY_TO, subject: "You're on the list for Eglur Daily",
-    htmlBody: frame_(inner, "We'll set up your briefing when Eglur Daily launches.", unsubscribeUrl_(email)), body: text
+  sendMail_({
+    to: email, subject: "You're on the list for Eglur Daily",
+    html: frame_(inner, "We'll set up your briefing when Eglur Daily launches.", unsubscribeUrl_(email)), text: text
   });
+}
+
+/* ------------------------------------------------------------- sending */
+
+// Microsoft 365 (Graph) when configured, so email comes from monitor@eglurtech.com; Gmail otherwise.
+function msConfig_() {
+  var p = PropertiesService.getScriptProperties();
+  var c = { tenant: p.getProperty('MS_TENANT_ID'), client: p.getProperty('MS_CLIENT_ID'),
+            secret: p.getProperty('MS_CLIENT_SECRET'), sender: p.getProperty('MS_SENDER') || SENDER };
+  return c.tenant && c.client && c.secret ? c : null;
+}
+
+function msToken_(c) {
+  var cache = CacheService.getScriptCache(), hit = cache.get('ms_token');
+  if (hit) return hit;
+  var res = UrlFetchApp.fetch('https://login.microsoftonline.com/' + encodeURIComponent(c.tenant) + '/oauth2/v2.0/token', {
+    method: 'post', muteHttpExceptions: true,
+    payload: { client_id: c.client, client_secret: c.secret, grant_type: 'client_credentials', scope: 'https://graph.microsoft.com/.default' }
+  });
+  var body = JSON.parse(res.getContentText() || '{}');
+  if (!body.access_token) throw new Error('Microsoft sign-in failed: ' + (body.error_description || body.error || res.getResponseCode()));
+  cache.put('ms_token', body.access_token, Math.max(60, Math.min(3000, (body.expires_in || 3600) - 300)));
+  return body.access_token;
+}
+
+function sendMail_(o) {
+  var c = msConfig_();
+  if (!c) {
+    MailApp.sendEmail({ to: o.to, name: FROM_NAME, replyTo: REPLY_TO, subject: o.subject, htmlBody: o.html, body: o.text });
+    return 'gmail';
+  }
+  var res = UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/users/' + encodeURIComponent(c.sender) + '/sendMail', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: { Authorization: 'Bearer ' + msToken_(c) },
+    payload: JSON.stringify({
+      message: {
+        subject: o.subject,
+        body: { contentType: 'HTML', content: o.html },
+        toRecipients: [{ emailAddress: { address: o.to } }],
+        replyTo: [{ emailAddress: { address: REPLY_TO } }]
+      },
+      saveToSentItems: false
+    })
+  });
+  if (res.getResponseCode() !== 202) throw new Error('Microsoft send failed (' + res.getResponseCode() + '): ' + res.getContentText().slice(0, 200));
+  return 'microsoft';
+}
+
+function quota_() {
+  return msConfig_() ? 5000 : MailApp.getRemainingDailyQuota();   // Microsoft 365 allows thousands a day
+}
+
+/** Run this from the editor after adding the MS_* script properties: sends a test email to this Google account. */
+function testSend() {
+  var to = Session.getEffectiveUser().getEmail();
+  var via = sendMail_({ to: to, subject: 'Eglur Daily test', text: 'It works.',
+    html: frame_('<h1 style="margin:0 0 12px;font-family:Georgia,serif;font-weight:400;font-size:32px">It works<span style="color:#286A6C">.</span></h1>' +
+                 '<p style="margin:0;font-size:16px;color:#3D4A49">This came from ' + esc_(msConfig_() ? msConfig_().sender : 'Gmail') + '.</p>', 'Test', '#') });
+  Logger.log('Sent a test to ' + to + ' via ' + via);
 }
 
 /* ---------------------------------------------------------- email pieces */
