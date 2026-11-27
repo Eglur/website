@@ -34,4 +34,7 @@ def fake_get_json(url: str, params: dict):
     if url.endswith("/divisions.json/search"):
         rows = [d for d in DATA["divisions"] if d["Date"][:10] >= params["queryParameters.startDate"]]
         return rows[: int(params.get("queryParameters.take", 25))]
+    if url.endswith("/calendar/events/list.json"):
+        lo, hi = params["queryParameters.startDate"], params["queryParameters.endDate"]
+        return [e for e in DATA["calendar"] if e["House"] == params["queryParameters.house"] and lo <= e["StartDate"][:10] <= hi]
     raise AssertionError(f"unexpected URL {url}")

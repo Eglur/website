@@ -27,6 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 BRAND = ROOT / "brand"
 OUT = Path("site")  # set by --out; the briefing is published here (index, archive, digests/)
+STATE: dict = {}    # remembered between runs in OUT/state.json (which Senedd questions were already shown)
 UA = "EglurBriefing/0.1 (+https://www.eglurtech.com)"
 
 
@@ -347,11 +348,53 @@ def fetch_senedd_written_questions(since: str, until: str) -> list[dict]:
             except Exception:
                 pass  # no questions due that day, or the page is missing
         d += dt.timedelta(days=1)
-    items = [it for it in seen.values() if it["tabled"] >= since or (it["answered"] and it["answered"] >= since)]
+    shown = set(STATE.get("senedd_shown", []))
+    # The Senedd publishes some answers a day or two late, so look back further and skip anything already shown.
+    back = (dt.date.fromisoformat(since) - dt.timedelta(days=7 if shown else 2)).isoformat()
+    key = lambda it: f"{it['id']}:{'a' if it['answered'] else 'q'}"   # an answer is news even if the question was shown
+    fresh = [it for it in seen.values() if it["tabled"] >= back or (it["answered"] and it["answered"] >= back)]
+    items = [it for it in fresh if key(it) not in shown]
+    STATE["senedd_shown"] = sorted(shown | {key(it) for it in fresh})[-5000:]
     if os.environ.get("BRIEFING_DEBUG"):
         print(f"senedd: {pages} pages, {len(seen)} questions seen, {len(items)} in window", file=sys.stderr)
         for it in sorted(items, key=lambda x: x["answered"], reverse=True)[:3]:
             print("  SAMPLE", json.dumps(it, ensure_ascii=False)[:700], file=sys.stderr)
+    return items
+
+
+def fetch_calendar(since: str, until: str) -> list[dict]:
+    """Westminster business coming up in the next week: committee sessions, debates, bill stages."""
+    start = dt.date.fromisoformat(until)
+    end = start + dt.timedelta(days=7)
+    items = []
+    for house in ("Commons", "Lords"):
+        events = get_json("https://whatson-api.parliament.uk/calendar/events/list.json",
+                          {"queryParameters.startDate": start.isoformat(), "queryParameters.endDate": end.isoformat(),
+                           "queryParameters.house": house})
+        for e in events:
+            if e.get("CancelledDate") or (e.get("Category") or "").lower() == "private meeting":
+                continue
+            com = e.get("Committee") or {}
+            inquiries = [i.get("Description", "") for i in com.get("Inquiries") or [] if i.get("Description")]
+            title = (e.get("BillName") or (f"{com['Description']}: {inquiries[0]}" if com.get("Description") and inquiries
+                     else com.get("Description")) or clean(e.get("Description")) or e.get("Type") or "Business")
+            details = clean(e.get("SummarisedDetails")) + " " + clean(e.get("Description")) + " " + clean(e.get("Notes"))
+            url = (e.get("BillPageLink") or (f"https://committees.parliament.uk/committee/{com['Id']}/" if com.get("Id")
+                   else "https://whatson.parliament.uk/"))
+            kind = " · ".join(x for x in (e.get("Type"), e.get("Category")) if x)
+            items.append({
+                "id": f"cal-{e['Id']}",
+                "type": kind or "Business",
+                "house": e.get("House") or house,
+                "title": title,
+                "who": "",
+                "body": e.get("Location") or "",
+                "date": day(e.get("StartDate")),
+                "time": e.get("StartTime") or "",
+                "upcoming": True,
+                "text": f"Coming up on {day(e.get('StartDate'))} {e.get('StartTime') or ''}. {title}. {details}".strip(),
+                "url": url,
+            })
     return items
 
 
@@ -361,6 +404,7 @@ SOURCES = {
     "bills": fetch_bills,
     "commons_divisions": fetch_commons_divisions,
     "senedd_written_questions": fetch_senedd_written_questions,
+    "look_ahead": fetch_calendar,
 }
 
 
@@ -425,6 +469,7 @@ TOOL = {
 SYSTEM = """You are a parliamentary researcher in a UK elected representative's office.
 You read official updates and decide which ones this office genuinely needs to know about.
 Be strict: most items are noise, and a short briefing is a good briefing.
+Items whose text starts "Coming up on" are future business: judge whether the office should prepare, attend or watch.
 Never state anything that is not in the item text. Use British English."""
 
 
@@ -627,6 +672,17 @@ def chamber(it: dict) -> str:
     return h if h in ("commons", "lords", "senedd") else "commons"
 
 
+def when_label(it: dict) -> str:
+    if not it.get("upcoming"):
+        return nice_date(it["date"])
+    try:
+        d = dt.date.fromisoformat(it["date"])
+        label = f"{d:%a} {d.day} {d:%b}"
+    except ValueError:
+        label = it["date"]
+    return f"{label} · {it['time']}" if it.get("time") else label
+
+
 def kind_label(it: dict) -> str:
     t = "Written question · awaiting answer" if it["type"] == "Written question" else it["type"]
     return f"{t} · {it['ref']}" if it.get("ref") else t
@@ -647,7 +703,7 @@ def card(it: dict) -> str:
     parts = [
         f'<article class="item c-{chamber(it)}{" top" if it["score"] >= 9 else ""}">',
         f'<div class="row"><span class="tags">{chamber_tag(it)}<span class="type">{esc(kind_label(it))}</span>'
-        f'<span>{esc(nice_date(it["date"]))}</span></span>'
+        f'<span>{esc(when_label(it))}</span></span>'
         f'<span class="score">{related_label(it)}{it["score"]}/10</span></div>',
         f'<h3><a href="{esc(it["url"])}" target="_blank" rel="noopener">{esc(it["title"])}</a></h3>',
     ]
@@ -710,13 +766,16 @@ def read_minutes(items: list[dict]) -> int:
 def render_digest(items: list[dict], scanned: int, office: str, today: str, since: str,
                   min_score: int, root: str, note: str = "") -> str:
     keep = sorted((i for i in items if i["score"] >= min_score), key=lambda i: (-i["score"], i["title"]))
-    top = [i for i in keep if i["score"] >= 9]
-    rest = [i for i in keep if i["score"] < 9]
+    ahead = sorted((i for i in keep if i.get("upcoming")), key=lambda i: (i["date"], i.get("time", ""), -i["score"]))
+    top = [i for i in keep if i["score"] >= 9 and not i.get("upcoming")]
+    rest = [i for i in keep if i["score"] < 9 and not i.get("upcoming")]
     groups = ""
     if top:
         groups += '<section class="group"><p class="label decide">Needs you today</p>\n' + "\n".join(card(i) for i in top) + "</section>\n"
     if rest:
         groups += '<section class="group"><p class="label">Worth knowing</p>\n' + "\n".join(card(i) for i in rest) + "</section>\n"
+    if ahead:
+        groups += '<section class="group"><p class="label">Coming up this week</p>\n' + "\n".join(card(i) for i in ahead) + "</section>\n"
     headline = "What needs you today" if keep else "Nothing needs you today"
     lede = (f"{office}. Official Westminster and Senedd business since {nice_date(since, long=True)}, "
             "filtered to your issues, ranked and explained.")
@@ -768,7 +827,16 @@ def collect(profile: dict, since: str, until: str) -> list[dict]:
     return items
 
 
+def load_state() -> None:
+    STATE.clear()
+    try:
+        STATE.update(json.loads((OUT / "state.json").read_text()))
+    except (OSError, ValueError):
+        pass
+
+
 def run(profile: dict, today: dt.date, days: int, use_ai: bool, extra_note: str = "") -> None:
+    load_state()
     since = (today - dt.timedelta(days=days)).isoformat()
     items = collect(profile, since, today.isoformat())
     scanned = len(items)
@@ -788,6 +856,7 @@ def run(profile: dict, today: dt.date, days: int, use_ai: bool, extra_note: str 
     args = (shortlist, scanned, profile["office"]["name"], today.isoformat(), since, f.get("min_score", 6))
     publish(render_digest(*args, root="./", note=note),
             render_digest(*args, root="../", note=note), today.isoformat())
+    (OUT / "state.json").write_text(json.dumps(STATE, indent=0) + "\n")
     print(f"Wrote {OUT / 'index.html'}", file=sys.stderr)
 
 
