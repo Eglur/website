@@ -331,9 +331,12 @@ def fetch_senedd_written_questions(since: str, until: str) -> list[dict]:
         if d.weekday() < 5:
             url = f"https://record.senedd.wales/OrderPaper/WrittenQuestions/{d:%d-%m-%Y}"
             try:
-                for it in parse_senedd_questions(get_text(url), url):
+                page = get_text(url)
+                for it in parse_senedd_questions(page, url):
                     seen[it["id"]] = it
                 pages += 1
+                if os.environ.get("BRIEFING_DEBUG") and not seen and (m := re.search(r"WQ\d{5,7}\s*\(e\)", page)):
+                    print("SENEDD-CONTEXT", repr(page[max(0, m.start() - 1500): m.start() + 600]), file=sys.stderr)
             except Exception:
                 pass  # no questions due that day, or the page is missing
         d += dt.timedelta(days=1)
