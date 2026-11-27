@@ -191,6 +191,54 @@
   "nation": "England",
   "type": "UA"
  },
+ "E06000058": {
+  "name": "Bournemouth, Christchurch and Poole",
+  "url": "https://democracy.bcpcouncil.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000060": {
+  "name": "Buckinghamshire",
+  "url": "https://buckinghamshire.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000061": {
+  "name": "North Northamptonshire",
+  "url": "https://northnorthants.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000062": {
+  "name": "West Northamptonshire",
+  "url": "https://westnorthants.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000063": {
+  "name": "Cumberland",
+  "url": "https://cumberland.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000064": {
+  "name": "Westmorland and Furness",
+  "url": "https://westmorlandandfurness.moderngov.co.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E06000066": {
+  "name": "Somerset",
+  "url": "https://democracy.somerset.gov.uk",
+  "nation": "England",
+  "type": "UA"
+ },
+ "E07000008": {
+  "name": "Cambridge",
+  "url": "https://democracy.cambridge.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
  "E07000012": {
   "name": "South Cambridgeshire",
   "url": "https://scambs.moderngov.co.uk",
@@ -437,6 +485,12 @@
   "nation": "England",
   "type": "NMD"
  },
+ "E07000112": {
+  "name": "Folkestone and Hythe",
+  "url": "https://www.folkestone-hythe.gov.uk/moderngov",
+  "nation": "England",
+  "type": "NMD"
+ },
  "E07000113": {
   "name": "Swale",
   "url": "https://democracy.swale.gov.uk",
@@ -545,6 +599,12 @@
   "nation": "England",
   "type": "NMD"
  },
+ "E07000146": {
+  "name": "Kings Lynn and West Norfolk",
+  "url": "https://democracy.west-norfolk.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
  "E07000149": {
   "name": "South Norfolk",
   "url": "https://democracy.southnorfolkandbroadland.gov.uk",
@@ -584,6 +644,12 @@
  "E07000176": {
   "name": "Rushcliffe",
   "url": "https://democracy.rushcliffe.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000178": {
+  "name": "Oxford",
+  "url": "https://mycouncil.oxford.gov.uk",
   "nation": "England",
   "type": "NMD"
  },
@@ -719,9 +785,27 @@
   "nation": "England",
   "type": "NMD"
  },
+ "E07000234": {
+  "name": "Bromsgrove",
+  "url": "https://moderngovwebpublic.bromsgrove.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
  "E07000235": {
   "name": "Malvern Hills",
   "url": "https://moderngov.malvernhills.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000236": {
+  "name": "Redditch",
+  "url": "https://moderngovwebpublic.redditchbc.gov.uk",
+  "nation": "England",
+  "type": "NMD"
+ },
+ "E07000238": {
+  "name": "Wychavon",
+  "url": "https://mgov.wychavon.gov.uk",
   "nation": "England",
   "type": "NMD"
  },
@@ -776,6 +860,12 @@
  "E08000012": {
   "name": "Liverpool",
   "url": "https://councillors.liverpool.gov.uk",
+  "nation": "England",
+  "type": "MD"
+ },
+ "E08000013": {
+  "name": "St. Helens",
+  "url": "https://sthelens.moderngov.co.uk",
   "nation": "England",
   "type": "MD"
  },
