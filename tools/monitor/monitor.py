@@ -411,6 +411,22 @@ def fetch_holyrood_written_questions(since: str, until: str) -> list[dict]:
     return out
 
 
+CONNECTORS = {"for", "of", "and", "the", "deputy"}
+
+
+def strip_minister(text: str) -> str:
+    """'To ask the Minister for Infrastructure for an update on…' -> 'for an update on…'."""
+    if not text.lower().startswith("to ask the "):
+        return text
+    words = text[len("to ask the "):].split(" ")
+    i = 0
+    while i < len(words) and words[i] and (words[i][0].isupper() or words[i] in CONNECTORS):
+        i += 1
+    while i > 0 and words[i - 1] in CONNECTORS:   # give back a trailing 'for' that belongs to the question
+        i -= 1
+    return " ".join(words[i:]) or text
+
+
 def stormont_list(data: dict) -> list[dict]:
     qs = (data.get("QuestionsList") or {}).get("Question") or []
     return qs if isinstance(qs, list) else [qs]
@@ -430,13 +446,13 @@ def fetch_stormont_written_questions(since: str, until: str) -> list[dict]:
         if not text:
             continue
         constituency = (q.get("TablerTitle") or "").replace("MLA - ", "").strip()
-        answer = clean(q.get("AnswerPlainText"))
+        answer = clean(re.sub(r"pagebreak", " ", q.get("AnswerPlainText") or ""))
         out.append({
             "id": f"nwq-{q['DocumentId']}",
             "type": "Written answer" if answered else "Written question",
             "house": "Stormont",
             "ref": q.get("Reference", ""),
-            "title": short_title(sentence(re.sub(r"^To ask the .+? (?=(to|whether|what|how|if|when|why)\b)", "", text, count=1, flags=re.I))),
+            "title": short_title(sentence(strip_minister(text))),
             "who": f"{q.get('TablerName', '')} ({constituency})" if constituency else q.get("TablerName", ""),
             "body": q.get("Department") or q.get("MinisterTitle", ""),
             "date": answered or day(q.get("TabledDate")),
