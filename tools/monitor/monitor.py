@@ -364,6 +364,90 @@ def fetch_senedd_written_questions(since: str, until: str) -> list[dict]:
     return items
 
 
+def sentence(s: str) -> str:
+    return s[:1].upper() + s[1:]
+
+
+def holyrood_name(m: dict) -> str:
+    """'Adams, James' -> 'James Adams'."""
+    last, _, first = (m.get("ParliamentaryName") or "").partition(",")
+    return f"{(m.get('PreferredName') or first).strip()} {last.strip()}".strip()
+
+
+def fetch_holyrood_written_questions(since: str, until: str) -> list[dict]:
+    """Scottish Parliament written questions lodged or answered in the window (data.parliament.scot, open data)."""
+    base = "https://data.parliament.scot/api/"
+    try:
+        msps = {m["PersonID"]: holyrood_name(m) for m in get_json(base + "members", {})}
+    except Exception:
+        msps = {}
+    years = sorted({int(since[:4]), int(until[:4])})
+    out = []
+    for y in years:
+        for q in get_json(base + "motionsquestionsanswersquestions", {"year": y}):
+            lodged, answered = day(q.get("ApprovedDate") or q.get("SubmissionDateTime")), day(q.get("AnswerDate"))
+            if not ((since <= lodged <= until) or (answered and since <= answered <= until)):
+                continue
+            text = clean(q.get("ItemText") or q.get("Title"))
+            if not text:
+                continue
+            who = msps.get(q.get("MSPID"), "")
+            who = f"{who} ({q['Party']})" if who and q.get("Party") else who
+            answer = clean(q.get("AnswerText"))
+            out.append({
+                "id": f"hwq-{q['EventID']}",
+                "type": "Written answer" if answered else "Written question",
+                "house": "Holyrood",
+                "ref": q["EventID"],
+                "title": short_title(sentence(re.sub(r"^To ask the Scottish Government,?\s*", "", text, flags=re.I))),
+                "who": who,
+                "body": "Scottish Government",
+                "date": answered or lodged,
+                "tabled": lodged,
+                "answered": answered,
+                "text": text + (" ANSWER: " + answer if answer else ""),
+                "url": "https://www.parliament.scot/chamber-and-committees/questions-and-answers/question?ref=" + urllib.parse.quote(q["EventID"]),
+            })
+    return out
+
+
+def stormont_list(data: dict) -> list[dict]:
+    qs = (data.get("QuestionsList") or {}).get("Question") or []
+    return qs if isinstance(qs, list) else [qs]
+
+
+def fetch_stormont_written_questions(since: str, until: str) -> list[dict]:
+    """Northern Ireland Assembly written questions tabled or answered in the window (data.niassembly.gov.uk)."""
+    base = "https://data.niassembly.gov.uk/questions.asmx/"
+    window = {"startDate": since, "endDate": until}
+    found: dict[str, dict] = {}
+    for op in ("GetQuestionsForWrittenAnswer_TabledInRange_JSON", "GetQuestionsForWrittenAnswer_AnsweredInRange_JSON"):
+        for q in stormont_list(get_json(base + op, window)):
+            found[q["DocumentId"]] = {**found.get(q["DocumentId"], {}), **q}   # the answered feed adds the answer
+    out = []
+    for q in found.values():
+        text, answered = clean(q.get("QuestionText")), day(q.get("AnsweredOnDate"))
+        if not text:
+            continue
+        constituency = (q.get("TablerTitle") or "").replace("MLA - ", "").strip()
+        answer = clean(q.get("AnswerPlainText"))
+        out.append({
+            "id": f"nwq-{q['DocumentId']}",
+            "type": "Written answer" if answered else "Written question",
+            "house": "Stormont",
+            "ref": q.get("Reference", ""),
+            "title": short_title(sentence(re.sub(r"^To ask the .+? (?=(to|whether|what|how|if|when|why)\b)", "", text, count=1, flags=re.I))),
+            "who": f"{q.get('TablerName', '')} ({constituency})" if constituency else q.get("TablerName", ""),
+            "body": q.get("Department") or q.get("MinisterTitle", ""),
+            "date": answered or day(q.get("TabledDate")),
+            "tabled": day(q.get("TabledDate")),
+            "answered": answered,
+            "text": text + (" ANSWER: " + answer if answer else ""),
+            "url": f"https://aims.niassembly.gov.uk/questions/printquestionsummary.aspx?docid={q['DocumentId']}",
+        })
+    return out
+
+
 def fetch_calendar(since: str, until: str) -> list[dict]:
     """Westminster business coming up in the next week: committee sessions, debates, bill stages."""
     start = dt.date.fromisoformat(until)
@@ -523,6 +607,8 @@ SOURCES = {
     "bills": fetch_bills,
     "commons_divisions": fetch_commons_divisions,
     "senedd_written_questions": fetch_senedd_written_questions,
+    "holyrood_written_questions": fetch_holyrood_written_questions,
+    "stormont_written_questions": fetch_stormont_written_questions,
     "look_ahead": fetch_calendar,
     "councils": fetch_councils,
 }
@@ -816,7 +902,11 @@ def stage_track(bill: dict) -> str:
 
 def chamber(it: dict) -> str:
     h = (it.get("house") or "").lower()
-    return h if h in ("commons", "lords", "senedd", "council") else "commons"
+    return h if h in ("commons", "lords", "senedd", "holyrood", "stormont", "council") else "commons"
+
+
+DEVOLVED = {"senedd": ("Senedd", "Wales"), "holyrood": ("Scottish Parliament", "Scotland"),
+            "stormont": ("NI Assembly", "Northern Ireland")}
 
 
 def when_label(it: dict) -> str:
@@ -837,7 +927,7 @@ def kind_label(it: dict) -> str:
 
 def chamber_tag(it: dict) -> str:
     c = chamber(it)
-    label = ("Senedd" if c == "senedd" else f"Council · {it.get('council', '')}".rstrip(" ·") if c == "council"
+    label = (DEVOLVED[c][0] if c in DEVOLVED else f"Council · {it.get('council', '')}".rstrip(" ·") if c == "council"
              else f"Westminster · {c.capitalize()}")
     return f'<span class="chamber ch-{c}"><i></i>{label}</span>'
 

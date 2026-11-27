@@ -57,6 +57,8 @@ written_statements = true
 bills = true
 commons_divisions = true
 senedd_written_questions = true
+holyrood_written_questions = false   # Scotland and Northern Ireland: used by Eglur Daily, not this Senedd office
+stormont_written_questions = false
 look_ahead = true
 councils = true   # meetings and decisions from the councils listed below   # Westminster committee sessions, debates and bill stages in the coming week
 
