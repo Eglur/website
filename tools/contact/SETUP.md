@@ -3,11 +3,15 @@
 The form at **www.eglurtech.com/contact** saves each message in Supabase. Supabase then calls the
 same Google Apps Script as the Eglur Daily waitlist, which:
 
-- emails the message to **toby@eglurtech.com**, with Reply-To set to the sender, so pressing Reply answers them directly;
+- emails the message to **contact@eglurtech.com** (a shared mailbox in Microsoft 365), with Reply-To set to the sender, so pressing Reply answers them directly;
 - sends the sender a short confirmation in fixed words (never their name or message, so nobody can use the form to send their own text to someone else's address);
 - adds a row to a **Messages** tab in the "Eglur Daily: sign-ups" spreadsheet, with a Status column (New, Replied, Closed).
 
 About 10 minutes. Do these **before** the website change goes live, in this order.
+
+## 0. The mailbox (Microsoft 365 admin)
+**admin.microsoft.com → Teams & groups → Shared mailboxes → Add a shared mailbox.** Name `Eglur`, email `contact@eglurtech.com`. Then add yourself under **Members**, which lets you read it and reply as contact@. Shared mailboxes are free.
+In classic Outlook it appears on its own; in Outlook on the web or the new Outlook, right-click **Folders → Add shared folder or mailbox** once.
 
 ## 1. The database (Supabase, project **Eglur Daily**)
 1. **SQL Editor → New query.** Paste everything from `tools/contact/supabase.sql`.
@@ -34,12 +38,12 @@ Or by hand:
 4. Click **Create webhook**.
 
 ## 4. Test it, once the website change is live
-1. Send yourself a message at **www.eglurtech.com/contact**, using an address other than toby@eglurtech.com.
-2. Check that the message arrives at toby@eglurtech.com, that pressing Reply addresses it to the sender, that the confirmation arrives at the address you used, and that a row appears in the Messages tab (and in Supabase under **Table Editor → contact_messages**).
+1. Send yourself a message at **www.eglurtech.com/contact**, using an address other than contact@eglurtech.com.
+2. Check that the message arrives at contact@eglurtech.com, that pressing Reply addresses it to the sender, that the confirmation arrives at the address you used, and that a row appears in the Messages tab (and in Supabase under **Table Editor → contact_messages**).
 3. Mark the test row Closed, or delete it.
 
 ## Good to know
-- **Where to reply:** just reply to the notification email in Outlook. It goes from your own mailbox, so the conversation continues there.
+- **Where to reply:** reply to the notification in the contact@ mailbox. Choose **From: contact@** or your own address, whichever you prefer.
 - **If an email fails**, the message is still in the Messages tab and in Supabase, and the row says why.
 - **Limits:** at most 60 notification emails and 20 confirmations a day, and one confirmation per address every six hours. Past that, messages still land in the sheet. Emails come from eglurtech@gmail.com until the Microsoft 365 step in `tools/waitlist/SETUP.md` is done, then from monitor@eglurtech.com.
 - **Switches** (Apps Script → Project Settings → Script properties): `CONTACT_TO` sends messages to a different address; `CONTACT_ACK` set to `off` stops the confirmations.

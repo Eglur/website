@@ -134,7 +134,7 @@ assert.deepStrictEqual(mr.slice(1, 8), ["Jane Smith", "jane@office.example", "Of
 assert.ok(isDate(mr[8]) && isDate(mr[9]), "email and confirmation times recorded");
 assert.strictEqual(sent.length, n0 + 2);
 const note = sent[n0], ack = sent[n0 + 1];
-assert.strictEqual(note.to, "toby@eglurtech.com");
+assert.strictEqual(note.to, "contact@eglurtech.com");
 assert.strictEqual(note.replyTo, "jane@office.example", "replying answers the sender");
 assert.strictEqual(note.name, "Eglur website");
 assert.strictEqual(note.subject, "Website message from Jane Smith (Office of Jane Smith MS)");
@@ -144,7 +144,7 @@ assert.ok(note.htmlBody.includes('href="mailto:jane@office.example"'));
 assert.ok(!note.htmlBody.includes("Unsubscribe") && note.htmlBody.includes("Sent by the contact form"));
 assert.ok(note.body.includes("Could we talk about <your> tool?") && note.body.includes("Organisation: Office of Jane Smith MS"));
 assert.strictEqual(ack.to, "jane@office.example");
-assert.strictEqual(ack.replyTo, "toby@eglurtech.com");
+assert.strictEqual(ack.replyTo, "contact@eglurtech.com");
 assert.strictEqual(ack.name, "Eglur");
 assert.strictEqual(ack.subject, "We got your message");
 assert.ok(ack.htmlBody.includes("Thanks for getting in touch") && ack.htmlBody.includes("If that wasn't you"));
@@ -156,7 +156,7 @@ for (const bit of ["Jane", "Smith", "Could we talk", "Office of"]) {
 n0 = sent.length;
 contact({ ...msg, message: "One more thing." });
 assert.strictEqual(sent.length, n0 + 1);
-assert.strictEqual(sent[n0].to, "toby@eglurtech.com");
+assert.strictEqual(sent[n0].to, "contact@eglurtech.com");
 assert.strictEqual(ms.rows[2][9], "Not sent: one already went to this address in the last six hours");
 
 // text that looks like a formula is kept as text, in messages and in sign-ups
@@ -198,7 +198,7 @@ props.CONTACT_NOTIFIED = JSON.stringify({ day: today, n: 60 });
 n0 = sent.length;
 assert.deepStrictEqual(contact({ ...msg, email: "k@x.example" }), { ok: true, logged: true, emailed: false });
 assert.ok(String(ms.rows[ms.rows.length - 1][8]).startsWith("Failed: not emailed"), "kept in the sheet when the day's limit is used");
-assert.ok(!sent.slice(n0).some(e => e.to === "toby@eglurtech.com"));
+assert.ok(!sent.slice(n0).some(e => e.to === "contact@eglurtech.com"));
 props.CONTACT_NOTIFIED = JSON.stringify({ day: "2000-01-01", n: 60 });   // a new day resets the count
 contact({ ...msg, email: "l@x.example" });
 assert.ok(isDate(ms.rows[ms.rows.length - 1][8]));
@@ -241,10 +241,10 @@ graphStatus = 202;
 // contact messages go the same way, with Reply-To the sender
 contact({ ...msg, email: "graph@x.example" });
 const gm = fetches.filter(f => f.url.includes("graph.microsoft.com")).slice(-2).map(f => JSON.parse(f.opts.payload).message);
-assert.strictEqual(gm[0].toRecipients[0].emailAddress.address, "toby@eglurtech.com");
+assert.strictEqual(gm[0].toRecipients[0].emailAddress.address, "contact@eglurtech.com");
 assert.strictEqual(gm[0].replyTo[0].emailAddress.address, "graph@x.example");
 assert.strictEqual(gm[1].toRecipients[0].emailAddress.address, "graph@x.example");
-assert.strictEqual(gm[1].replyTo[0].emailAddress.address, "toby@eglurtech.com");
+assert.strictEqual(gm[1].replyTo[0].emailAddress.address, "contact@eglurtech.com");
 // testSend works from the editor
 call("testSend");
 assert.strictEqual(JSON.parse(fetches[fetches.length - 1].opts.payload).message.toRecipients[0].emailAddress.address, "eglurtech@gmail.com");

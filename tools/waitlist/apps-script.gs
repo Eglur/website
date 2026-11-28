@@ -1,7 +1,7 @@
 /**
  * Eglur Daily: sign-up record, welcome email, briefing sender and unsubscribe.
  * Also the website's contact form: each message is logged in the Messages sheet and emailed
- * to you with Reply-To set to the sender, and the sender gets a short fixed confirmation.
+ * to contact@eglurtech.com with Reply-To set to the sender, and the sender gets a short fixed confirmation.
  *
  * Lives in a Google Sheet on eglurtech@gmail.com (Extensions > Apps Script).
  * Setup: paste this file, run setup() once, then Deploy > New deployment > Web app
@@ -30,7 +30,7 @@ var MSG_HEADERS = ['Received', 'Name', 'Email', 'Organisation', 'About', 'Messag
                    'Emailed to you', 'Confirmation'];
 var MCOL = {};
 MSG_HEADERS.forEach(function (h, i) { MCOL[h] = i + 1; });
-var CONTACT_TO = 'toby@eglurtech.com';   // where messages go; a CONTACT_TO script property overrides it
+var CONTACT_TO = 'contact@eglurtech.com';   // where messages go (a shared mailbox); a CONTACT_TO script property overrides it
 var TOPICS = { 'conversation': 'An early conversation', 'design-partner': 'Becoming a design partner', 'other': 'Something else' };
 var NOTIFY_PER_DAY = 60;   // emails to you; past this, messages still land in the sheet
 var ACKS_PER_DAY = 20;     // confirmations to senders, at most one per address every six hours
