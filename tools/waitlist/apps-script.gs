@@ -1,5 +1,7 @@
 /**
  * Eglur Daily: sign-up record, welcome email, briefing sender and unsubscribe.
+ * Also the website's contact form: each message is logged in the Messages sheet and emailed
+ * to contact@eglurtech.com with Reply-To set to the sender, and the sender gets a short fixed confirmation.
  *
  * Lives in a Google Sheet on eglurtech@gmail.com (Extensions > Apps Script).
  * Setup: paste this file, run setup() once, then Deploy > New deployment > Web app
@@ -22,6 +24,17 @@ var SENDER = 'monitor@eglurtech.com';   // sends from this Microsoft 365 mailbox
 var FROM_NAME = 'Eglur Daily';
 var SITE = 'https://www.eglurtech.com';
 
+// Contact form messages (from the Supabase webhook on public.contact_messages)
+var MSG_SHEET = 'Messages';
+var MSG_HEADERS = ['Received', 'Name', 'Email', 'Organisation', 'About', 'Message', 'Came from', 'Status',
+                   'Emailed to you', 'Confirmation'];
+var MCOL = {};
+MSG_HEADERS.forEach(function (h, i) { MCOL[h] = i + 1; });
+var CONTACT_TO = 'contact@eglurtech.com';   // where messages go (a shared mailbox); a CONTACT_TO script property overrides it
+var TOPICS = { 'conversation': 'An early conversation', 'design-partner': 'Becoming a design partner', 'other': 'Something else' };
+var NOTIFY_PER_DAY = 60;   // emails to you; past this, messages still land in the sheet
+var ACKS_PER_DAY = 20;     // confirmations to senders, at most one per address every six hours
+
 /* ------------------------------------------------------------------ setup */
 
 function spreadsheet_() {
@@ -36,7 +49,9 @@ function setup() {
   var ss = spreadsheet_();
   ss.rename('Eglur Daily: sign-ups');
   var sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME, 0);
-  ss.getSheets().forEach(function (s) { if (s.getName() !== SHEET_NAME && s.getLastRow() === 0) ss.deleteSheet(s); });
+  ss.getSheets().forEach(function (s) {
+    if (s.getName() !== SHEET_NAME && s.getName() !== MSG_SHEET && s.getLastRow() === 0) ss.deleteSheet(s);
+  });
   sh.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS])
     .setFontWeight('bold').setFontColor('#FCFFFE').setBackground('#286A6C')
     .setFontFamily('Arial').setVerticalAlignment('middle');
@@ -64,7 +79,11 @@ function doPost(e) {
   if (!authorised_(e)) return json_({ ok: false, error: 'unauthorised' });
   var body = {};
   try { body = JSON.parse((e.postData && e.postData.contents) || '{}'); } catch (err) { return json_({ ok: false, error: 'bad json' }); }
-  if (body.type === 'INSERT' && body.record) return json_(addSignup_(body.record));   // from the Supabase webhook
+  if (body.type === 'INSERT' && body.record) {                                        // from a Supabase webhook
+    if (body.table === 'contact_messages') return json_(addMessage_(body.record));
+    if (!body.table || body.table === 'waitlist') return json_(addSignup_(body.record));
+    return json_({ ok: false, error: 'unknown table' });
+  }
   if (body.action === 'send') return json_(sendBriefing_(body));                     // from the daily job
   return json_({ ok: false, error: 'unknown request' });
 }
@@ -96,8 +115,8 @@ function addSignup_(r) {
     var sh = sheet_(), row = findRow_(sh, email);
     if (row) return { ok: true, duplicate: true };
     var topics = (r.topics || []).join(', ');
-    sh.appendRow([new Date(r.created_at || new Date()), email, r.area || '', topics, r.topics_other || '', r.places || '',
-                  r.people || '', r.frequency === 'weekly' ? 'Weekly' : 'Daily', 'Active', '', '']);
+    sh.appendRow([new Date(r.created_at || new Date()), cell_(email), cell_(r.area), cell_(topics), cell_(r.topics_other),
+                  cell_(r.places), cell_(r.people), r.frequency === 'weekly' ? 'Weekly' : 'Daily', 'Active', '', '']);
     row = sh.getLastRow();
     try {
       sendWelcome_(email, r);
@@ -178,6 +197,149 @@ function unsubscribePage_(email, sig) {
   return HtmlService.createHtmlOutput(html).setTitle(title);
 }
 
+/* -------------------------------------------------------- contact form */
+
+function addMessage_(r) {
+  var email = String(r.email || '').trim();
+  var m = {
+    when: new Date(r.created_at || new Date()),
+    name: oneLine_(r.name, 120),
+    email: email.length <= 254 && /^[^@\s,;<>"]+@[^@\s,;<>"]+\.[^@\s,;<>"]+$/.test(email) ? email : '',
+    organisation: oneLine_(r.organisation, 160),
+    about: TOPICS[r.topic] || '',
+    message: String(r.message || '').replace(/\r\n?/g, '\n').slice(0, 5000).trim(),
+    page: oneLine_(r.from_page, 40).replace(/[^a-z0-9-]/g, '')
+  };
+  if (!m.name || !m.email || !m.message) return { ok: false, error: 'incomplete message' };
+
+  var lock = LockService.getScriptLock(); lock.waitLock(20000);
+  var sh = null, row = 0, notify, ackSkip;
+  try {
+    try {   // a problem with the sheet mustn't stop the email reaching you
+      sh = msgSheet_();
+      row = sh.getLastRow() + 1;
+      sh.getRange(row, 1, 1, MSG_HEADERS.length).setValues([[m.when, cell_(m.name), cell_(m.email), cell_(m.organisation),
+        m.about, cell_(m.message), cell_(m.page), 'New', '', '']]);
+    } catch (err) { sh = null; row = 0; }
+    notify = quota_() >= 1 && countToday_('CONTACT_NOTIFIED', NOTIFY_PER_DAY);
+    ackSkip = ackSkip_(m.email);
+  } finally { lock.releaseLock(); }
+  function mark(col, v) { if (sh && row) try { sh.getRange(row, MCOL[col]).setValue(v); } catch (err) {} }
+
+  // 1. To you. Reply-To is the sender, so replying answers them directly.
+  var emailed = false;
+  try {
+    if (!notify) throw new Error("not emailed: today's email limit is used up, so read it here");
+    sendMail_(notifyEmail_(m));
+    emailed = true;
+    mark('Emailed to you', new Date());
+  } catch (err) { mark('Emailed to you', 'Failed: ' + err.message); }
+
+  // 2. To the sender: fixed words only, never their name or message, so nobody can use
+  //    the form to send their own text to someone else's address.
+  try {
+    if (ackSkip) mark('Confirmation', 'Not sent: ' + ackSkip);
+    else { sendMail_(ackEmail_(m)); mark('Confirmation', new Date()); }
+  } catch (err) { mark('Confirmation', 'Failed: ' + err.message); }
+  return { ok: true, logged: !!row, emailed: emailed };
+}
+
+function ackSkip_(email) {
+  if (String(prop_('CONTACT_ACK') || '').toLowerCase() === 'off') return 'switched off';
+  var cache = CacheService.getScriptCache(), key = 'ack:' + email.toLowerCase().slice(0, 240);
+  if (cache.get(key)) return 'one already went to this address in the last six hours';
+  if (quota_() < 10) return 'saving the day\'s remaining email allowance';
+  if (!countToday_('CONTACT_ACKS', ACKS_PER_DAY)) return 'daily limit reached';
+  cache.put(key, '1', 21600);   // six hours, the longest the cache keeps anything
+  return '';
+}
+
+/** Counts one more use today, if today's limit allows it. */
+function countToday_(name, max) {
+  var props = PropertiesService.getScriptProperties();
+  var today = Utilities.formatDate(new Date(), 'Europe/London', 'yyyy-MM-dd'), c = {};
+  try { c = JSON.parse(props.getProperty(name) || '{}'); } catch (err) { c = {}; }
+  if (c.day !== today) c = { day: today, n: 0 };
+  if (c.n >= max) return false;
+  c.n++;
+  props.setProperty(name, JSON.stringify(c));
+  return true;
+}
+
+function notifyEmail_(m) {
+  var where = m.page ? 'eglurtech.com/' + (m.page === 'home' ? '' : m.page) : '';
+  var rows = [['Name', esc_(m.name)], ['Email', '<a href="mailto:' + esc_(m.email) + '" style="color:#1E5153">' + esc_(m.email) + '</a>'],
+              ['Organisation', esc_(m.organisation)], ['About', esc_(m.about)], ['Came from', esc_(where)],
+              ['Received', esc_(when_(m.when))]].filter(function (x) { return x[1]; });
+  var table = rows.map(function (x) {
+    return '<tr><td style="padding:10px 0;border-top:1px solid #E3E8E6;width:120px;vertical-align:top;font-size:14px;color:#5F6B6A">' +
+      x[0] + '</td><td style="padding:10px 0;border-top:1px solid #E3E8E6;font-size:15px;line-height:1.5;color:#101A1A">' + x[1] + '</td></tr>';
+  }).join('');
+  var inner =
+    '<h1 style="margin:0 0 14px;font-family:\'DM Serif Display\',Georgia,serif;font-weight:400;font-size:34px;line-height:1.1;color:#101A1A">' +
+    'New message<span style="color:#286A6C">.</span></h1>' +
+    '<p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#3D4A49">From the contact form on eglurtech.com. ' +
+    'Reply to this email to answer ' + esc_(m.name) + ' directly.</p>' +
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:0 0 4px">' + table +
+    '<tr><td colspan="2" style="border-top:1px solid #E3E8E6"></td></tr></table>' +
+    '<p style="margin:20px 0 0;font-size:16px;line-height:1.65;color:#101A1A">' + esc_(m.message).replace(/\n/g, '<br>') + '</p>';
+  var text = 'New message from the contact form on eglurtech.com. Reply to this email to answer ' + m.name + ' directly.\n\n' +
+    [['Name', m.name], ['Email', m.email], ['Organisation', m.organisation], ['About', m.about], ['Came from', where],
+     ['Received', when_(m.when)]].filter(function (x) { return x[1]; }).map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') +
+    '\n\n' + m.message + '\n';
+  var subject = ('Website message from ' + m.name + (m.organisation ? ' (' + m.organisation + ')' : '')).slice(0, 160);
+  return { to: prop_('CONTACT_TO') || CONTACT_TO, name: 'Eglur website', replyTo: m.email, subject: subject, text: text,
+           html: frame_(inner, m.name + ' sent a message from eglurtech.com', '', 'Sent by the contact form at eglurtech.com/contact.') };
+}
+
+function ackEmail_(m) {
+  var inner =
+    '<h1 style="margin:0 0 18px;font-family:\'DM Serif Display\',Georgia,serif;font-weight:400;font-size:38px;line-height:1.05;color:#101A1A">' +
+    'Thanks for getting in touch<span style="color:#286A6C">.</span></h1>' +
+    '<p style="margin:0 0 16px;font-size:17px;line-height:1.6;color:#3D4A49">Your message has reached us. We read every message, ' +
+    'and we\'ll reply to you personally.</p>' +
+    '<p style="margin:0;font-size:17px;line-height:1.6;color:#3D4A49">Need to add something? Just reply to this email.</p>';
+  var text = "Thanks for getting in touch.\n\nYour message has reached us. We read every message, and we'll reply to you personally.\n\n" +
+    'Need to add something? Just reply to this email.\n\nEglur Technologies. Eglur is Welsh for clear.\n' +
+    "You're getting this because this address was entered on the contact form at eglurtech.com. If that wasn't you, " +
+    "ignore this email and you won't hear from us again.";
+  return { to: m.email, name: 'Eglur', replyTo: prop_('CONTACT_TO') || CONTACT_TO, subject: 'We got your message', text: text,
+           html: frame_(inner, "We'll reply to you personally.", '',
+             "You're getting this because this address was entered on the contact form at eglurtech.com. " +
+             "If that wasn't you, ignore this email and you won't hear from us again.") };
+}
+
+function msgSheet_() {
+  var ss = spreadsheet_(), sh = ss.getSheetByName(MSG_SHEET);
+  if (!sh) { sh = ss.insertSheet(MSG_SHEET); formatMessages_(sh); }
+  return sh;
+}
+
+/** Optional: run from the editor to create (or re-format) the Messages sheet before the first message. */
+function setupMessages() {
+  formatMessages_(msgSheet_());
+  Logger.log('The Messages sheet is ready.');
+}
+
+function formatMessages_(sh) {
+  sh.getRange(1, 1, 1, MSG_HEADERS.length).setValues([MSG_HEADERS])
+    .setFontWeight('bold').setFontColor('#FCFFFE').setBackground('#286A6C')
+    .setFontFamily('Arial').setVerticalAlignment('middle');
+  sh.setRowHeight(1, 34);
+  sh.setFrozenRows(1);
+  [150, 170, 220, 200, 190, 420, 110, 100, 150, 150].forEach(function (w, i) { sh.setColumnWidth(i + 1, w); });
+  var body = sh.getRange(2, 1, sh.getMaxRows() - 1, MSG_HEADERS.length);
+  body.setFontFamily('Arial').setVerticalAlignment('top').setWrap(true);
+  sh.getRange(2, MCOL['Received'], sh.getMaxRows() - 1, 1).setNumberFormat('d mmm yyyy, hh:mm');
+  sh.getRange(2, MCOL['Emailed to you'], sh.getMaxRows() - 1, 2).setNumberFormat('d mmm yyyy, hh:mm');
+  var status = sh.getRange(2, MCOL['Status'], sh.getMaxRows() - 1, 1);
+  status.setDataValidation(SpreadsheetApp.newDataValidation().requireValueInList(['New', 'Replied', 'Closed'], true).build());
+  sh.setConditionalFormatRules([
+    SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('New').setFontColor('#1E5153').setBackground('#E6F1EF').setRanges([status]).build(),
+    SpreadsheetApp.newConditionalFormatRule().whenTextEqualTo('Closed').setFontColor('#7D8B88').setBackground('#F1F3F2').setRanges([status]).build()
+  ]);
+}
+
 /* ----------------------------------------------------------- welcome email */
 
 function sendWelcome_(email, r) {
@@ -240,7 +402,7 @@ function msToken_(c) {
 function sendMail_(o) {
   var c = msConfig_();
   if (!c) {
-    MailApp.sendEmail({ to: o.to, name: FROM_NAME, replyTo: REPLY_TO, subject: o.subject, htmlBody: o.html, body: o.text });
+    MailApp.sendEmail({ to: o.to, name: o.name || FROM_NAME, replyTo: o.replyTo || REPLY_TO, subject: o.subject, htmlBody: o.html, body: o.text });
     return 'gmail';
   }
   var res = UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/users/' + encodeURIComponent(c.sender) + '/sendMail', {
@@ -251,7 +413,7 @@ function sendMail_(o) {
         subject: o.subject,
         body: { contentType: 'HTML', content: o.html },
         toRecipients: [{ emailAddress: { address: o.to } }],
-        replyTo: [{ emailAddress: { address: REPLY_TO } }]
+        replyTo: [{ emailAddress: { address: o.replyTo || REPLY_TO } }]
       },
       saveToSentItems: false
     })
@@ -287,7 +449,7 @@ function button_(href, label) {
     esc_(label) + '</a></td></tr></table>';
 }
 
-function frame_(inner, preheader, unsub) {
+function frame_(inner, preheader, unsub, foot) {
   return '<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<meta name="color-scheme" content="light"><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet"></head>' +
     '<body style="margin:0;padding:0;background:#F1F6F5">' +
@@ -297,9 +459,29 @@ function frame_(inner, preheader, unsub) {
     '<tr><td style="padding:0 6px 22px">' + wordmark_(26) + '</td></tr>' +
     '<tr><td style="background:#FFFFFF;border-radius:16px;padding:40px 36px;font-family:Arial,Helvetica,sans-serif">' + inner + '</td></tr>' +
     '<tr><td style="padding:22px 6px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.6;color:#5F6B6A">' +
-    'Eglur Technologies. Eglur is Welsh for clear.<br>You signed up at eglurtech.com/daily. ' +
-    '<a href="' + unsub + '" style="color:#5F6B6A">Unsubscribe</a></td></tr>' +
+    'Eglur Technologies. Eglur is Welsh for clear.<br>' +
+    (foot ? esc_(foot) : 'You signed up at eglurtech.com/daily. <a href="' + unsub + '" style="color:#5F6B6A">Unsubscribe</a>') +
+    '</td></tr>' +
     '</table></td></tr></table></body></html>';
+}
+
+function prop_(k) {
+  return PropertiesService.getScriptProperties().getProperty(k);
+}
+
+/** One line of plain text: no line breaks or control characters, at most max characters. */
+function oneLine_(s, max) {
+  return String(s == null ? '' : s).replace(/[\u0000-\u001f\u007f\s]+/g, ' ').trim().slice(0, max);
+}
+
+/** Sheets runs text that starts with = + - or @ as a formula; a leading apostrophe keeps it as text. */
+function cell_(v) {
+  var s = String(v == null ? '' : v);
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
+function when_(d) {
+  return Utilities.formatDate(d, 'Europe/London', 'EEE d MMM yyyy, HH:mm');
 }
 
 function esc_(s) {

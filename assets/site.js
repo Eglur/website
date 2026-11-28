@@ -1,5 +1,5 @@
 /* Eglur · www.eglurtech.com
-   Navigation, the case animation and the draft demo.
+   Navigation, the case animation, the draft demo and the contact form.
    No cookies, no tracking, no dependencies. Everything here is an enhancement:
    every page reads in full without it. */
 (function () {
@@ -415,5 +415,132 @@
     }
 
     $$('[data-demo]').forEach(initDemo);
+
+    /* ---------- Contact form: saved to our database, which emails it on to us ----------
+       The public key can only add a message; it can't read any back. */
+    function initContact(form) {
+      var endpoint = form.getAttribute('data-endpoint'), key = form.getAttribute('data-key');
+      var done = doc.getElementById('cf-done'), status = $('[data-status]', form);
+      var btn = $('[type="submit"]', form), btnText = btn.textContent, sending = false;
+      var inputs = { name: doc.getElementById('cf-name'), email: doc.getElementById('cf-email'),
+                     organisation: doc.getElementById('cf-org'), message: doc.getElementById('cf-message') };
+      var fails = $$('[data-fail]', form);
+
+      /* "Join an early conversation" links here with ?about=conversation */
+      var about = (/[?&]about=([a-z-]{1,40})/.exec(window.location.search) || [])[1];
+      $$('input[name="topic"]', form).forEach(function (r) { if (r.value === about) r.checked = true; });
+
+      /* which of our pages they came from, so the reply can pick up the thread */
+      var fromPage = '';
+      try {
+        var ref = doc.referrer ? new URL(doc.referrer) : null;
+        if (ref && ref.origin === window.location.origin) {
+          fromPage = ref.pathname.replace(/\.html$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '').slice(0, 40);
+          if (!fromPage || fromPage === 'index') fromPage = 'home';
+        }
+      } catch (err) { fromPage = ''; }
+
+      function oneLine(s) { return String(s || '').replace(/[\u0000-\u001f\u007f\s]+/g, ' ').trim(); }
+      function values() {
+        var topic = $('input[name="topic"]:checked', form);
+        return {
+          name: oneLine(inputs.name.value),
+          email: String(inputs.email.value || '').trim(),
+          organisation: oneLine(inputs.organisation.value),
+          topic: topic ? topic.value : '',
+          message: String(inputs.message.value || '').replace(/\r\n?/g, '\n')
+            .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '').trim(),
+          from_page: fromPage
+        };
+      }
+      function problem(field, v) {
+        if (field === 'name') return !v ? 'Enter your name' : v.length > 120 ? 'Name must be 120 characters or fewer' : '';
+        if (field === 'email') return !v ? 'Enter your email address'
+          : (v.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) ? 'Enter an email address in the correct format, like name@example.com' : '';
+        if (field === 'organisation') return v.length > 160 ? 'Organisation must be 160 characters or fewer' : '';
+        if (field === 'message') return !v ? 'Enter a message' : v.length > 5000 ? 'Message must be 5,000 characters or fewer' : '';
+        return '';
+      }
+      function setError(input, msg) {
+        var box = doc.getElementById(input.id + '-err');
+        var ids = (input.getAttribute('aria-describedby') || '').split(/\s+/).filter(function (id) { return id && id !== box.id; });
+        if (msg) {
+          $('[data-msg]', box).textContent = msg;
+          ids.push(box.id);
+          input.setAttribute('aria-invalid', 'true');
+        } else {
+          input.removeAttribute('aria-invalid');
+        }
+        box.hidden = !msg;
+        if (ids.length) input.setAttribute('aria-describedby', ids.join(' '));
+        else input.removeAttribute('aria-describedby');
+      }
+      Object.keys(inputs).forEach(function (field) {
+        inputs[field].addEventListener('input', function () {
+          if (inputs[field].getAttribute('aria-invalid') === 'true' && !problem(field, values()[field])) setError(inputs[field], '');
+        });
+      });
+
+      function busy(on) {
+        sending = on;
+        btn.textContent = on ? 'Sending…' : btnText;
+        if (on) { btn.setAttribute('aria-disabled', 'true'); form.setAttribute('aria-busy', 'true'); }
+        else { btn.removeAttribute('aria-disabled'); form.removeAttribute('aria-busy'); }
+        status.textContent = on ? 'Sending your message…' : '';
+      }
+      function showFail(kind) {
+        fails.forEach(function (f) { f.hidden = f.getAttribute('data-fail') !== kind; });
+        btn.focus();
+      }
+      function showDone(v) {
+        $('[data-name]', done).textContent = v.name;
+        $('[data-email]', done).textContent = v.email;
+        form.hidden = true;
+        done.hidden = false;
+        var top = done.getBoundingClientRect().top + window.scrollY - 110;
+        if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top), behavior: reduce.matches ? 'auto' : 'smooth' });
+        $('h2', done).focus({ preventScroll: true });
+      }
+      $('[data-edit]', done).addEventListener('click', function () {
+        form.classList.remove('ld', 'd2');
+        done.hidden = true;
+        form.hidden = false;
+        inputs.email.focus();
+        inputs.email.select();
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (sending) return;
+        fails.forEach(function (f) { f.hidden = true; });
+        var v = values(), first = null;
+        ['name', 'email', 'organisation', 'message'].forEach(function (field) {
+          var msg = problem(field, v[field]);
+          setError(inputs[field], msg);
+          if (msg && !first) first = inputs[field];
+        });
+        if (first) { first.focus(); return; }
+
+        busy(true);
+        var ctl = window.AbortController ? new AbortController() : null;
+        var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 20000);
+        var headers = { 'apikey': key, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+        if (key.indexOf('sb_') !== 0) headers.Authorization = 'Bearer ' + key;   // older JWT keys only
+        fetch(endpoint, { method: 'POST', credentials: 'omit', headers: headers, body: JSON.stringify(v), signal: ctl ? ctl.signal : undefined })
+          .then(function (r) {
+            if (r.ok) return 'sent';
+            return r.json().then(function (b) { return (b && b.code) || ''; }, function () { return ''; })
+              .then(function (code) { return r.status === 429 || code === 'PT429' ? 'busy' : 'failed'; });
+          }, function () { return 'failed'; })
+          .then(function (result) {
+            clearTimeout(timer);
+            busy(false);
+            if (result === 'sent') showDone(v); else showFail(result);
+          });
+      });
+    }
+
+    $$('form[data-contact]').forEach(initContact);
   }
 })();

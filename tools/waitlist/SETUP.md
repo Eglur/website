@@ -59,6 +59,7 @@ Until this is done, emails come from eglurtech@gmail.com. Afterwards they come f
 Optional hardening: as set up, the Mail.Send permission could send as any mailbox in your organisation. Microsoft's "RBAC for Applications" can limit it to monitor@ only; worth doing before anyone else joins your Microsoft 365.
 
 ## Good to know
+- **The website's contact form** uses this same script and sheet (a Messages tab). Setup: `tools/contact/SETUP.md`.
 - **Limits:** from Gmail, about 100 emails a day (the job stops before that). From Microsoft 365, thousands a day.
 - **Changing what someone follows:** edit their row in the sheet. Changes apply from the next morning.
 - **Unsubscribing:** every email has a link. It sets their Status to Unsubscribed, and nothing more is sent to them. You can also change Status by hand.
