@@ -4,6 +4,7 @@ const fs = require("fs"), path = require("path"), vm = require("vm"), crypto = r
 
 const sent = [], props = {}, fetches = [], cache = {};
 let graphStatus = 202;
+const denySenders = new Set();   // mailboxes the Microsoft app isn't allowed to send as
 // Like Sheets: a leading apostrophe marks text and isn't part of the stored value. `raw` keeps what was written.
 const kept = x => (typeof x === "string" && x[0] === "'" ? x.slice(1) : x);
 function makeSheet(name) {
@@ -51,7 +52,9 @@ const ctx = {
   UrlFetchApp: { fetch: (url, opts) => {
     fetches.push({ url, opts });
     if (url.includes("login.microsoftonline.com")) return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ access_token: "tok123", expires_in: 3600 }) };
-    return { getResponseCode: () => graphStatus, getContentText: () => (graphStatus === 202 ? "" : '{"error":{"code":"ErrorAccessDenied"}}') };
+    const sender = decodeURIComponent((url.match(/\/users\/([^/]+)\/sendMail/) || [])[1] || "");
+    const status = denySenders.has(sender) ? 403 : graphStatus;
+    return { getResponseCode: () => status, getContentText: () => (status === 202 ? "" : '{"error":{"code":"ErrorAccessDenied"}}') };
   } },
   ContentService: { createTextOutput: t => ({ text: t, setMimeType() { return this; } }), MimeType: { JSON: "json" } },
   HtmlService: { createHtmlOutput: h => ({ html: h, setTitle() { return this; } }) },
@@ -238,13 +241,30 @@ graphStatus = 403;
 post({ type: "INSERT", record: { email: "fail@example.com", area: "SA65", topics: [], frequency: "daily" } });
 assert.ok(String(sheet.rows[sheet.rows.length - 1][9]).startsWith("Failed: Microsoft send failed (403)"));
 graphStatus = 202;
-// contact messages go the same way, with Reply-To the sender
+// contact messages go the same way, sent FROM contact@ (not monitor@), with Reply-To the sender
 contact({ ...msg, email: "graph@x.example" });
-const gm = fetches.filter(f => f.url.includes("graph.microsoft.com")).slice(-2).map(f => JSON.parse(f.opts.payload).message);
+let gf = fetches.filter(f => f.url.includes("graph.microsoft.com")).slice(-2);
+const gm = gf.map(f => JSON.parse(f.opts.payload).message);
+assert.deepStrictEqual(gf.map(f => f.url), Array(2).fill("https://graph.microsoft.com/v1.0/users/contact%40eglurtech.com/sendMail"));
 assert.strictEqual(gm[0].toRecipients[0].emailAddress.address, "contact@eglurtech.com");
 assert.strictEqual(gm[0].replyTo[0].emailAddress.address, "graph@x.example");
 assert.strictEqual(gm[1].toRecipients[0].emailAddress.address, "graph@x.example");
 assert.strictEqual(gm[1].replyTo[0].emailAddress.address, "contact@eglurtech.com");
+assert.ok(isDate(ms.rows[ms.rows.length - 1][8]) && isDate(ms.rows[ms.rows.length - 1][9]));
+// if Microsoft won't let the app send as contact@, the emails still go, from monitor@, and the row says so
+denySenders.add("contact@eglurtech.com");
+let before = fetches.length;
+contact({ ...msg, email: "deny@x.example" });
+gf = fetches.slice(before).filter(f => f.url.includes("/sendMail"));
+assert.deepStrictEqual(gf.map(f => f.url.split("/users/")[1]), ["contact%40eglurtech.com/sendMail", "monitor%40eglurtech.com/sendMail",
+                                                                 "contact%40eglurtech.com/sendMail", "monitor%40eglurtech.com/sendMail"]);
+assert.strictEqual(ms.rows[ms.rows.length - 1][8], "Sent from monitor@eglurtech.com (not allowed to send as contact@eglurtech.com)");
+assert.strictEqual(ms.rows[ms.rows.length - 1][9], "Sent from monitor@eglurtech.com (not allowed to send as contact@eglurtech.com)");
+denySenders.clear();
+// Daily emails still come from monitor@
+before = fetches.length;
+post({ action: "send", to: "ms@example.com", subject: "Again", html: "x", text: "x" });
+assert.strictEqual(fetches.slice(before).find(f => f.url.includes("/sendMail")).url, "https://graph.microsoft.com/v1.0/users/monitor%40eglurtech.com/sendMail");
 // testSend works from the editor
 call("testSend");
 assert.strictEqual(JSON.parse(fetches[fetches.length - 1].opts.payload).message.toRecipients[0].emailAddress.address, "eglurtech@gmail.com");
