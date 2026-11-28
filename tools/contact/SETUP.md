@@ -20,11 +20,11 @@ In classic Outlook it appears on its own; in Outlook on the web or the new Outlo
 
 This creates the `contact_messages` table. The website's public key can only add a message to it; it can't read, change or delete any. There's also a brake: at most 3 messages an hour from one address, 30 an hour and 150 a day in total.
 
-## 2. The script (Google Sheet, signed in as eglurtech@gmail.com)
-1. Open the **Eglur Daily: sign-ups** sheet, then **Extensions → Apps Script**.
-2. Select all the code, delete it, paste in everything from `tools/waitlist/apps-script.gs`, and click **Save**.
+## 2. The script (signed in as eglurtech@gmail.com)
+1. Go to **script.google.com** and open the **Eglur Daily** project. (It's a standalone project, so it isn't under the sheet's Extensions menu.)
+2. Select all the code, delete it, paste in everything from `tools/waitlist/apps-script.gs`, then put back the original `var SHEET_ID = '…';` line near the top: it tells the script which sheet to use. Click **Save**.
 3. Optional: choose **setupMessages** in the function menu and click **Run**, to create the Messages tab now. Otherwise it appears with the first message.
-4. **Deploy → Manage deployments →** edit (pencil) **→ Version: New version → Deploy.** The web address stays the same.
+4. **Deploy → Manage deployments**, and for **each** active deployment: edit (pencil) **→ Version:** the newest (or **New version**) **→ Deploy.** The web addresses stay the same.
 
 ## 3. Connect them (Supabase, project **Eglur Daily**)
 Only after step 2 is deployed: the old script would treat a message as a waitlist sign-up.
@@ -45,6 +45,6 @@ Or by hand:
 ## Good to know
 - **Where to reply:** reply to the notification in the contact@ mailbox. Choose **From: contact@** or your own address, whichever you prefer.
 - **If an email fails**, the message is still in the Messages tab and in Supabase, and the row says why.
-- **Limits:** at most 60 notification emails and 20 confirmations a day, and one confirmation per address every six hours. Past that, messages still land in the sheet. Emails come from eglurtech@gmail.com until the Microsoft 365 step in `tools/waitlist/SETUP.md` is done, then from monitor@eglurtech.com.
-- **Switches** (Apps Script → Project Settings → Script properties): `CONTACT_TO` sends messages to a different address; `CONTACT_ACK` set to `off` stops the confirmations.
+- **Limits:** at most 60 notification emails and 20 confirmations a day, and one confirmation per address every six hours. Past that, messages still land in the sheet. With Microsoft 365 set up (`tools/waitlist/SETUP.md` step 5), contact emails come from **Eglur <contact@eglurtech.com>**; Eglur Daily emails still come from monitor@. If Microsoft ever refuses to send as contact@, they go from monitor@ instead and the row says so. Without Microsoft 365 they come from eglurtech@gmail.com.
+- **Switches** (Apps Script → Project Settings → Script properties): `CONTACT_TO` sends messages to a different address; `CONTACT_FROM` sends them from a different mailbox; `CONTACT_ACK` set to `off` stops the confirmations.
 - **Privacy:** messages are kept in Supabase and the sheet, and only you can see either. The website's data page says so. Delete a person's rows in both places if they ask.

@@ -3,7 +3,8 @@
  * Also the website's contact form: each message is logged in the Messages sheet and emailed
  * to contact@eglurtech.com with Reply-To set to the sender, and the sender gets a short fixed confirmation.
  *
- * Lives in a Google Sheet on eglurtech@gmail.com (Extensions > Apps Script).
+ * Lives on eglurtech@gmail.com: either inside the sheet (Extensions > Apps Script, SHEET_ID empty) or, as now,
+ * as a standalone project with SHEET_ID set. When pasting a new version, keep the existing SHEET_ID line.
  * Setup: paste this file, run setup() once, then Deploy > New deployment > Web app
  * (Execute as: Me, Who has access: Anyone). See tools/waitlist/SETUP.md.
  * To send from monitor@eglurtech.com, add MS_TENANT_ID, MS_CLIENT_ID and MS_CLIENT_SECRET
@@ -31,6 +32,7 @@ var MSG_HEADERS = ['Received', 'Name', 'Email', 'Organisation', 'About', 'Messag
 var MCOL = {};
 MSG_HEADERS.forEach(function (h, i) { MCOL[h] = i + 1; });
 var CONTACT_TO = 'contact@eglurtech.com';   // where messages go (a shared mailbox); a CONTACT_TO script property overrides it
+var CONTACT_FROM = 'contact@eglurtech.com';   // contact emails are sent from this mailbox via Microsoft 365; CONTACT_FROM overrides
 var TOPICS = { 'conversation': 'An early conversation', 'design-partner': 'Becoming a design partner', 'other': 'Something else' };
 var NOTIFY_PER_DAY = 60;   // emails to you; past this, messages still land in the sheet
 var ACKS_PER_DAY = 20;     // confirmations to senders, at most one per address every six hours
@@ -230,16 +232,17 @@ function addMessage_(r) {
   var emailed = false;
   try {
     if (!notify) throw new Error("not emailed: today's email limit is used up, so read it here");
-    sendMail_(notifyEmail_(m));
+    var note = notifyEmail_(m);
+    var via = sendMail_(note);
     emailed = true;
-    mark('Emailed to you', new Date());
+    mark('Emailed to you', sentNote_(via, note.from));
   } catch (err) { mark('Emailed to you', 'Failed: ' + err.message); }
 
   // 2. To the sender: fixed words only, never their name or message, so nobody can use
   //    the form to send their own text to someone else's address.
   try {
     if (ackSkip) mark('Confirmation', 'Not sent: ' + ackSkip);
-    else { sendMail_(ackEmail_(m)); mark('Confirmation', new Date()); }
+    else { var ack = ackEmail_(m); mark('Confirmation', sentNote_(sendMail_(ack), ack.from)); }
   } catch (err) { mark('Confirmation', 'Failed: ' + err.message); }
   return { ok: true, logged: !!row, emailed: emailed };
 }
@@ -288,7 +291,7 @@ function notifyEmail_(m) {
      ['Received', when_(m.when)]].filter(function (x) { return x[1]; }).map(function (x) { return x[0] + ': ' + x[1]; }).join('\n') +
     '\n\n' + m.message + '\n';
   var subject = ('Website message from ' + m.name + (m.organisation ? ' (' + m.organisation + ')' : '')).slice(0, 160);
-  return { to: prop_('CONTACT_TO') || CONTACT_TO, name: 'Eglur website', replyTo: m.email, subject: subject, text: text,
+  return { to: prop_('CONTACT_TO') || CONTACT_TO, from: contactFrom_(), name: 'Eglur website', replyTo: m.email, subject: subject, text: text,
            html: frame_(inner, m.name + ' sent a message from eglurtech.com', '', 'Sent by the contact form at eglurtech.com/contact.') };
 }
 
@@ -303,10 +306,19 @@ function ackEmail_(m) {
     'Need to add something? Just reply to this email.\n\nEglur Technologies. Eglur is Welsh for clear.\n' +
     "You're getting this because this address was entered on the contact form at eglurtech.com. If that wasn't you, " +
     "ignore this email and you won't hear from us again.";
-  return { to: m.email, name: 'Eglur', replyTo: prop_('CONTACT_TO') || CONTACT_TO, subject: 'We got your message', text: text,
+  return { to: m.email, from: contactFrom_(), name: 'Eglur', replyTo: prop_('CONTACT_TO') || CONTACT_TO, subject: 'We got your message', text: text,
            html: frame_(inner, "We'll reply to you personally.", '',
              "You're getting this because this address was entered on the contact form at eglurtech.com. " +
              "If that wasn't you, ignore this email and you won't hear from us again.") };
+}
+
+function contactFrom_() {
+  return prop_('CONTACT_FROM') || CONTACT_FROM;
+}
+
+/** Writes when an email went, noting it if it had to go from the default mailbox instead of the one asked for. */
+function sentNote_(via, from) {
+  return via === 'gmail' || via === from ? new Date() : 'Sent from ' + via + ' (not allowed to send as ' + from + ')';
 }
 
 function msgSheet_() {
@@ -399,13 +411,27 @@ function msToken_(c) {
   return body.access_token;
 }
 
+/**
+ * Sends o = { to, subject, html, text, replyTo?, name?, from? }. Returns 'gmail', or the Microsoft 365
+ * mailbox it was sent from: o.from if given and allowed, otherwise the default sender (monitor@).
+ */
 function sendMail_(o) {
   var c = msConfig_();
   if (!c) {
     MailApp.sendEmail({ to: o.to, name: o.name || FROM_NAME, replyTo: o.replyTo || REPLY_TO, subject: o.subject, htmlBody: o.html, body: o.text });
     return 'gmail';
   }
-  var res = UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/users/' + encodeURIComponent(c.sender) + '/sendMail', {
+  var from = o.from || c.sender, res = graphSend_(c, from, o);
+  if (from !== c.sender && (res.getResponseCode() === 403 || res.getResponseCode() === 404)) {
+    from = c.sender;                       // the app may only be allowed to send as the default mailbox
+    res = graphSend_(c, from, o);
+  }
+  if (res.getResponseCode() !== 202) throw new Error('Microsoft send failed (' + res.getResponseCode() + '): ' + res.getContentText().slice(0, 200));
+  return from;
+}
+
+function graphSend_(c, from, o) {
+  return UrlFetchApp.fetch('https://graph.microsoft.com/v1.0/users/' + encodeURIComponent(from) + '/sendMail', {
     method: 'post', contentType: 'application/json', muteHttpExceptions: true,
     headers: { Authorization: 'Bearer ' + msToken_(c) },
     payload: JSON.stringify({
@@ -418,8 +444,6 @@ function sendMail_(o) {
       saveToSentItems: false
     })
   });
-  if (res.getResponseCode() !== 202) throw new Error('Microsoft send failed (' + res.getResponseCode() + '): ' + res.getContentText().slice(0, 200));
-  return 'microsoft';
 }
 
 function quota_() {
