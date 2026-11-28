@@ -425,6 +425,7 @@
       var inputs = { name: doc.getElementById('cf-name'), email: doc.getElementById('cf-email'),
                      organisation: doc.getElementById('cf-org'), message: doc.getElementById('cf-message') };
       var fails = $$('[data-fail]', form);
+      function say(key, english) { return form.getAttribute('data-msg-' + key) || english; }   // the Welsh page supplies its own words
 
       /* "Join an early conversation" links here with ?about=conversation */
       var about = (/[?&]about=([a-z-]{1,40})/.exec(window.location.search) || [])[1];
@@ -455,11 +456,11 @@
         };
       }
       function problem(field, v) {
-        if (field === 'name') return !v ? 'Enter your name' : v.length > 120 ? 'Name must be 120 characters or fewer' : '';
-        if (field === 'email') return !v ? 'Enter your email address'
-          : (v.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) ? 'Enter an email address in the correct format, like name@example.com' : '';
-        if (field === 'organisation') return v.length > 160 ? 'Organisation must be 160 characters or fewer' : '';
-        if (field === 'message') return !v ? 'Enter a message' : v.length > 5000 ? 'Message must be 5,000 characters or fewer' : '';
+        if (field === 'name') return !v ? say('name-empty', 'Enter your name') : v.length > 120 ? say('name-long', 'Name must be 120 characters or fewer') : '';
+        if (field === 'email') return !v ? say('email-empty', 'Enter your email address')
+          : (v.length > 254 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) ? say('email-bad', 'Enter an email address in the correct format, like name@example.com') : '';
+        if (field === 'organisation') return v.length > 160 ? say('org-long', 'Organisation must be 160 characters or fewer') : '';
+        if (field === 'message') return !v ? say('message-empty', 'Enter a message') : v.length > 5000 ? say('message-long', 'Message must be 5,000 characters or fewer') : '';
         return '';
       }
       function setError(input, msg) {
@@ -484,10 +485,10 @@
 
       function busy(on) {
         sending = on;
-        btn.textContent = on ? 'Sending…' : btnText;
+        btn.textContent = on ? say('sending', 'Sending…') : btnText;
         if (on) { btn.setAttribute('aria-disabled', 'true'); form.setAttribute('aria-busy', 'true'); }
         else { btn.removeAttribute('aria-disabled'); form.removeAttribute('aria-busy'); }
-        status.textContent = on ? 'Sending your message…' : '';
+        status.textContent = on ? say('status', 'Sending your message…') : '';
       }
       function showFail(kind) {
         fails.forEach(function (f) { f.hidden = f.getAttribute('data-fail') !== kind; });
