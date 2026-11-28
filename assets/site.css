@@ -459,11 +459,12 @@ a.mnode.key:hover{border-color:var(--teal-deep);background:var(--teal-deep);colo
 .bd-checks li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:10px;align-items:start;padding:6px 0;font-size:15px;line-height:1.5;color:var(--ink-2)}
 .bd-n{margin-top:.25em;font:600 11px/1.2 var(--mono);color:var(--teal)}
 .bd-ok{display:block;width:9px;height:9px;margin-top:.5em;border-radius:50%;background:var(--teal)}
-.fd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:64px;align-items:start}
+.fd{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:64px;align-items:end}
 .fd h2{max-width:14ch;margin-top:18px;font-size:clamp(38px,4.4vw,58px);line-height:1.04;letter-spacing:-.02em}
 .fd-body p{max-width:46ch;font-size:19px;color:var(--ink-2)}
 .fd-body p+p{margin-top:16px}
 .fd-body .fd-sign{margin-top:24px;font-family:var(--serif);font-size:26px;line-height:1.2;color:var(--ink)}
+.fd-photo{display:block;width:220px;max-width:100%;height:auto;margin-top:40px;border-radius:2px;background:var(--hair)}
 .offer{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin:8px 0 52px;padding-top:28px;border-top:1px solid var(--ink)}
 .offer h3{margin:0 0 10px;font-size:24px;line-height:1.15}
 .offer p{font-size:16.5px;color:var(--ink-2)}
@@ -587,6 +588,7 @@ textarea.inp{min-height:184px;resize:vertical}
   .why,.fd,.offer{grid-template-columns:minmax(0,1fr)}
   .why{gap:44px}
   .fd{gap:24px}
+  .fd-photo{width:160px;margin-top:28px}
   .offer{gap:28px;margin-bottom:40px}
   .bd-cols{grid-template-columns:minmax(0,1fr)}
   .bd-cols>div+div{border-left:0;border-top:1px solid var(--hair)}
