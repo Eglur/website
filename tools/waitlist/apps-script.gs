@@ -3,7 +3,8 @@
  * Also the website's contact form: each message is logged in the Messages sheet and emailed
  * to contact@eglurtech.com with Reply-To set to the sender, and the sender gets a short fixed confirmation.
  *
- * Lives in a Google Sheet on eglurtech@gmail.com (Extensions > Apps Script).
+ * Lives on eglurtech@gmail.com: either inside the sheet (Extensions > Apps Script, SHEET_ID empty) or, as now,
+ * as a standalone project with SHEET_ID set. When pasting a new version, keep the existing SHEET_ID line.
  * Setup: paste this file, run setup() once, then Deploy > New deployment > Web app
  * (Execute as: Me, Who has access: Anyone). See tools/waitlist/SETUP.md.
  * To send from monitor@eglurtech.com, add MS_TENANT_ID, MS_CLIENT_ID and MS_CLIENT_SECRET
