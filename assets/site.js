@@ -206,7 +206,7 @@
         Object.keys(meters).forEach(function (k) {
           var m = meters[k], total = 0;
           m.steps.forEach(function (s) { total += s.min * easeOut(clamp((t - s.at) / 0.9, 0, 1)); });
-          var text = fmtMinutes(total);
+          var text = total < 0.5 ? '–' : fmtMinutes(total);   // a dash until it plays, so no one reads '0 min' as a claim
           if (text !== m.shown) { m.v.textContent = text; m.shown = text; }
           m.box.classList.toggle('zero', total < 0.5);
         });
