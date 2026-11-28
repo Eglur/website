@@ -23,7 +23,12 @@ This creates the `contact_messages` table. The website's public key can only add
 4. **Deploy → Manage deployments →** edit (pencil) **→ Version: New version → Deploy.** The web address stays the same.
 
 ## 3. Connect them (Supabase, project **Eglur Daily**)
-1. **Database → Webhooks.** Open the existing `send-to-sheet` hook and copy its URL (it ends with `?token=…`). Close it without changing anything.
+Only after step 2 is deployed: the old script would treat a message as a waitlist sign-up.
+
+**Easiest, and the secret token is never copied:** SQL Editor → New query → paste everything from `tools/contact/webhook.sql` → **Run**. It gives `contact_messages` a webhook with the same address as the waitlist's, all inside the database. It then shows up under **Database → Webhooks** as `send-message-to-inbox`.
+
+Or by hand:
+1. **Database → Webhooks.** Open the existing waitlist hook and copy its URL (it ends with `?token=…`). Close it without changing anything.
 2. **Create a new hook.** Name: `send-message-to-inbox`. Table: `contact_messages`. Events: **Insert** only.
 3. Type: **HTTP Request**, method **POST**, URL: the one you copied. Set **Timeout** to `5000`.
 4. Click **Create webhook**.
