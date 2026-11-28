@@ -180,6 +180,10 @@ contact({ ...msg, email: "h@x.example", name: "Bob\r\nBcc: x@y.z" });
 assert.strictEqual(sent[sent.length - 2].subject, "Website message from Bob Bcc: x@y.z (Office of Jane Smith MS)");
 // unauthorised posts are refused
 assert.deepStrictEqual(contact(msg, "wrong"), { ok: false, error: "unauthorised" });
+// a webhook from any other table is refused rather than treated as a sign-up
+n0 = sent.length;
+assert.deepStrictEqual(post({ type: "INSERT", table: "something_else", record: { email: "z@x.example", area: "x" } }), { ok: false, error: "unknown table" });
+assert.strictEqual(sent.length, n0);
 
 // switches and limits
 props.CONTACT_ACK = "off";

@@ -79,8 +79,11 @@ function doPost(e) {
   if (!authorised_(e)) return json_({ ok: false, error: 'unauthorised' });
   var body = {};
   try { body = JSON.parse((e.postData && e.postData.contents) || '{}'); } catch (err) { return json_({ ok: false, error: 'bad json' }); }
-  if (body.type === 'INSERT' && body.record && body.table === 'contact_messages') return json_(addMessage_(body.record));
-  if (body.type === 'INSERT' && body.record) return json_(addSignup_(body.record));   // from the Supabase webhook
+  if (body.type === 'INSERT' && body.record) {                                        // from a Supabase webhook
+    if (body.table === 'contact_messages') return json_(addMessage_(body.record));
+    if (!body.table || body.table === 'waitlist') return json_(addSignup_(body.record));
+    return json_({ ok: false, error: 'unknown table' });
+  }
   if (body.action === 'send') return json_(sendBriefing_(body));                     // from the daily job
   return json_({ ok: false, error: 'unknown request' });
 }
