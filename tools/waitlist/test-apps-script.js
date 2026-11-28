@@ -4,29 +4,35 @@ const fs = require("fs"), path = require("path"), vm = require("vm"), crypto = r
 
 const sent = [], props = {}, fetches = [], cache = {};
 let graphStatus = 202;
-function makeSheet() {
-  const rows = [];   // row 1 = headers
+// Like Sheets: a leading apostrophe marks text and isn't part of the stored value. `raw` keeps what was written.
+const kept = x => (typeof x === "string" && x[0] === "'" ? x.slice(1) : x);
+function makeSheet(name) {
+  const rows = [], raw = [];   // row 1 = headers
   const cell = (r, c) => (rows[r - 1] || [])[c - 1];
   const range = (r, c, nr = 1, nc = 1) => ({
-    setValues(v) { v.forEach((row, i) => row.forEach((x, j) => { (rows[r - 1 + i] ||= [])[c - 1 + j] = x; })); return this; },
-    setValue(v) { (rows[r - 1] ||= [])[c - 1] = v; return this; },
+    setValues(v) { v.forEach((row, i) => { raw.push(row); row.forEach((x, j) => { (rows[r - 1 + i] ||= [])[c - 1 + j] = kept(x); }); }); return this; },
+    setValue(v) { (rows[r - 1] ||= [])[c - 1] = kept(v); return this; },
     getValue() { return cell(r, c); },
     getValues() { return Array.from({ length: nr }, (_, i) => Array.from({ length: nc }, (_, j) => cell(r + i, c + j) ?? "")); },
     setFontWeight() { return this; }, setFontColor() { return this; }, setBackground() { return this; }, setFontFamily() { return this; },
     setVerticalAlignment() { return this; }, setWrap() { return this; }, setNumberFormat() { return this; }, setDataValidation() { return this; },
     applyRowBanding() { return this; },
   });
-  return { rows, getName: () => "Sign-ups", getLastRow: () => rows.length, getMaxRows: () => 1000, getRange: range,
-    appendRow(v) { rows.push(v); }, setRowHeight() {}, setFrozenRows() {}, setColumnWidth() {}, setConditionalFormatRules() {}, getBandings: () => [1] };
+  return { rows, raw, getName: () => name, getLastRow: () => rows.length, getMaxRows: () => 1000, getRange: range,
+    appendRow(v) { raw.push(v); rows.push(v.map(kept)); }, setRowHeight() {}, setFrozenRows() {}, setColumnWidth() {},
+    setConditionalFormatRules() {}, getBandings: () => [1] };
 }
-const sheet = makeSheet();
+const sheets = { "Sign-ups": makeSheet("Sign-ups") };
+const sheet = sheets["Sign-ups"];
+const book = { rename() {}, getSheetByName: n => sheets[n] || null, insertSheet: n => (sheets[n] = makeSheet(n)),
+               getSheets: () => Object.values(sheets), deleteSheet(sh) { delete sheets[sh.getName()]; } };
 const ctx = {
   console,
   Logger: { log() {} },
   PropertiesService: { getScriptProperties: () => ({ getProperty: k => props[k] || null, setProperty: (k, v) => { props[k] = v; } }) },
   SpreadsheetApp: {
-    openById: id => ({ rename() {}, getSheetByName: () => sheet, insertSheet: () => sheet, getSheets: () => [sheet], deleteSheet() {} }),
-    getActiveSpreadsheet: () => ({ rename() {}, getSheetByName: () => sheet, insertSheet: () => sheet, getSheets: () => [sheet], deleteSheet() {} }),
+    openById: id => book,
+    getActiveSpreadsheet: () => book,
     newDataValidation: () => ({ requireValueInList() { return this; }, build() { return {}; } }),
     newConditionalFormatRule: () => ({ whenTextEqualTo() { return this; }, setFontColor() { return this; }, setBackground() { return this; }, setRanges() { return this; }, build() { return {}; } }),
     BandingTheme: { LIGHT_GREY: 1 },
@@ -35,6 +41,7 @@ const ctx = {
     getUuid: () => crypto.randomUUID(),
     computeHmacSha256Signature: (v, k) => Array.from(crypto.createHmac("sha256", k).update(v).digest()),
     base64EncodeWebSafe: b => Buffer.from(b).toString("base64").replace(/\+/g, "-").replace(/\//g, "_"),
+    formatDate: (d, tz, f) => (f === "yyyy-MM-dd" ? new Date(d).toISOString().slice(0, 10) : "Sat 28 Nov 2026, 10:15"),
   },
   MailApp: { sendEmail: o => sent.push(o), getRemainingDailyQuota: () => 99 },
   ScriptApp: { getService: () => ({ getUrl: () => "https://script.google.com/macros/s/TEST/exec" }) },
@@ -108,6 +115,97 @@ assert.strictEqual(post({ action: "send", to: "jane@example.com", subject: "x", 
 post({ type: "INSERT", record: { email: "x@y.co", area: "<b>Hi</b>", topics: [], frequency: "weekly" } });
 assert.ok(sent[2].htmlBody.includes("&lt;b&gt;Hi&lt;/b&gt;") && sent[2].htmlBody.includes("Fridays"));
 
+// ---- contact form: a message is logged, emailed to Toby with Reply-To the sender, and confirmed to the sender
+const isDate = v => Object.prototype.toString.call(v) === "[object Date]";
+const today = new Date().toISOString().slice(0, 10);
+const msg = { id: 1, created_at: "2026-11-28T10:15:00Z", name: "Jane Smith", email: "jane@office.example",
+              organisation: "Office of Jane Smith MS", topic: "conversation",
+              message: "Hello.\nCould we talk about <your> tool?", from_page: "product" };
+const contact = (rec, token) => post({ type: "INSERT", table: "contact_messages", schema: "public", record: rec, old_record: null }, token);
+let n0 = sent.length;
+assert.deepStrictEqual(contact(msg), { ok: true, logged: true, emailed: true });
+const ms = sheets["Messages"];
+assert.ok(ms, "Messages sheet created on the first message");
+assert.deepStrictEqual(ms.rows[0], ["Received", "Name", "Email", "Organisation", "About", "Message", "Came from", "Status", "Emailed to you", "Confirmation"]);
+let mr = ms.rows[1];
+assert.ok(isDate(mr[0]));
+assert.deepStrictEqual(mr.slice(1, 8), ["Jane Smith", "jane@office.example", "Office of Jane Smith MS", "An early conversation",
+                                        "Hello.\nCould we talk about <your> tool?", "product", "New"]);
+assert.ok(isDate(mr[8]) && isDate(mr[9]), "email and confirmation times recorded");
+assert.strictEqual(sent.length, n0 + 2);
+const note = sent[n0], ack = sent[n0 + 1];
+assert.strictEqual(note.to, "toby@eglurtech.com");
+assert.strictEqual(note.replyTo, "jane@office.example", "replying answers the sender");
+assert.strictEqual(note.name, "Eglur website");
+assert.strictEqual(note.subject, "Website message from Jane Smith (Office of Jane Smith MS)");
+assert.ok(note.htmlBody.includes("Hello.<br>Could we talk about &lt;your&gt; tool?"), "message escaped, line breaks kept");
+assert.ok(note.htmlBody.includes("eglurtech.com/product") && note.htmlBody.includes("An early conversation"));
+assert.ok(note.htmlBody.includes('href="mailto:jane@office.example"'));
+assert.ok(!note.htmlBody.includes("Unsubscribe") && note.htmlBody.includes("Sent by the contact form"));
+assert.ok(note.body.includes("Could we talk about <your> tool?") && note.body.includes("Organisation: Office of Jane Smith MS"));
+assert.strictEqual(ack.to, "jane@office.example");
+assert.strictEqual(ack.replyTo, "toby@eglurtech.com");
+assert.strictEqual(ack.name, "Eglur");
+assert.strictEqual(ack.subject, "We got your message");
+assert.ok(ack.htmlBody.includes("Thanks for getting in touch") && ack.htmlBody.includes("If that wasn't you"));
+for (const bit of ["Jane", "Smith", "Could we talk", "Office of"]) {
+  assert.ok(!ack.htmlBody.includes(bit) && !ack.body.includes(bit), `the confirmation carries none of the sender's words (${bit})`);
+}
+
+// a second message from the same address: Toby still gets it; no second confirmation within six hours
+n0 = sent.length;
+contact({ ...msg, message: "One more thing." });
+assert.strictEqual(sent.length, n0 + 1);
+assert.strictEqual(sent[n0].to, "toby@eglurtech.com");
+assert.strictEqual(ms.rows[2][9], "Not sent: one already went to this address in the last six hours");
+
+// text that looks like a formula is kept as text, in messages and in sign-ups
+contact({ ...msg, email: "f@x.example", name: '=HYPERLINK("http://evil.example","x")', organisation: "+44 1234", message: "=IMPORTXML(A1)" });
+let fr = ms.raw[ms.raw.length - 1];
+assert.ok(fr[1].startsWith("'=") && fr[3].startsWith("'+") && fr[5].startsWith("'="), "formulas neutralised");
+assert.strictEqual(ms.rows[ms.rows.length - 1][5], "=IMPORTXML(A1)", "and shown exactly as written");
+post({ type: "INSERT", table: "waitlist", record: { email: "g@x.example", area: "=1+1", topics: [], places: "@x", frequency: "daily" } });
+fr = sheet.raw[sheet.raw.length - 1];
+assert.ok(fr[2] === "'=1+1" && fr[5] === "'@x", "sign-ups get the same protection");
+
+// bad or incomplete records are refused, and nothing is sent
+n0 = sent.length;
+const rowsBefore = ms.rows.length;
+for (const bad of [{ email: "a@b.co\nBcc: x@y.z" }, { email: "x@y.co, z@w.co" }, { email: "<x@y.co>" }, { name: "  " }, { message: "" }]) {
+  assert.deepStrictEqual(contact({ ...msg, ...bad }), { ok: false, error: "incomplete message" }, JSON.stringify(bad));
+}
+assert.strictEqual(sent.length, n0); assert.strictEqual(ms.rows.length, rowsBefore);
+// a line break in a name can't reach the subject line
+contact({ ...msg, email: "h@x.example", name: "Bob\r\nBcc: x@y.z" });
+assert.strictEqual(sent[sent.length - 2].subject, "Website message from Bob Bcc: x@y.z (Office of Jane Smith MS)");
+// unauthorised posts are refused
+assert.deepStrictEqual(contact(msg, "wrong"), { ok: false, error: "unauthorised" });
+
+// switches and limits
+props.CONTACT_ACK = "off";
+contact({ ...msg, email: "i@x.example" });
+assert.strictEqual(ms.rows[ms.rows.length - 1][9], "Not sent: switched off");
+delete props.CONTACT_ACK;
+props.CONTACT_ACKS = JSON.stringify({ day: today, n: 20 });
+contact({ ...msg, email: "j@x.example" });
+assert.strictEqual(ms.rows[ms.rows.length - 1][9], "Not sent: daily limit reached");
+delete props.CONTACT_ACKS;
+props.CONTACT_NOTIFIED = JSON.stringify({ day: today, n: 60 });
+n0 = sent.length;
+assert.deepStrictEqual(contact({ ...msg, email: "k@x.example" }), { ok: true, logged: true, emailed: false });
+assert.ok(String(ms.rows[ms.rows.length - 1][8]).startsWith("Failed: not emailed"), "kept in the sheet when the day's limit is used");
+assert.ok(!sent.slice(n0).some(e => e.to === "toby@eglurtech.com"));
+props.CONTACT_NOTIFIED = JSON.stringify({ day: "2000-01-01", n: 60 });   // a new day resets the count
+contact({ ...msg, email: "l@x.example" });
+assert.ok(isDate(ms.rows[ms.rows.length - 1][8]));
+props.CONTACT_TO = "hello@eglurtech.com";
+contact({ ...msg, email: "m@x.example" });
+assert.ok(sent.some(e => e.to === "hello@eglurtech.com" && e.replyTo === "m@x.example"), "CONTACT_TO changes where messages go");
+delete props.CONTACT_TO;
+// re-running setup keeps the Messages sheet
+call("setup");
+assert.ok(sheets["Messages"] && sheets["Messages"].rows.length > 5);
+
 // ---- Microsoft 365: once the MS_* properties are set, mail goes from monitor@eglurtech.com via Graph
 Object.assign(props, { MS_TENANT_ID: "tenant-1", MS_CLIENT_ID: "client-1", MS_CLIENT_SECRET: "secret-1" });
 const gmailBefore = sent.length;
@@ -136,6 +234,13 @@ graphStatus = 403;
 post({ type: "INSERT", record: { email: "fail@example.com", area: "SA65", topics: [], frequency: "daily" } });
 assert.ok(String(sheet.rows[sheet.rows.length - 1][9]).startsWith("Failed: Microsoft send failed (403)"));
 graphStatus = 202;
+// contact messages go the same way, with Reply-To the sender
+contact({ ...msg, email: "graph@x.example" });
+const gm = fetches.filter(f => f.url.includes("graph.microsoft.com")).slice(-2).map(f => JSON.parse(f.opts.payload).message);
+assert.strictEqual(gm[0].toRecipients[0].emailAddress.address, "toby@eglurtech.com");
+assert.strictEqual(gm[0].replyTo[0].emailAddress.address, "graph@x.example");
+assert.strictEqual(gm[1].toRecipients[0].emailAddress.address, "graph@x.example");
+assert.strictEqual(gm[1].replyTo[0].emailAddress.address, "toby@eglurtech.com");
 // testSend works from the editor
 call("testSend");
 assert.strictEqual(JSON.parse(fetches[fetches.length - 1].opts.payload).message.toRecipients[0].emailAddress.address, "eglurtech@gmail.com");
@@ -143,5 +248,7 @@ assert.strictEqual(JSON.parse(fetches[fetches.length - 1].opts.payload).message.
 if (process.argv[2]) {
   fs.mkdirSync(process.argv[2], { recursive: true });
   fs.writeFileSync(path.join(process.argv[2], "welcome.html"), w.htmlBody);
+  fs.writeFileSync(path.join(process.argv[2], "contact-to-you.html"), note.htmlBody);
+  fs.writeFileSync(path.join(process.argv[2], "contact-confirmation.html"), ack.htmlBody);
 }
 console.log("apps-script: all checks passed");
