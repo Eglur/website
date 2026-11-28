@@ -68,6 +68,8 @@ a:hover{color:var(--ink)}
 .nav-list a::after{content:"";position:absolute;left:50%;bottom:-5px;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--teal);transform:scale(0);transition:transform .35s var(--ease)}
 .nav-list a:hover,.nav-list a.here,.nav-list a[aria-current="page"]{color:var(--ink)}
 .nav-list a.here::after,.nav-list a[aria-current="page"]::after{transform:scale(1)}
+.nav-lang{display:inline-block;padding:6px 0;font-size:15px;color:var(--ink-2);text-decoration:none;white-space:nowrap;border-radius:2px}
+.nav-lang:hover{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 
 /* phone menu: a disclosure that works without script */
 .menu{display:none;position:static}
@@ -145,6 +147,7 @@ figure{margin:0}
 /* mission */
 .mission{padding:128px 0 120px}
 .mission-title{max-width:15ch;margin:24px 0 32px;font-size:clamp(44px,6.2vw,84px);line-height:1;letter-spacing:-.022em}
+.mission-title:lang(cy){max-width:18ch}   /* Welsh words run longer */
 .mission .big{max-width:52ch;font-size:clamp(19px,1.8vw,22px);line-height:1.55;color:var(--t2)}
 .commit{display:grid;grid-template-columns:repeat(3,1fr);gap:48px;margin-top:104px}
 .commit>div{padding-top:24px;border-top:1px solid rgba(252,255,254,.3)}
@@ -559,7 +562,7 @@ textarea.inp{min-height:184px;resize:vertical}
 }
 @media (max-width:900px){
   :root{--pad:24px}
-  .nav-list,.nav-cta{display:none}
+  .nav-list,.nav-cta,.nav-lang{display:none}
   .menu{display:block}
   .hero{padding:80px 0 48px}
   .hero.sub{padding-bottom:56px}
